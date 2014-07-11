@@ -30,6 +30,7 @@
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="30dp"
+                    android:onClick="onClick"
                     android:src="@drawable/talk_icon" />
 
                 <ImageView
