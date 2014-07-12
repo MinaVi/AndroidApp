@@ -37,6 +37,7 @@
                     android:id="@+id/ar_icon"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
+                    android:onClick="onClick"
                     android:src="@drawable/ar_icon" />
             </TableRow>
 

@@ -54,24 +54,43 @@ public final class R {
         public static final int waku_n=0x7f02001e;
     }
     public static final class id {
-        public static final int action_settings=0x7f08000d;
-        public static final int ar_icon=0x7f080002;
-        public static final int back_area=0x7f08000c;
-        public static final int imageView1=0x7f080009;
-        public static final int imageView2=0x7f08000b;
-        public static final int imageView3=0x7f08000a;
-        public static final int map_icon=0x7f080004;
-        public static final int setting_icon=0x7f080005;
-        public static final int tableRow1=0x7f080003;
-        public static final int tableRow2=0x7f080000;
-        public static final int talk_icon=0x7f080001;
-        public static final int talk_name=0x7f080007;
-        public static final int talk_words=0x7f080008;
-        public static final int title_image=0x7f080006;
+        public static final int action_settings=0x7f08001f;
+        public static final int ar_icon=0x7f080014;
+        public static final int azimuth=0x7f080001;
+        public static final int back_area=0x7f08001e;
+        public static final int camera=0x7f080010;
+        public static final int frame=0x7f08000f;
+        public static final int geo=0x7f080007;
+        public static final int imageView1=0x7f080019;
+        public static final int imageView2=0x7f08001b;
+        public static final int imageView3=0x7f08001a;
+        public static final int lblAzimuth=0x7f080000;
+        public static final int lblPitch=0x7f080002;
+        public static final int lblRoll=0x7f080004;
+        public static final int lbl_geo=0x7f080006;
+        public static final int lbl_log=0x7f080008;
+        public static final int lbl_pre_azimuth=0x7f08000c;
+        public static final int lbl_prov=0x7f08000a;
+        public static final int location_button=0x7f08000e;
+        public static final int log=0x7f080009;
+        public static final int map_icon=0x7f080016;
+        public static final int overlay=0x7f080011;
+        public static final int pitch=0x7f080003;
+        public static final int prevAzimuth=0x7f08000d;
+        public static final int provider=0x7f08000b;
+        public static final int roll=0x7f080005;
+        public static final int setting_icon=0x7f080017;
+        public static final int tableRow1=0x7f080015;
+        public static final int tableRow2=0x7f080012;
+        public static final int talk_icon=0x7f080013;
+        public static final int talk_name=0x7f08001c;
+        public static final int talk_words=0x7f08001d;
+        public static final int title_image=0x7f080018;
     }
     public static final class layout {
-        public static final int activity_main=0x7f030000;
-        public static final int activity_talk=0x7f030001;
+        public static final int activity_ar=0x7f030000;
+        public static final int activity_main=0x7f030001;
+        public static final int activity_talk=0x7f030002;
     }
     public static final class menu {
         public static final int main=0x7f070000;
