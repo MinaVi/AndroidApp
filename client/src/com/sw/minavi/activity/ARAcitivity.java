@@ -162,8 +162,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		String desc = location.getLongitude() + ", " + location.getLatitude();
 		geoText.setText(desc);
 
-		Toast.makeText(ARAcitivity.this, desc, Toast.LENGTH_SHORT)
-				.show();
+		Toast.makeText(ARAcitivity.this, desc, Toast.LENGTH_SHORT).show();
 
 		// 表示情報の一覧を取得(当該座標の直近のデータのみ)
 		values = LocalItemTableManager.getInstance(helper).GetRecords();
@@ -205,24 +204,46 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			int direction = LocationUtilities.getDirection(curLat, curLon,
 					val.getLat(), val.getLon());
 
-			// 方位角±60以内の範囲にあるか判定
-			boolean azimuthOK = false;
-			if (azimuth + 60 > 359) {
-				boolean okFlag1 = (direction >= azimuth - 60)
-						&& (direction <= 359);
-				boolean okFlag2 = (direction >= 0)
-						&& (direction <= ((azimuth + 60) - 359));
-				azimuthOK = okFlag1 && okFlag2;
+			int allowAngleOfView = 60; // 画角
 
-			} else if (azimuth - 60 < 0) {
-				boolean okFlag1 = (direction <= azimuth + 60)
-						&& (direction >= 0);
-				boolean okFlag2 = (direction <= 359)
-						&& (direction >= (359 - (60 - azimuth)));
-				azimuthOK = okFlag1 && okFlag2;
+			// 方位角±allowAngleOfView以内の範囲にあるか判定
+			boolean azimuthOK = false;
+			if (azimuth + allowAngleOfView > 359) {
+				// 反時計回りの方向に許容角度を加算した結果、1回転するケース
+
+				// 0度～N度の範囲内にあるか
+				int zeroOverLimit = azimuth + allowAngleOfView - 359;
+				boolean okFlag1 = (0 <= direction)
+						&& (direction <= zeroOverLimit);
+
+				// N度～359度の範囲内にあるか
+				int lowLimit = azimuth - allowAngleOfView;
+				boolean okFlag2 = (lowLimit <= direction) && (direction <= 359);
+
+				// どちらかの条件を満たしていれば範囲内とみなす
+				azimuthOK = okFlag1 || okFlag2;
+
+			} else if (azimuth - allowAngleOfView < 0) {
+				// 時計回りの方向に許容角度を減算した結果、1回転するケース
+
+				// N度～359殿範囲内にあるか
+				int maxUnderLimit = azimuth - allowAngleOfView + 359;
+				boolean okFlag1 = (maxUnderLimit <= direction)
+						&& (direction <= 359);
+
+				// 0度～N度の範囲内にあるか
+				int zeroOverLimit = azimuth + allowAngleOfView;
+				boolean okFlag2 = (0 <= direction)
+						&& (direction <= zeroOverLimit);
+
+				// どちらかの条件を満たしていれば範囲内とみなす
+				azimuthOK = okFlag1 || okFlag2;
+
 			} else {
-				azimuthOK = (direction >= azimuth - 60)
-						&& (direction <= azimuth + 60);
+
+				int maxLimit = azimuth + allowAngleOfView;
+				int minLimit = azimuth - allowAngleOfView;
+				azimuthOK = (minLimit <= direction) && (direction <= maxLimit);
 			}
 
 			// 当該座標とイベントの距離が10[m]以内であるか判定
@@ -405,8 +426,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		return rLayoutParams;
 	}
 
-	public PinButton createPiButton(LocalItem item, int azimuth,
-			float distance) {
+	public PinButton createPiButton(LocalItem item, int azimuth, float distance) {
 
 		int useImage = R.drawable.exclamation;
 		if (item.getId() % 2 == 0) {
