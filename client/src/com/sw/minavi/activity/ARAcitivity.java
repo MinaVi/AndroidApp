@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
@@ -247,7 +248,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			}
 
 			// 当該座標とイベントの距離が10[m]以内であるか判定
-			boolean distanceOK = distance <= 10;
+			boolean distanceOK = distance <= 1000;
 
 			// 描画許可・不許可問わず利用するので、このタイミングでピンを作成
 			PinButton pin = createPiButton(val, direction, distance);
@@ -447,13 +448,18 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			@Override
 			public void onClick(View v) {
 				PinButton pin = (PinButton) v;
-
-				String showMessage = String.format(
-						"%s(id:%s, 経度:%s,緯度:%s, 方位角:%s,当該座標との距離:%s[m])",
-						new Object[] { pin.message, pin.id, pin.lon, pin.lat,
-								pin.azimuth, pin.distance });
-				Toast.makeText(ARAcitivity.this, showMessage,
-						Toast.LENGTH_SHORT).show();
+//
+//				String showMessage = String.format(
+//						"%s(id:%s, 経度:%s,緯度:%s, 方位角:%s,当該座標との距離:%s[m])",
+//						new Object[] { pin.message, pin.id, pin.lon, pin.lat,
+//								pin.azimuth, pin.distance });
+//				Toast.makeText(ARAcitivity.this, showMessage,
+//						Toast.LENGTH_SHORT).show();
+				
+		        Intent intent=new Intent();
+		        intent.setClassName("com.sw.minavi","com.sw.minavi.activity.TalkActivity");
+		        intent.putExtra("id", pin.id);
+		        startActivity(intent);
 			}
 		});
 		return btn;
