@@ -54,20 +54,21 @@ public final class R {
         public static final int waku_n=0x7f02001e;
     }
     public static final class id {
-        public static final int action_settings=0x7f080024;
-        public static final int answerTextFirstView=0x7f080020;
-        public static final int answerTextForthView=0x7f080023;
-        public static final int answerTextSecondView=0x7f080021;
-        public static final int answerTextThirdView=0x7f080022;
-        public static final int answer_area=0x7f08001f;
+        public static final int action_settings=0x7f080025;
+        public static final int answerTextFirstView=0x7f080021;
+        public static final int answerTextForthView=0x7f080024;
+        public static final int answerTextSecondView=0x7f080022;
+        public static final int answerTextThirdView=0x7f080023;
+        public static final int answer_area=0x7f080020;
         public static final int ar_icon=0x7f080014;
         public static final int azimuth=0x7f080001;
-        public static final int back_area=0x7f08001c;
+        public static final int back_area=0x7f08001d;
         public static final int back_image=0x7f080019;
         public static final int camera=0x7f080010;
         public static final int chara_image_left=0x7f08001a;
+        public static final int chara_image_right=0x7f08001b;
         public static final int frame=0x7f08000f;
-        public static final int frame_image=0x7f08001b;
+        public static final int frame_image=0x7f08001c;
         public static final int geo=0x7f080007;
         public static final int lblAzimuth=0x7f080000;
         public static final int lblPitch=0x7f080002;
@@ -79,7 +80,7 @@ public final class R {
         public static final int location_button=0x7f08000e;
         public static final int log=0x7f080009;
         public static final int map_icon=0x7f080016;
-        public static final int nameText=0x7f08001d;
+        public static final int nameText=0x7f08001e;
         public static final int overlay=0x7f080011;
         public static final int pitch=0x7f080003;
         public static final int prevAzimuth=0x7f08000d;
@@ -88,7 +89,7 @@ public final class R {
         public static final int setting_icon=0x7f080017;
         public static final int tableRow1=0x7f080015;
         public static final int tableRow2=0x7f080012;
-        public static final int talkText=0x7f08001e;
+        public static final int talkText=0x7f08001f;
         public static final int talk_icon=0x7f080013;
         public static final int title_image=0x7f080018;
     }

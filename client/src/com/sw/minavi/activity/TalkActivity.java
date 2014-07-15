@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sw.minavi.R;
-import com.sw.minavi.beans.TalkBeans;
+import com.sw.minavi.activity.beans.TalkBeans;
 
 public class TalkActivity extends Activity implements OnClickListener {
 
@@ -28,6 +28,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 	private ImageView backImage;
 	private ImageView charaImageLeft;
+	private ImageView charaImageRight;
 
 	private ArrayList<TalkBeans> talkTexts = new ArrayList<TalkBeans>();
 	private int textCount = 0;
@@ -65,6 +66,10 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 		backImage = (ImageView) findViewById(R.id.back_image);
 		charaImageLeft = (ImageView) findViewById(R.id.chara_image_left);
+		charaImageRight = (ImageView) findViewById(R.id.chara_image_right);
+		
+		//charaImageLeft.setVisibility(View.GONE);
+		charaImageRight.setVisibility(View.GONE);
 
 		pinId = getIntent().getExtras().getInt("pinId");
 
@@ -143,13 +148,24 @@ public class TalkActivity extends Activity implements OnClickListener {
 			textCount = 0;
 			nameTextView.setText("naviko");
 			talkTextView.setText("end");
+			if (talkTexts.get(textCount).getPosition() == 0) {
+				charaImageLeft.setImageResource(talkTexts.get(textCount).getImageId());
+			} else {
+				charaImageRight.setVisibility(View.VISIBLE);
+				charaImageRight.setImageResource(talkTexts.get(textCount).getImageId());
+			}
 			
 			// test
 			setTestTexts();
 		} else {
 			nameTextView.setText("naviko");
 			talkTextView.setText(talkTexts.get(textCount).getFirstTalkStr());
-			charaImageLeft.setImageResource(talkTexts.get(textCount).getImageId());
+			if (talkTexts.get(textCount).getPosition() == 0) {
+				charaImageLeft.setImageResource(talkTexts.get(textCount).getImageId());
+			} else {
+				charaImageRight.setImageResource(talkTexts.get(textCount).getImageId());
+				charaImageRight.setVisibility(View.VISIBLE);
+			}
 			textCount = textCount + 1;
 		}
 	}
@@ -168,6 +184,8 @@ public class TalkActivity extends Activity implements OnClickListener {
 		int pos = 0;
 		TalkBeans beans = null;
 
+		charaImageRight.setVisibility(View.GONE);
+
 		// test
 		id = getResources().getIdentifier("nomal_n", "drawable", getPackageName());
 		type = 0;
@@ -175,8 +193,8 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 		// とりあえずランダム
 		Random rnd = new Random();
-		int ran = rnd.nextInt(3) + 1;
-		int caseNum = ran % 3;
+		int ran = rnd.nextInt(4) + 1;
+		int caseNum = ran % 4;
 
 		if (pinId > 0) {
 			// 分岐フラグ
@@ -366,6 +384,36 @@ public class TalkActivity extends Activity implements OnClickListener {
 			id = getResources().getIdentifier("nomal_n", "drawable", getPackageName());
 			beans = new TalkBeans(str1, id, type, pos);
 			answerTextsForth.add(beans);
+		}else if(caseNum == 3){
+			
+			str1 = "ミナです！";
+			beans = new TalkBeans(str1, id, type, pos);
+			talkTexts.add(beans);
+			
+			str1 = "ナミです！";
+			id = getResources().getIdentifier("t_smile_n", "drawable", getPackageName());
+			beans = new TalkBeans(str1, id, type, 1);
+			talkTexts.add(beans);
+			
+			str1 = "二人合わせて！";
+			id = getResources().getIdentifier("smile_n", "drawable", getPackageName());
+			beans = new TalkBeans(str1, id, type, pos);
+			talkTexts.add(beans);
+			
+			str1 = "…え、なにそれ？";
+			id = getResources().getIdentifier("t_nomal_n", "drawable", getPackageName());
+			beans = new TalkBeans(str1, id, type, 1);
+			talkTexts.add(beans);
+			
+			str1 = "あれ？ナミちゃんノリ悪いよ～；";
+			id = getResources().getIdentifier("bewilder_n", "drawable", getPackageName());
+			beans = new TalkBeans(str1, id, type, pos);
+			talkTexts.add(beans);
+			
+			str1 = "無茶ぶりすぎ！";
+			id = getResources().getIdentifier("t_embarrass_n", "drawable", getPackageName());
+			beans = new TalkBeans(str1, id, type, 1);
+			talkTexts.add(beans);
 		}
 	}
 
