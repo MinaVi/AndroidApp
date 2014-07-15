@@ -458,7 +458,8 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				
 		        Intent intent=new Intent();
 		        intent.setClassName("com.sw.minavi","com.sw.minavi.activity.TalkActivity");
-		        intent.putExtra("id", pin.id);
+		        intent.putExtra("pinId", pin.id);
+		        intent.putExtra("areaId", 0);
 		        startActivity(intent);
 			}
 		});

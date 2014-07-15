@@ -42,6 +42,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		// TODO Auto-generated method stub
 		if (v.getId() == R.id.talk_icon) {
 			Intent intent = new Intent(this, TalkActivity.class);
+			intent.putExtra("pinId", 0);
+			intent.putExtra("areaId", 0);
 			startActivity(intent);
 		} else if (v.getId() == R.id.ar_icon) {
 			Intent intent = new Intent(this, ARAcitivity.class);

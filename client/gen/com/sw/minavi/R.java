@@ -63,12 +63,12 @@ public final class R {
         public static final int ar_icon=0x7f080014;
         public static final int azimuth=0x7f080001;
         public static final int back_area=0x7f08001c;
+        public static final int back_image=0x7f080019;
         public static final int camera=0x7f080010;
+        public static final int chara_image_left=0x7f08001a;
         public static final int frame=0x7f08000f;
+        public static final int frame_image=0x7f08001b;
         public static final int geo=0x7f080007;
-        public static final int imageView1=0x7f080019;
-        public static final int imageView2=0x7f08001b;
-        public static final int imageView3=0x7f08001a;
         public static final int lblAzimuth=0x7f080000;
         public static final int lblPitch=0x7f080002;
         public static final int lblRoll=0x7f080004;
