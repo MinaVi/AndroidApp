@@ -55,18 +55,18 @@ public class LocalItemTableManager {
 
 		// サンプルデータの準備
 		String[][] datas = new String[][] {
-				{ "1", "message1", "139.701334", "35.658512", "auther1", "20130701000000" },
-				{ "2", "message2", "139.701331", "35.658513", "auther2", "20130701000000" },
-				{ "3", "message3", "139.701337", "35.658513", "auther3", "20130701000000" },
-				{ "4", "message4", "139.701340", "35.658522", "auther4", "20130701000000" },
-				{ "5", "message5", "139.701334", "35.658523", "auther5", "20130701000000" },
-				{ "6", "Version2", "141.347506", "43.060656", "auther6", "20130701000000" },
-				{ "7", "北大１", "141.343930", "43.072635", "auther1", "20130701000000" },
-				{ "8", "北大２", "141.344041", "43.072680", "auther2", "20130701000000" },
-				{ "9", "北大３", "141.343842", "43.072588", "auther3", "20130701000000" },
-				{ "10", "北大４", "139.701340", "35.658522", "auther4", "20130701000000" },
-				{ "11", "北大５", "139.701334", "35.658523", "auther5", "20130701000000" },
-				{ "12", "北大６", "139.701329", "35.658521", "auther6", "20130701000000" },
+				{ "1", "message1", "139.701334", "35.658512", "question", "auther1", "20130701000000" },
+				{ "2", "message2", "139.701331", "35.658513", "question", "auther2", "20130701000000" },
+				{ "3", "message3", "139.701337", "35.658513", "question", "auther3", "20130701000000" },
+				{ "4", "message4", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
+				{ "5", "message5", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
+				{ "6", "Version2", "141.347506", "43.060656", "question", "auther6", "20130701000000" },
+				{ "7", "北大１", "141.343930", "43.072635", "question", "auther1", "20130701000000" },
+				{ "8", "北大２", "141.344041", "43.072680", "question", "auther2", "20130701000000" },
+				{ "9", "北大３", "141.343842", "43.072588", "question", "auther3", "20130701000000" },
+				{ "10", "北大４", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
+				{ "11", "北大５", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
+				{ "12", "大通り", "141.347702", "43.059936", "smile_n", "auther6", "20130701000000" },
 		};
 
 		// 書き込み用のDBオブジェクトを取得
@@ -86,8 +86,9 @@ public class LocalItemTableManager {
 				values.put(LocalItemTable.message.getName(), data[1]);
 				values.put(LocalItemTable.lon.getName(), data[2]);
 				values.put(LocalItemTable.lat.getName(), data[3]);
-				values.put(LocalItemTable.auther.getName(), data[4]);
-				values.put(LocalItemTable.createTime.getName(), data[5]);
+				values.put(LocalItemTable.ar_image_name.getName(), data[4]);
+				values.put(LocalItemTable.auther.getName(), data[5]);
+				values.put(LocalItemTable.createTime.getName(), data[6]);
 
 				// insert
 				sqliteDB.insert(Tables.localItemTable.getName(), null, values);
@@ -128,6 +129,7 @@ public class LocalItemTableManager {
 				val.setMessage(cursor.getString(LocalItemTable.message.getColNo()));
 				val.setLon(Double.valueOf(cursor.getString(LocalItemTable.lon.getColNo())).doubleValue());
 				val.setLat(Double.valueOf(cursor.getString(LocalItemTable.lat.getColNo())).doubleValue());
+				val.setArImageName(cursor.getString(LocalItemTable.ar_image_name.getColNo()));
 				val.setAuther(cursor.getString(LocalItemTable.auther.getColNo()));
 				val.setCreateTime(cursor.getString(LocalItemTable.createTime.getColNo()));
 

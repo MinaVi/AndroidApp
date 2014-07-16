@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,6 +87,11 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		// Sampleの登録
 		helper = new DatabaseOpenHelper(this);
 		LocalItemTableManager.getInstance(helper).InsertSample();
+
+		// デバック時に表示
+		TableLayout textViewLayer = (TableLayout) findViewById(R.id.text_view_layer);
+		textViewLayer.setVisibility(View.GONE);
+
 	}
 
 	@Override
@@ -255,13 +261,29 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 
 			if (distanceOK && azimuthOK) {
 				// 描画許可
-
 				// 既に登録済みのアイテムは追加しない(座標が移動してしまうため)
 				FrameLayout.LayoutParams layotParams = getRdmMrgnLayout();
+
+				// 表示画像のサイズ修正
+				// リソースからbitmapを作成
+				Bitmap image = BitmapFactory.decodeResource(getResources(),
+						getResources().getIdentifier(val.getArImageName(), "drawable", getPackageName()));
+
+				if (image != null) {
+					// 画像サイズ取得
+					int width = image.getWidth();
+					int height = image.getHeight();
+
+					layotParams.width = width;
+					layotParams.height = height;
+					
+				}
+				
 				if (!dispItemSet.contains(pin)) {
 					// frameLayout.addView(pin, pin.getId(), layotParams);
 					// dispItemSet.add(pin);
 				}
+				
 				addItemList.add(new Pair<PinButton, FrameLayout.LayoutParams>(
 						pin, layotParams));
 			}
@@ -283,6 +305,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 						pin.getId()));
 				// 描画対象ボタンの内、新しいボタンは新規に描画
 				frameLayout.addView(pin, pin.getId(), layotParams);
+
 				dispItemSet.add(pin);
 			}
 		}
@@ -429,10 +452,8 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 
 	public PinButton createPiButton(LocalItem item, int azimuth, float distance) {
 
-		int useImage = R.drawable.exclamation;
-		if (item.getId() % 2 == 0) {
-			useImage = R.drawable.question;
-		}
+		int useImage = getResources()
+				.getIdentifier(String.valueOf(item.getArImageName()), "drawable", getPackageName());
 
 		PinButton btn = new PinButton(this);
 		btn.setImageResource(useImage);
@@ -448,19 +469,19 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			@Override
 			public void onClick(View v) {
 				PinButton pin = (PinButton) v;
-//
-//				String showMessage = String.format(
-//						"%s(id:%s, 経度:%s,緯度:%s, 方位角:%s,当該座標との距離:%s[m])",
-//						new Object[] { pin.message, pin.id, pin.lon, pin.lat,
-//								pin.azimuth, pin.distance });
-//				Toast.makeText(ARAcitivity.this, showMessage,
-//						Toast.LENGTH_SHORT).show();
-				
-		        Intent intent=new Intent();
-		        intent.setClassName("com.sw.minavi","com.sw.minavi.activity.TalkActivity");
-		        intent.putExtra("pinId", pin.id);
-		        intent.putExtra("areaId", 0);
-		        startActivity(intent);
+				//
+				//				String showMessage = String.format(
+				//						"%s(id:%s, 経度:%s,緯度:%s, 方位角:%s,当該座標との距離:%s[m])",
+				//						new Object[] { pin.message, pin.id, pin.lon, pin.lat,
+				//								pin.azimuth, pin.distance });
+				//				Toast.makeText(ARAcitivity.this, showMessage,
+				//						Toast.LENGTH_SHORT).show();
+
+				Intent intent = new Intent();
+				intent.setClassName("com.sw.minavi", "com.sw.minavi.activity.TalkActivity");
+				intent.putExtra("pinId", pin.id);
+				intent.putExtra("areaId", 0);
+				startActivity(intent);
 			}
 		});
 		return btn;

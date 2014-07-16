@@ -5,6 +5,7 @@ public class LocalItem {
 	private String message;
 	private double lon;
 	private double lat;
+	private String arImageName;
 	private String auther;
 	private String createTime;
 
@@ -40,6 +41,14 @@ public class LocalItem {
 		this.lat = lat;
 	}
 
+	public String getArImageName() {
+		return arImageName;
+	}
+
+	public void setArImageName(String arImageName) {
+		this.arImageName = arImageName;
+	}
+	
 	public String getAuther() {
 		return this.auther;
 	}

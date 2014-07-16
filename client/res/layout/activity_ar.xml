@@ -5,6 +5,7 @@
     android:orientation="horizontal" >
 
     <TableLayout
+        android:id="@+id/text_view_layer"
         android:layout_width="169dp"
         android:layout_height="match_parent" >
 

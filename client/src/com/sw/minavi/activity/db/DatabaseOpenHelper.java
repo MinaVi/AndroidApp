@@ -62,8 +62,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		lon ("lon", 2),
 		/** テーブル項目:lat */
 		lat ("lat", 3),
-		/** テーブル項目:image_path */
-		image_path ("image_path", 4),
+		/** テーブル項目:ar_image_name */
+		ar_image_name ("ar_image_name", 4),
 		/** テーブル項目:auther */
 		auther ("auther", 5),
 		/** テーブル項目:createTime */
@@ -145,7 +145,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.message.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.lon.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.lat.getName(), "text", })).append(",");
-			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { LocalItemTable.image_path.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { LocalItemTable.ar_image_name.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { LocalItemTable.auther.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.createTime.getName(), "text", }));
 			createSql.append(");");
