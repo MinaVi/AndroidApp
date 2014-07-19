@@ -14,8 +14,17 @@ import android.widget.TextView;
 
 import com.sw.minavi.R;
 import com.sw.minavi.activity.beans.TalkBeans;
+import com.sw.minavi.activity.db.DatabaseOpenHelper;
+import com.sw.minavi.activity.db.TalkEventsTableManager;
+import com.sw.minavi.activity.db.TalkGroupsTableManager;
+import com.sw.minavi.activity.db.TalkSelectsTableManager;
+import com.sw.minavi.item.TalkEvent;
+import com.sw.minavi.item.TalkGroup;
+import com.sw.minavi.item.TalkSelect;
 
 public class TalkActivity extends Activity implements OnClickListener {
+
+	private DatabaseOpenHelper helper;
 
 	private TextView nameTextView;
 	private TextView talkTextView;
@@ -67,7 +76,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 		backImage = (ImageView) findViewById(R.id.back_image);
 		charaImageLeft = (ImageView) findViewById(R.id.chara_image_left);
 		charaImageRight = (ImageView) findViewById(R.id.chara_image_right);
-		
+
 		//charaImageLeft.setVisibility(View.GONE);
 		charaImageRight.setVisibility(View.GONE);
 
@@ -79,8 +88,24 @@ public class TalkActivity extends Activity implements OnClickListener {
 		}
 
 		// test
-		setTestTexts();
+		//setTestTexts();
 
+		// Sampleの登録
+		helper = new DatabaseOpenHelper(this);
+		TalkGroupsTableManager.getInstance(helper).InsertSample();
+		TalkEventsTableManager.getInstance(helper).InsertSample();
+		TalkSelectsTableManager.getInstance(helper).InsertSample();
+
+		// イベントセット
+		ArrayList<TalkGroup> talkGroup = getTalkGroupIds();
+		setTexts(talkGroup);
+
+	}
+
+	// 対象のイベント一覧を取得
+	private ArrayList<TalkGroup> getTalkGroupIds() {
+		ArrayList<TalkGroup> groups = TalkGroupsTableManager.getInstance(helper).GetRecords();
+		return groups;
 	}
 
 	@Override
@@ -154,11 +179,16 @@ public class TalkActivity extends Activity implements OnClickListener {
 				charaImageRight.setVisibility(View.VISIBLE);
 				charaImageRight.setImageResource(talkTexts.get(textCount).getImageId());
 			}
-			
+
 			// test
-			setTestTexts();
+			// setTestTexts();
+			// 次の会話内容セット
+			// イベントセット
+			ArrayList<TalkGroup> talkGroup = getTalkGroupIds();
+			setTexts(talkGroup);
+
 		} else {
-			nameTextView.setText("naviko");
+			nameTextView.setText(talkTexts.get(textCount).getTalkName());
 			talkTextView.setText(talkTexts.get(textCount).getFirstTalkStr());
 			if (talkTexts.get(textCount).getPosition() == 0) {
 				charaImageLeft.setImageResource(talkTexts.get(textCount).getImageId());
@@ -170,6 +200,104 @@ public class TalkActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	private void setTexts(ArrayList<TalkGroup> groups) {
+		talkTexts = new ArrayList<TalkBeans>();
+		answerTexts = new ArrayList<TalkBeans>();
+		answerTextsFirst = new ArrayList<TalkBeans>();
+		answerTextsSecond = new ArrayList<TalkBeans>();
+		answerTextsThird = new ArrayList<TalkBeans>();
+		answerTextsForth = new ArrayList<TalkBeans>();
+		String str1 = "";
+		int firstGroupId = 0;
+		int secondGroupId = 0;
+		int thirdGroupId = 0;
+		int forthGroupId = 0;
+		TalkBeans beans = null;
+
+		charaImageRight.setVisibility(View.GONE);
+
+		// 取得されたグループからランダムで表示
+		Random rnd = new Random();
+		int ran = rnd.nextInt(groups.size());
+		TalkGroup group = groups.get(ran);
+		int groupId = group.getTalkGroupId();
+
+		// 選択されたグループに紐づくイベント取得
+		ArrayList<TalkEvent> talkEvents = TalkEventsTableManager.getInstance(helper).GetRecords(groupId);
+
+		// イベント情報をセット
+		talkTexts = getTalkBeans(talkEvents);
+
+		// 取得されたグループから選択肢情報を取得
+		if (group.getSelectFlg() == 1) {
+			ArrayList<TalkSelect> selects = TalkSelectsTableManager.getInstance(helper).GetRecords(groupId);
+			// 一つしか取れないはず
+			TalkSelect select = selects.get(0);
+			
+			answerCount = select.getAnswerCount();
+			
+			// 選択肢は最低二つ
+			str1 = select.getFirstTalkBody();
+			beans = new TalkBeans(str1, "", 0, 0, 0);
+			answerTexts.add(beans);
+			firstGroupId = select.getFirstTalkGroupId();
+			ArrayList<TalkEvent> firstSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(firstGroupId);
+			answerTextsFirst = getTalkBeans(firstSelectEve);
+
+			str1 = select.getSecondTalkBody();
+			beans = new TalkBeans(str1, "", 0, 0, 0);
+			answerTexts.add(beans);
+			secondGroupId = select.getSecondTalkGroupId();
+			ArrayList<TalkEvent> secondSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(secondGroupId);
+			answerTextsSecond = getTalkBeans(secondSelectEve);
+			
+			if(select.getAnswerCount() > 2){
+				str1 = select.getThirdTalkBody();
+				beans = new TalkBeans(str1, "", 0, 0, 0);
+				answerTexts.add(beans);
+				thirdGroupId = select.getThirdTalkGroupId();
+				ArrayList<TalkEvent> thirdSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(thirdGroupId);
+				answerTextsThird = getTalkBeans(thirdSelectEve);
+			}
+			if(select.getAnswerCount() > 3){
+				str1 = select.getForthTalkBody();
+				beans = new TalkBeans(str1, "", 0, 0, 0);
+				answerTexts.add(beans);
+				forthGroupId = select.getForthTalkGroupId();
+				ArrayList<TalkEvent> forthSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(forthGroupId);
+				answerTextsForth = getTalkBeans(forthSelectEve);
+			}
+			
+			// 分岐後イベントをそれぞれ取得
+			
+			
+		}
+	}
+
+	private ArrayList<TalkBeans> getTalkBeans(ArrayList<TalkEvent> talkEvents){
+		
+		ArrayList<TalkBeans> texts = new ArrayList<TalkBeans>();
+		String str1 = "";
+		String talkName = "";
+		int imageId = 0;
+		int animationType = 0;
+		int pos = 0;
+		TalkBeans beans = null;
+		
+		// イベント情報をセット
+		for (int i = 0; i < talkEvents.size(); i++) {
+			str1 = talkEvents.get(i).getTalkBody();
+			talkName = talkEvents.get(i).getTalkName();
+			imageId = getResources().getIdentifier(talkEvents.get(i).getImageFileName(), "drawable", getPackageName());
+			animationType = talkEvents.get(i).getImageAnimationType();
+			pos = talkEvents.get(i).getImagePositionType();
+			beans = new TalkBeans(str1, talkName, imageId, animationType, pos);
+			texts.add(beans);
+		}
+		
+		return texts;
+	}
+	
 	// テストテキストセット
 	private void setTestTexts() {
 		talkTexts = new ArrayList<TalkBeans>();
@@ -195,226 +323,46 @@ public class TalkActivity extends Activity implements OnClickListener {
 		Random rnd = new Random();
 		int ran = rnd.nextInt(4) + 1;
 		int caseNum = ran % 4;
-
-		if (pinId > 0) {
-			// 分岐フラグ
-			answerCount = 2;
-
-			// YesNo選択
-			str1 = "ここはもしかして、\nVersin2本社じゃないですか？";
-			beans = new TalkBeans(str1, id, type, pos);
-
-			talkTexts.add(beans);
-
-			// 1の場合
-			str1 = "yes";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTexts.add(beans);
-
-			// YesNo選択
-			str1 = "あー…";
-			beans = new TalkBeans(str1, id, type, pos);
-			id = getResources().getIdentifier("chicane_n", "drawable", getPackageName());
-			answerTextsFirst.add(beans);
-
-			str1 = "きっと今日も皆さん、\n苦労なさってるんですね；";
-			beans = new TalkBeans(str1, id, type, pos);
-			id = getResources().getIdentifier("embarrass_n", "drawable", getPackageName());
-			answerTextsFirst.add(beans);
-			// 2の場合
-			str1 = "no";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTexts.add(beans);
-
-			str1 = "あれ、\nおかしいですね…？";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsSecond.add(beans);
-
-			str1 = "…みつびきちゃん\nさぼったな（ボソッ）";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsSecond.add(beans);
-
-		} else if (caseNum == 1) {
-			str1 = "こんにちは！";
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-
-			str1 = "始めまして\nミナと言います。";
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-
-			str1 = "これから北海道を、\n色々案内しますね。";
-			id = getResources().getIdentifier("smile_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-
-			str1 = "よろしくお願いいたします。";
-			id = getResources().getIdentifier("smile_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-
-		} else if (caseNum == 2) {
-			// 分岐フラグ
-			answerCount = 2;
-
-			// YesNo選択
-			str1 = "今日はいい天気ですね～";
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-
-			str1 = "こう天気がいいと\nぶらっと遠出したくなりますよね～";
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-
-			// 1の場合
-			str1 = "yes";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTexts.add(beans);
-
-			str1 = "やっぱりそうですよね～";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsFirst.add(beans);
-
-			str1 = "こんな日は美瑛とか富良野とか\n行きたいですよね～";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsFirst.add(beans);
-
-			// 2の場合
-			str1 = "no";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTexts.add(beans);
-
-			str1 = "あれ、\nもしかしてインドア派ですか？";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsSecond.add(beans);
-
-			str1 = "それとも…実は晴れてると\n思ってるの私だけですか？";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsSecond.add(beans);
-
-		} else if (caseNum == 0) {
-			answerCount = 4;
-			str1 = "ところで質問ですが、";
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-			str1 = "北海道と言えば\n何を連想しますか？";
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-
-			// 1の場合
-			str1 = "大自然";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTexts.add(beans);
-
-
-			str1 = "やはり北海道と言えば\n大自然ですよね！";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsFirst.add(beans);
-
-			str1 = "草原や森林はもとより、\n広大な湿原、";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsFirst.add(beans);
-
-			str1 = "大雪山に代表される山々、";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsFirst.add(beans);
-
-			str1 = "世界遺産にもなった知床半島、";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsFirst.add(beans);
-
-			str1 = "自然の神秘、\n青い池などはとても魅力的ですよね。";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsFirst.add(beans);
-
-			// 2の場合
-			str1 = "おいしい食べ物";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTexts.add(beans);
-
-			str1 = "本当においしいんですよね！\nかにとかうにとか、";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsSecond.add(beans);
-			str1 = "海鮮がやはり有名ですが,\nジンギスカンや鹿肉、";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsSecond.add(beans);
-			str1 = "大自然でとれた農作物も\nとてもおいしいです！";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsSecond.add(beans);
-			str1 = "とてもじゃないですけど\nずっと住んでないと食べきれないほどです！";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsSecond.add(beans);
-
-			// 3の場合
-			str1 = "なまら";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTexts.add(beans);
-
-			str1 = "これは意外なお答えですね？";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsThird.add(beans);
-			str1 = "北海道弁で有名なのは\n「なまら」や「～しょ」ですが、";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsThird.add(beans);
-			str1 = "その他にもいろいろありますので、\nぜひ耳を傾けて探してみてください";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsThird.add(beans);
-			str1 = "あ、北海道かるた等はお土産やさんにもあるので\n一見の価値ありです！";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsThird.add(beans);
-
-			// 4の場合
-			str1 = "なんくるないさー";
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTexts.add(beans);
-			
-			str1 = "えー…っと\nそれは沖縄の方言ですよ。";
-			id = getResources().getIdentifier("bewilder_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsForth.add(beans);
-			str1 = "北海道風にいうと…";
-			id = getResources().getIdentifier("nomal_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsForth.add(beans);
-			str1 = "『なんとかなるっしょ！』";
-			id = getResources().getIdentifier("smile_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsForth.add(beans);
-			str1 = "ですかね～。";
-			id = getResources().getIdentifier("nomal_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, pos);
-			answerTextsForth.add(beans);
-		}else if(caseNum == 3){
-			
-			str1 = "ミナです！";
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-			
-			str1 = "ナミです！";
-			id = getResources().getIdentifier("t_smile_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, 1);
-			talkTexts.add(beans);
-			
-			str1 = "二人合わせて！";
-			id = getResources().getIdentifier("smile_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-			
-			str1 = "…え、なにそれ？";
-			id = getResources().getIdentifier("t_nomal_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, 1);
-			talkTexts.add(beans);
-			
-			str1 = "あれ？ナミちゃんノリ悪いよ～；";
-			id = getResources().getIdentifier("bewilder_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, pos);
-			talkTexts.add(beans);
-			
-			str1 = "無茶ぶりすぎ！";
-			id = getResources().getIdentifier("t_embarrass_n", "drawable", getPackageName());
-			beans = new TalkBeans(str1, id, type, 1);
-			talkTexts.add(beans);
-		}
+		//
+		//		if (pinId > 0) {
+		//			// 分岐フラグ
+		//			answerCount = 2;
+		//
+		//			// YesNo選択
+		//			str1 = "ここはもしかして、\nVersin2本社じゃないですか？";
+		//			beans = new TalkBeans(str1, id, type, pos);
+		//
+		//			talkTexts.add(beans);
+		//
+		//			// 1の場合
+		//			str1 = "yes";
+		//			beans = new TalkBeans(str1, id, type, pos);
+		//			answerTexts.add(beans);
+		//
+		//			// YesNo選択
+		//			str1 = "あー…";
+		//			beans = new TalkBeans(str1, id, type, pos);
+		//			id = getResources().getIdentifier("chicane_n", "drawable", getPackageName());
+		//			answerTextsFirst.add(beans);
+		//
+		//			str1 = "きっと今日も皆さん、\n苦労なさってるんですね；";
+		//			beans = new TalkBeans(str1, id, type, pos);
+		//			id = getResources().getIdentifier("embarrass_n", "drawable", getPackageName());
+		//			answerTextsFirst.add(beans);
+		//			// 2の場合
+		//			str1 = "no";
+		//			beans = new TalkBeans(str1, id, type, pos);
+		//			answerTexts.add(beans);
+		//
+		//			str1 = "あれ、\nおかしいですね…？";
+		//			beans = new TalkBeans(str1, id, type, pos);
+		//			answerTextsSecond.add(beans);
+		//
+		//			str1 = "…みつびきちゃん\nさぼったな（ボソッ）";
+		//			beans = new TalkBeans(str1, id, type, pos);
+		//			answerTextsSecond.add(beans);
+		//
+		//		}
 	}
 
 }
