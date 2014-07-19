@@ -55,11 +55,11 @@ public class TalkGroupsTableManager {
 
 		// サンプルデータの準備
 		String[][] datas = new String[][] {
-				{ "1", "0", "0"},
-				{ "2", "0", "0" },
-				{ "3", "0", "1" },
-				{ "6", "0", "1" },
-				{ "11", "1", "1" },
+				{ "1", "0", "0", "0", "0"},
+				{ "2", "0", "0", "0", "0" },
+				{ "3", "0", "0", "0", "1" },
+				{ "6", "0", "0", "0", "1" },
+				//{ "11", "1", "0", "0", "1" },
 				
 		};
 
@@ -78,6 +78,8 @@ public class TalkGroupsTableManager {
 				ContentValues values = new ContentValues();
 				values.put(TalkGroupsTable.talk_group_id.getName(), data[TalkGroupsTable.talk_group_id.getColNo()]);
 				values.put(TalkGroupsTable.area_id.getName(), data[TalkGroupsTable.area_id.getColNo()]);
+				values.put(TalkGroupsTable.local_area_id.getName(), data[TalkGroupsTable.local_area_id.getColNo()]);
+				values.put(TalkGroupsTable.background_file_name.getName(), data[TalkGroupsTable.background_file_name.getColNo()]);
 				values.put(TalkGroupsTable.select_flg.getName(), data[TalkGroupsTable.select_flg.getColNo()]);
 
 				// insert
@@ -117,6 +119,8 @@ public class TalkGroupsTableManager {
 				TalkGroup val = new TalkGroup();
 				val.setTalkGroupId(cursor.getInt(TalkGroupsTable.talk_group_id.getColNo()));
 				val.setAreaId(cursor.getInt(TalkGroupsTable.area_id.getColNo()));
+				val.setLocalAreaId(cursor.getInt(TalkGroupsTable.local_area_id.getColNo()));
+				val.setBackGroundFileName(cursor.getString(TalkGroupsTable.background_file_name.getColNo()));
 				val.setSelectFlg(cursor.getInt(TalkGroupsTable.select_flg.getColNo()));
 				
 

@@ -57,6 +57,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 	// ARからのIDを格納
 	private int pinId = 0;
 	private int areaId = 0;
+	private int arTalkGroupId = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,8 @@ public class TalkActivity extends Activity implements OnClickListener {
 			// 背景を特殊背景に変える
 			backImage.setImageResource(getResources().getIdentifier("aoiike", "drawable", getPackageName()));
 		}
+
+		arTalkGroupId = getIntent().getExtras().getInt("talkGroupId");
 
 		// test
 		//setTestTexts();
@@ -216,12 +219,21 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 		charaImageRight.setVisibility(View.GONE);
 
-		// 取得されたグループからランダムで表示
-		Random rnd = new Random();
-		int ran = rnd.nextInt(groups.size());
-		TalkGroup group = groups.get(ran);
-		int groupId = group.getTalkGroupId();
-
+		// ARからの遷移の場合、優先的に表示する。
+		int groupId = 0;
+		TalkGroup group = null;
+		if (arTalkGroupId != 0) {
+			groupId = arTalkGroupId;
+			group = groups.get(groupId);
+			// 次回以降は通常通り
+			arTalkGroupId = 0;
+		} else {
+			// 取得されたグループからランダムで表示
+			Random rnd = new Random();
+			int ran = rnd.nextInt(groups.size());
+			group = groups.get(ran);
+			groupId = group.getTalkGroupId();
+		}
 		// 選択されたグループに紐づくイベント取得
 		ArrayList<TalkEvent> talkEvents = TalkEventsTableManager.getInstance(helper).GetRecords(groupId);
 
@@ -233,9 +245,9 @@ public class TalkActivity extends Activity implements OnClickListener {
 			ArrayList<TalkSelect> selects = TalkSelectsTableManager.getInstance(helper).GetRecords(groupId);
 			// 一つしか取れないはず
 			TalkSelect select = selects.get(0);
-			
+
 			answerCount = select.getAnswerCount();
-			
+
 			// 選択肢は最低二つ
 			str1 = select.getFirstTalkBody();
 			beans = new TalkBeans(str1, "", 0, 0, 0);
@@ -250,32 +262,33 @@ public class TalkActivity extends Activity implements OnClickListener {
 			secondGroupId = select.getSecondTalkGroupId();
 			ArrayList<TalkEvent> secondSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(secondGroupId);
 			answerTextsSecond = getTalkBeans(secondSelectEve);
-			
-			if(select.getAnswerCount() > 2){
+
+			if (select.getAnswerCount() > 2) {
 				str1 = select.getThirdTalkBody();
 				beans = new TalkBeans(str1, "", 0, 0, 0);
 				answerTexts.add(beans);
 				thirdGroupId = select.getThirdTalkGroupId();
-				ArrayList<TalkEvent> thirdSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(thirdGroupId);
+				ArrayList<TalkEvent> thirdSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(
+						thirdGroupId);
 				answerTextsThird = getTalkBeans(thirdSelectEve);
 			}
-			if(select.getAnswerCount() > 3){
+			if (select.getAnswerCount() > 3) {
 				str1 = select.getForthTalkBody();
 				beans = new TalkBeans(str1, "", 0, 0, 0);
 				answerTexts.add(beans);
 				forthGroupId = select.getForthTalkGroupId();
-				ArrayList<TalkEvent> forthSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(forthGroupId);
+				ArrayList<TalkEvent> forthSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(
+						forthGroupId);
 				answerTextsForth = getTalkBeans(forthSelectEve);
 			}
-			
+
 			// 分岐後イベントをそれぞれ取得
-			
-			
+
 		}
 	}
 
-	private ArrayList<TalkBeans> getTalkBeans(ArrayList<TalkEvent> talkEvents){
-		
+	private ArrayList<TalkBeans> getTalkBeans(ArrayList<TalkEvent> talkEvents) {
+
 		ArrayList<TalkBeans> texts = new ArrayList<TalkBeans>();
 		String str1 = "";
 		String talkName = "";
@@ -283,7 +296,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 		int animationType = 0;
 		int pos = 0;
 		TalkBeans beans = null;
-		
+
 		// イベント情報をセット
 		for (int i = 0; i < talkEvents.size(); i++) {
 			str1 = talkEvents.get(i).getTalkBody();
@@ -294,10 +307,10 @@ public class TalkActivity extends Activity implements OnClickListener {
 			beans = new TalkBeans(str1, talkName, imageId, animationType, pos);
 			texts.add(beans);
 		}
-		
+
 		return texts;
 	}
-	
+
 	// テストテキストセット
 	private void setTestTexts() {
 		talkTexts = new ArrayList<TalkBeans>();

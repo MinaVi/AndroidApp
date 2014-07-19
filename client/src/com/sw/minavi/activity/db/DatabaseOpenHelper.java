@@ -27,7 +27,10 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		talkEventsTable ("talk_events_tbl", 2),
 
 		/** talk_selects_tblの定義情報 */
-		talkSelectsTable ("talk_selects_tbl", 3);
+		talkSelectsTable ("talk_selects_tbl", 3),
+		
+		/** settings_tblの定義情報 */
+		settingsTable ("settings_tbl", 4);
 
 		/** テーブル名称 */
 		private final String name;
@@ -65,18 +68,20 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public enum LocalItemTable {
 		/** テーブル項目:id */
 		id ("id", 0),
+		/** テーブル項目:talk_group_id */
+		talk_group_id ("talk_group_id", 1),
 		/** テーブル項目:message */
-		message ("message", 1),
+		message ("message", 2),
 		/** テーブル項目:lon */
-		lon ("lon", 2),
+		lon ("lon", 3),
 		/** テーブル項目:lat */
-		lat ("lat", 3),
+		lat ("lat", 4),
 		/** テーブル項目:ar_image_name */
-		ar_image_name ("ar_image_name", 4),
+		ar_image_name ("ar_image_name", 5),
 		/** テーブル項目:auther */
-		auther ("auther", 5),
+		auther ("auther", 6),
 		/** テーブル項目:createTime */
-		createTime ("createTime", 6);
+		createTime ("createTime", 7);
 
 		/** 項目名称 */
 		private final String name;
@@ -116,8 +121,12 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		talk_group_id ("talk_group_id", 0),
 		/** テーブル項目:area_id */
 		area_id ("area_id", 1),
+		/** テーブル項目:local_area_id */
+		local_area_id ("local_area_id", 2),
+		/** テーブル項目:background_file_name */
+		background_file_name ("background_file_name", 3),
 		/** テーブル項目:select_flg */
-		select_flg ("select_flg", 2);
+		select_flg ("select_flg", 4);
 
 		/** 項目名称 */
 		private final String name;
@@ -150,6 +159,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			return colNo;
 		}
 	}
+
 	
 	/** local_item_tblの定義情報 */
 	public enum TalkEventsTable {
@@ -257,6 +267,46 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	/** SettingsTableの定義情報 */
+	public enum SettingsTable {
+		/** テーブル項目:setting_id */
+		setting_id ("setting_id", 0),
+		/** テーブル項目:key */
+		key ("key", 1),
+		/** テーブル項目:value */
+		value ("value", 1);
+
+		/** 項目名称 */
+		private final String name;
+		/** 項目番号 */
+		private final int colNo;
+
+		/**
+		 * コンストラクタ
+		 * @param name 項目名称
+		 * @param colNo 項目番号
+		 */
+		private SettingsTable(String name, int colNo) {
+			this.name = name;
+			this.colNo = colNo;
+		}
+
+		/**
+		 * 項目名称を取得します
+		 * @return 項目名称
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * 項目番号を取得します
+		 * @return 項目番号
+		 */
+		public int getColNo() {
+			return colNo;
+		}
+	}
 	
 	/**
 	 * コンストラクタ
@@ -294,11 +344,23 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		db.beginTransaction();
 
 		try {
+			
+			// talk_groups_tbleを作成
+			StringBuilder createSql = new StringBuilder();
+			createSql.append(String.format(SQL_CREATE_TBL, new Object[] { Tables.settingsTable.getName() }));
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PRIMARYS, new Object[] { SettingsTable.setting_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { SettingsTable.key.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { SettingsTable.value.getName(), "integer", }));
+			createSql.append(");");
+
+			// SQLの発行
+			db.execSQL(createSql.toString());
 
 			// local_item_tblを作成
-			StringBuilder createSql = new StringBuilder();
+			createSql = new StringBuilder();
 			createSql.append(String.format(SQL_CREATE_TBL, new Object[] { Tables.localItemTable.getName() }));
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PRIMARYS, new Object[] { LocalItemTable.id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.talk_group_id.getName(), "integer", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.message.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.lon.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.lat.getName(), "text", })).append(",");
@@ -315,6 +377,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			createSql.append(String.format(SQL_CREATE_TBL, new Object[] { Tables.talkGroupsTable.getName() }));
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PRIMARYS, new Object[] { TalkGroupsTable.talk_group_id.getName(), "integer", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.area_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.local_area_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { TalkGroupsTable.background_file_name.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.select_flg.getName(), "integer", }));
 			createSql.append(");");
 

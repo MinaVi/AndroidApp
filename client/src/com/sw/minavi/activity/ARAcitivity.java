@@ -445,8 +445,10 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		FrameLayout.LayoutParams rLayoutParams = new FrameLayout.LayoutParams(
 				imgWidth, imgHeight);
 		rLayoutParams.gravity = Gravity.NO_GRAVITY;
-		rLayoutParams.setMargins(rdmWidth, rdmHeight, 0, 0);
-
+		//rLayoutParams.setMargins(rdmWidth, rdmHeight, 0, 0);
+		
+		// TODO　調整中
+		rLayoutParams.setMargins(200, 100, 0, 0);	// XperiaA用
 		return rLayoutParams;
 	}
 
@@ -459,6 +461,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		btn.setImageResource(useImage);
 		btn.message = item.getMessage();
 		btn.id = item.getId();
+		btn.talkGroupId = item.getTalkGroupId();
 		btn.lon = String.valueOf(item.getLon());
 		btn.lat = String.valueOf(item.getLat());
 		btn.azimuth = String.valueOf(azimuth);
@@ -481,6 +484,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				intent.setClassName("com.sw.minavi", "com.sw.minavi.activity.TalkActivity");
 				intent.putExtra("pinId", pin.id);
 				intent.putExtra("areaId", 0);
+				intent.putExtra("talkGroupId", pin.talkGroupId);
 				startActivity(intent);
 			}
 		});

@@ -44,6 +44,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			Intent intent = new Intent(this, TalkActivity.class);
 			intent.putExtra("pinId", 0);
 			intent.putExtra("areaId", 0);
+			intent.putExtra("talk_group_id", 0);
 			startActivity(intent);
 		} else if (v.getId() == R.id.ar_icon) {
 			Intent intent = new Intent(this, ARAcitivity.class);
