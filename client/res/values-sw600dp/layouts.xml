@@ -1,0 +1,3 @@
+<resources>
+    <item name="activity_talk" type="layout">@layout/activity_talk_nexus7_2013</item>
+</resources>

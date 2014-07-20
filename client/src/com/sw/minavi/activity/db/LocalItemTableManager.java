@@ -61,12 +61,32 @@ public class LocalItemTableManager {
 				{ "4","1", "message4", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
 				{ "5","1", "message5", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
 				{ "6","1", "Version2", "141.347506", "43.060656", "question", "auther6", "20130701000000" },
-				{ "7","1", "北大１", "141.343930", "43.072635", "smile_n", "auther1", "20130701000000" },
-				{ "8","1", "北大２", "141.344041", "43.072680", "question", "auther2", "20130701000000" },
-				{ "9","1", "北大３", "141.343842", "43.072588", "smile_n", "auther3", "20130701000000" },
-				{ "10","1", "北大４", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
-				{ "11","1", "北大５", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
+				{ "7","11", "北大１", "141.343930", "43.072635", "smile_n", "auther1", "20130701000000" },
+				{ "8","11", "北大２", "141.344041", "43.072680", "question", "auther2", "20130701000000" },
+				{ "9","11", "北大３", "141.343842", "43.072588", "smile_n", "auther3", "20130701000000" },
+				{ "10","11", "北大４", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
+				{ "11","11", "北大５", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
 				{ "12","1", "大通り", "141.347702", "43.059936", "smile_n", "auther6", "20130701000000" },
+				//{ "13","11", "麻生", "141.338918", "43.107020", "chitoge", "auther6", "20130701000000" },
+				
+				// 猿払村道の駅
+				//{ "14","13", "豊富温泉", "141.840295", "45.07146,", "chitoge", "auther6", "20130701000000" },
+				//{ "15","14", "温泉", "141.840273", "45.074233", "buraito", "auther6", "20130701000000" },
+				// テスト
+				{ "14","13", "豊富温泉", "141.840295", "45.07146", "chitoge", "auther6", "20130701000000" },
+				{ "15","14", "温泉", "141.840273", "45.074233", "buraito", "auther6", "20130701000000" },
+				{ "16","15", "温泉", "141.840273", "45.074233", "yan", "auther6", "20130701000000" },
+				
+				// 宗谷岬
+//				{ "16","15", "猿払村道の駅クイズ", "141.338320", "43.106800", "t_nomal_n", "auther6", "20130701000000" },
+				
+				
+				
+				// とよとみ温泉
+//				{ "17","17", "温泉", "141.338918", "43.059936", "yan", "auther6", "20130701000000" },
+//				{ "18","18", "豊富温泉", "141.338320", "43.106800", "rurusy", "auther6", "20130701000000" },
+				
+				
 		};
 
 		// 書き込み用のDBオブジェクトを取得
@@ -127,7 +147,7 @@ public class LocalItemTableManager {
 				// LocalItemの生成・編集
 				LocalItem val = new LocalItem();
 				val.setId(cursor.getInt(LocalItemTable.id.getColNo()));
-				val.setId(cursor.getInt(LocalItemTable.talk_group_id.getColNo()));
+				val.setTalkGroupId(cursor.getInt(LocalItemTable.talk_group_id.getColNo()));
 				val.setMessage(cursor.getString(LocalItemTable.message.getColNo()));
 				val.setLon(Double.valueOf(cursor.getString(LocalItemTable.lon.getColNo())).doubleValue());
 				val.setLat(Double.valueOf(cursor.getString(LocalItemTable.lat.getColNo())).doubleValue());

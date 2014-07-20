@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -448,7 +449,9 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		//rLayoutParams.setMargins(rdmWidth, rdmHeight, 0, 0);
 		
 		// TODO　調整中
-		rLayoutParams.setMargins(200, 100, 0, 0);	// XperiaA用
+		// ランダムに配置
+		Random rdm = new Random();
+		rLayoutParams.setMargins(100 + rdm.nextInt(700)+100, 100, 0, 0);	// XperiaA用
 		return rLayoutParams;
 	}
 
@@ -461,7 +464,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		btn.setImageResource(useImage);
 		btn.message = item.getMessage();
 		btn.id = item.getId();
-		btn.talkGroupId = item.getTalkGroupId();
+		btn.talk_group_id = item.getTalkGroupId();
 		btn.lon = String.valueOf(item.getLon());
 		btn.lat = String.valueOf(item.getLat());
 		btn.azimuth = String.valueOf(azimuth);
@@ -483,9 +486,9 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				Intent intent = new Intent();
 				intent.setClassName("com.sw.minavi", "com.sw.minavi.activity.TalkActivity");
 				intent.putExtra("pinId", pin.id);
-				intent.putExtra("areaId", 0);
-				intent.putExtra("talkGroupId", pin.talkGroupId);
+				intent.putExtra("talkGroupId", pin.talk_group_id);
 				startActivity(intent);
+				finish();
 			}
 		});
 		return btn;

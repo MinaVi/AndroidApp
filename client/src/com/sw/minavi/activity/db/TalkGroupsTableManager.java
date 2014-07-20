@@ -59,7 +59,17 @@ public class TalkGroupsTableManager {
 				{ "2", "0", "0", "0", "0" },
 				{ "3", "0", "0", "0", "1" },
 				{ "6", "0", "0", "0", "1" },
-				//{ "11", "1", "0", "0", "1" },
+				
+				// 地域システム周辺
+				{ "11", "1", "0", "0", "0" },
+				{ "12", "1", "0", "0", "0" },
+				
+				// 猿払道の駅
+				{ "13", "2", "0", "hoteltoyotomi", "0" },
+				{ "14", "2", "0", "onsen", "0" },
+				{ "15", "2", "0", "hoteltoyotomi", "0" },
+				
+				
 				
 		};
 
@@ -111,6 +121,45 @@ public class TalkGroupsTableManager {
 		try {
 			// select
 			cursor = sqliteDB.rawQuery("select * from talk_groups_tbl", null);
+
+			// 取得したデータをレコード毎に処理する
+			while (cursor.moveToNext()) {
+
+				// TalkGroupsTableの生成・編集
+				TalkGroup val = new TalkGroup();
+				val.setTalkGroupId(cursor.getInt(TalkGroupsTable.talk_group_id.getColNo()));
+				val.setAreaId(cursor.getInt(TalkGroupsTable.area_id.getColNo()));
+				val.setLocalAreaId(cursor.getInt(TalkGroupsTable.local_area_id.getColNo()));
+				val.setBackGroundFileName(cursor.getString(TalkGroupsTable.background_file_name.getColNo()));
+				val.setSelectFlg(cursor.getInt(TalkGroupsTable.select_flg.getColNo()));
+				
+
+				// 戻り値のリストに追加
+				values.add(val);
+			}
+		} finally {
+			// DBクローズ
+			sqliteDB.close();
+		}
+		return values;
+	}
+	
+	/**
+	 * 以下の条件に該当するlocal_item_tblのレコードをList形式で取得する<br/>
+	 * ・抽出項目：指定なし<br/>
+	 * ・抽出条件：指定なし<br/>
+	 * @return
+	 */
+	public ArrayList<TalkGroup> GetRecordsByAreaId(int areaId) {
+		ArrayList<TalkGroup> values = new ArrayList<TalkGroup>();
+		Cursor cursor = null;
+
+		// 読み込み用のDBオブジェクトを取得
+		SQLiteDatabase sqliteDB = helper.getReadableDatabase();
+
+		try {
+			// select
+			cursor = sqliteDB.rawQuery("SELECT * FROM talk_groups_tbl WHERE area_id = ?", new String[]{String.valueOf(areaId)});
 
 			// 取得したデータをレコード毎に処理する
 			while (cursor.moveToNext()) {

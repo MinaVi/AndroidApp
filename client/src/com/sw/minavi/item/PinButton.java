@@ -6,7 +6,7 @@ import android.widget.ImageButton;
 public class PinButton extends ImageButton {
 
 	public int id = 0;
-	public int talkGroupId = 0;
+	public int talk_group_id = 0;
 	public String message = "";
 	public String lon = "";
 	public String lat = "";

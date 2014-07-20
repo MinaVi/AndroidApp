@@ -83,11 +83,6 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 		pinId = getIntent().getExtras().getInt("pinId");
 
-		if (pinId > 0) {
-			// 背景を特殊背景に変える
-			backImage.setImageResource(getResources().getIdentifier("aoiike", "drawable", getPackageName()));
-		}
-
 		arTalkGroupId = getIntent().getExtras().getInt("talkGroupId");
 
 		// test
@@ -107,7 +102,14 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 	// 対象のイベント一覧を取得
 	private ArrayList<TalkGroup> getTalkGroupIds() {
-		ArrayList<TalkGroup> groups = TalkGroupsTableManager.getInstance(helper).GetRecords();
+
+		ArrayList<TalkGroup> groups = null;
+		if (areaId > 0) {
+			groups = TalkGroupsTableManager.getInstance(helper).GetRecordsByAreaId(areaId);
+		} else {
+			groups = TalkGroupsTableManager.getInstance(helper).GetRecords();
+		}
+
 		return groups;
 	}
 
@@ -188,6 +190,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 			// 次の会話内容セット
 			// イベントセット
 			ArrayList<TalkGroup> talkGroup = getTalkGroupIds();
+			charaImageRight.setVisibility(View.GONE);
 			setTexts(talkGroup);
 
 		} else {
@@ -224,7 +227,24 @@ public class TalkActivity extends Activity implements OnClickListener {
 		TalkGroup group = null;
 		if (arTalkGroupId != 0) {
 			groupId = arTalkGroupId;
-			group = groups.get(groupId);
+
+			// 取得されたグループから対象のグループを選択
+			for (int i = 0; i < groups.size(); i++) {
+				if(groups.get(i).getTalkGroupId() == arTalkGroupId){
+
+					group = groups.get(i);
+					break;
+					
+				}
+			}
+
+			if (group.getBackGroundFileNmae() != null && group.getBackGroundFileNmae().length() > 0) {
+				// 背景を特殊背景に変える
+				backImage.setImageResource(getResources().getIdentifier(group.getBackGroundFileNmae(), "drawable", getPackageName()));
+			}
+
+			// エリアが指定されている場合は、エリア情報のみ
+			areaId = group.getAreaId();
 			// 次回以降は通常通り
 			arTalkGroupId = 0;
 		} else {
@@ -310,72 +330,4 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 		return texts;
 	}
-
-	// テストテキストセット
-	private void setTestTexts() {
-		talkTexts = new ArrayList<TalkBeans>();
-		answerTextsFirst = new ArrayList<TalkBeans>();
-		answerTextsSecond = new ArrayList<TalkBeans>();
-		answerTextsThird = new ArrayList<TalkBeans>();
-		answerTextsForth = new ArrayList<TalkBeans>();
-		answerTexts = new ArrayList<TalkBeans>();
-		String str1 = "";
-		int id = 0;
-		int type = 0;
-		int pos = 0;
-		TalkBeans beans = null;
-
-		charaImageRight.setVisibility(View.GONE);
-
-		// test
-		id = getResources().getIdentifier("nomal_n", "drawable", getPackageName());
-		type = 0;
-		pos = 0;
-
-		// とりあえずランダム
-		Random rnd = new Random();
-		int ran = rnd.nextInt(4) + 1;
-		int caseNum = ran % 4;
-		//
-		//		if (pinId > 0) {
-		//			// 分岐フラグ
-		//			answerCount = 2;
-		//
-		//			// YesNo選択
-		//			str1 = "ここはもしかして、\nVersin2本社じゃないですか？";
-		//			beans = new TalkBeans(str1, id, type, pos);
-		//
-		//			talkTexts.add(beans);
-		//
-		//			// 1の場合
-		//			str1 = "yes";
-		//			beans = new TalkBeans(str1, id, type, pos);
-		//			answerTexts.add(beans);
-		//
-		//			// YesNo選択
-		//			str1 = "あー…";
-		//			beans = new TalkBeans(str1, id, type, pos);
-		//			id = getResources().getIdentifier("chicane_n", "drawable", getPackageName());
-		//			answerTextsFirst.add(beans);
-		//
-		//			str1 = "きっと今日も皆さん、\n苦労なさってるんですね；";
-		//			beans = new TalkBeans(str1, id, type, pos);
-		//			id = getResources().getIdentifier("embarrass_n", "drawable", getPackageName());
-		//			answerTextsFirst.add(beans);
-		//			// 2の場合
-		//			str1 = "no";
-		//			beans = new TalkBeans(str1, id, type, pos);
-		//			answerTexts.add(beans);
-		//
-		//			str1 = "あれ、\nおかしいですね…？";
-		//			beans = new TalkBeans(str1, id, type, pos);
-		//			answerTextsSecond.add(beans);
-		//
-		//			str1 = "…みつびきちゃん\nさぼったな（ボソッ）";
-		//			beans = new TalkBeans(str1, id, type, pos);
-		//			answerTextsSecond.add(beans);
-		//
-		//		}
-	}
-
 }
