@@ -55,27 +55,31 @@ public class LocalItemTableManager {
 
 		// サンプルデータの準備
 		String[][] datas = new String[][] {
-				{ "1","1", "message1", "139.701334", "35.658512", "question", "auther1", "20130701000000" },
-				{ "2","1", "message2", "139.701331", "35.658513", "question", "auther2", "20130701000000" },
-				{ "3","1", "message3", "139.701337", "35.658513", "question", "auther3", "20130701000000" },
-				{ "4","1", "message4", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
-				{ "5","1", "message5", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
-				{ "6","1", "Version2", "141.347506", "43.060656", "question", "auther6", "20130701000000" },
-				{ "7","11", "北大１", "141.343930", "43.072635", "smile_n", "auther1", "20130701000000" },
-				{ "8","11", "北大２", "141.344041", "43.072680", "question", "auther2", "20130701000000" },
-				{ "9","11", "北大３", "141.343842", "43.072588", "smile_n", "auther3", "20130701000000" },
-				{ "10","11", "北大４", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
-				{ "11","11", "北大５", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
-				{ "12","1", "大通り", "141.347702", "43.059936", "smile_n", "auther6", "20130701000000" },
+//				{ "1","1", "message1", "139.701334", "35.658512", "question", "auther1", "20130701000000" },
+//				{ "2","1", "message2", "139.701331", "35.658513", "question", "auther2", "20130701000000" },
+//				{ "3","1", "message3", "139.701337", "35.658513", "question", "auther3", "20130701000000" },
+//				{ "4","1", "message4", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
+//				{ "5","1", "message5", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
+//				{ "6","1", "Version2", "141.347506", "43.060656", "question", "auther6", "20130701000000" },
+//				{ "7","11", "北大１", "141.343930", "43.072635", "smile_n", "auther1", "20130701000000" },
+//				{ "8","11", "北大２", "141.344041", "43.072680", "question", "auther2", "20130701000000" },
+//				{ "9","11", "北大３", "141.343842", "43.072588", "smile_n", "auther3", "20130701000000" },
+//				{ "10","11", "北大４", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
+//				{ "11","11", "北大５", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
+//				{ "12","1", "大通り", "141.347702", "43.059936", "smile_n", "auther6", "20130701000000" },
 				//{ "13","11", "麻生", "141.338918", "43.107020", "chitoge", "auther6", "20130701000000" },
 				
 				// 猿払村道の駅
-				//{ "14","13", "豊富温泉", "141.840295", "45.07146,", "chitoge", "auther6", "20130701000000" },
-				//{ "15","14", "温泉", "141.840273", "45.074233", "buraito", "auther6", "20130701000000" },
+//				{ "14","13", "豊富温泉", "141.840295", "45.07146,", "chitoge", "auther6", "20130701000000" },
+//				{ "15","14", "温泉", "141.840273", "45.074233", "buraito", "auther6", "20130701000000" },
 				// テスト
-				{ "14","13", "豊富温泉", "141.840295", "45.07146", "chitoge", "auther6", "20130701000000" },
-				{ "15","14", "温泉", "141.840273", "45.074233", "buraito", "auther6", "20130701000000" },
-				{ "16","15", "温泉", "141.840273", "45.074233", "yan", "auther6", "20130701000000" },
+//				{ "14","13", "豊富温泉", "141.840295", "45.07146", "chitoge", "auther6", "20130701000000" },
+//				{ "15","14", "温泉", "141.840273", "45.074233", "buraito", "auther6", "20130701000000" },
+//				{ "16","15", "温泉", "141.840273", "45.074233", "yan", "auther6", "20130701000000" },
+				
+				// 原生花園
+				{ "17","13","0", "原生花園", "141.685969", "45.104496", "chitoge", "auther6", "20130701000000" },
+				{ "18","15","0", "原生花園センター", "141.705174", "45.111871", "yan", "auther6", "20130701000000" },
 				
 				// 宗谷岬
 //				{ "16","15", "猿払村道の駅クイズ", "141.338320", "43.106800", "t_nomal_n", "auther6", "20130701000000" },
@@ -104,12 +108,13 @@ public class LocalItemTableManager {
 				ContentValues values = new ContentValues();
 				values.put(LocalItemTable.id.getName(), data[0]);
 				values.put(LocalItemTable.talk_group_id.getName(), data[1]);
-				values.put(LocalItemTable.message.getName(), data[2]);
-				values.put(LocalItemTable.lon.getName(), data[3]);
-				values.put(LocalItemTable.lat.getName(), data[4]);
-				values.put(LocalItemTable.ar_image_name.getName(), data[5]);
-				values.put(LocalItemTable.auther.getName(), data[6]);
-				values.put(LocalItemTable.createTime.getName(), data[7]);
+				values.put(LocalItemTable.story_group_id.getName(), data[2]);
+				values.put(LocalItemTable.message.getName(), data[3]);
+				values.put(LocalItemTable.lon.getName(), data[4]);
+				values.put(LocalItemTable.lat.getName(), data[5]);
+				values.put(LocalItemTable.ar_image_name.getName(), data[6]);
+				values.put(LocalItemTable.auther.getName(), data[7]);
+				values.put(LocalItemTable.createTime.getName(), data[8]);
 
 				// insert
 				sqliteDB.insert(Tables.localItemTable.getName(), null, values);
@@ -148,6 +153,7 @@ public class LocalItemTableManager {
 				LocalItem val = new LocalItem();
 				val.setId(cursor.getInt(LocalItemTable.id.getColNo()));
 				val.setTalkGroupId(cursor.getInt(LocalItemTable.talk_group_id.getColNo()));
+				val.setStoryGroupId(cursor.getInt(LocalItemTable.story_group_id.getColNo()));
 				val.setMessage(cursor.getString(LocalItemTable.message.getColNo()));
 				val.setLon(Double.valueOf(cursor.getString(LocalItemTable.lon.getColNo())).doubleValue());
 				val.setLat(Double.valueOf(cursor.getString(LocalItemTable.lat.getColNo())).doubleValue());

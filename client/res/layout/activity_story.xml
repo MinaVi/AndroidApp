@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.00" >
+
+        <ImageView
+            android:id="@+id/back_image"
+            android:layout_width="match_parent"
+            android:layout_height="378dp"
+            android:layout_marginTop="50dp"
+            android:layout_weight="0.00"
+            android:scaleType="fitXY"
+            android:src="@drawable/menu_back" />
+
+        <ImageView
+            android:id="@+id/chara_image_left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            android:layout_marginRight="100dp"
+            android:layout_marginTop="100dp"
+            android:src="@drawable/nomal_n" />
+
+        <ImageView
+            android:id="@+id/chara_image_right"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="100dp"
+            android:src="@drawable/t_nomal_n" />
+
+        <ImageView
+            android:id="@+id/frame_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.00"
+            android:scaleType="fitXY"
+            android:src="@drawable/talk_back" />
+
+        <LinearLayout
+            android:id="@+id/back_area"
+            android:layout_width="83dp"
+            android:layout_height="57dp"
+            android:layout_marginLeft="250dp"
+            android:onClick="onClick"
+            android:orientation="vertical" >
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/nameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="390dp"
+            android:text="Na"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/talkText"
+            android:layout_width="288dp"
+            android:layout_height="49dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="420dp"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:text="hoge"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:id="@+id/answer_area"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/answerTextFirstView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:text="Large Text"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/answerTextSecondView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:text="Large Text"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/answerTextThirdView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:text="Large Text"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/answerTextForthView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:text="Large Text"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

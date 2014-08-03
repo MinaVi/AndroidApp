@@ -65,7 +65,7 @@ public class TalkGroupsTableManager {
 				{ "12", "1", "0", "0", "0" },
 				
 				// 猿払道の駅
-				{ "13", "2", "0", "hoteltoyotomi", "0" },
+				{ "13", "2", "0", "sarobetu", "0" },
 				{ "14", "2", "0", "onsen", "0" },
 				{ "15", "2", "0", "hoteltoyotomi", "0" },
 				

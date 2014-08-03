@@ -30,7 +30,17 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		talkSelectsTable ("talk_selects_tbl", 3),
 		
 		/** settings_tblの定義情報 */
-		settingsTable ("settings_tbl", 4);
+		settingsTable ("settings_tbl", 4),
+
+		/** story_groups_tblの定義情報 */
+		storyGroupsTable ("story_groups_tbl", 5),
+
+		/** story_events_tblの定義情報 */
+		storyEventsTable ("story_events_tbl", 6),
+
+		/** story_selects_tblの定義情報 */
+		storySelectsTable ("story_selects_tbl", 7);
+		
 
 		/** テーブル名称 */
 		private final String name;
@@ -70,18 +80,20 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		id ("id", 0),
 		/** テーブル項目:talk_group_id */
 		talk_group_id ("talk_group_id", 1),
+		/** テーブル項目:story_group_id */
+		story_group_id ("story_group_id", 2),
 		/** テーブル項目:message */
-		message ("message", 2),
+		message ("message", 3),
 		/** テーブル項目:lon */
-		lon ("lon", 3),
+		lon ("lon", 4),
 		/** テーブル項目:lat */
-		lat ("lat", 4),
+		lat ("lat", 5),
 		/** テーブル項目:ar_image_name */
-		ar_image_name ("ar_image_name", 5),
+		ar_image_name ("ar_image_name", 6),
 		/** テーブル項目:auther */
-		auther ("auther", 6),
+		auther ("auther", 7),
 		/** テーブル項目:createTime */
-		createTime ("createTime", 7);
+		createTime ("createTime", 8);
 
 		/** 項目名称 */
 		private final String name;
@@ -308,6 +320,162 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		}
 	}
 	
+	
+	/** talk_groups_tblの定義情報 */
+	public enum StoryGroupsTable {
+		/** テーブル項目:story_group_id */
+		story_group_id ("story_group_id", 0),
+		/** テーブル項目:area_id */
+		area_id ("area_id", 1),
+		/** テーブル項目:local_area_id */
+		local_area_id ("local_area_id", 2),
+		/** テーブル項目:background_file_name */
+		background_file_name ("background_file_name", 3),
+		/** テーブル項目:select_flg */
+		select_flg ("select_flg", 4),
+		/** テーブル項目:is_read */
+		is_read ("is_reead", 5),;
+
+		/** 項目名称 */
+		private final String name;
+		/** 項目番号 */
+		private final int colNo;
+
+		/**
+		 * コンストラクタ
+		 * @param name 項目名称
+		 * @param colNo 項目番号
+		 */
+		private StoryGroupsTable(String name, int colNo) {
+			this.name = name;
+			this.colNo = colNo;
+		}
+
+		/**
+		 * 項目名称を取得します
+		 * @return 項目名称
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * 項目番号を取得します
+		 * @return 項目番号
+		 */
+		public int getColNo() {
+			return colNo;
+		}
+	}
+
+	
+	/** local_item_tblの定義情報 */
+	public enum StoryEventsTable {
+		/** テーブル項目:story_event_id */
+		story_event_id ("story_event_id", 0),
+		/** テーブル項目:story_group_id */
+		story_group_id ("story_group_id", 1),
+		/** テーブル項目:talk_name */
+		talk_name ("talk_name", 2),
+		/** テーブル項目:talk_body */
+		talk_body ("talk_body", 3),
+		/** テーブル項目:image_file_name */
+		image_file_name ("image_file_name", 4),
+		/** テーブル項目:image_position_type */
+		image_position_type ("image_position_type", 5),
+		/** テーブル項目:image_animation_type */
+		image_animation_type ("image_animation_type", 6);
+
+		/** 項目名称 */
+		private final String name;
+		/** 項目番号 */
+		private final int colNo;
+
+		/**
+		 * コンストラクタ
+		 * @param name 項目名称
+		 * @param colNo 項目番号
+		 */
+		private StoryEventsTable(String name, int colNo) {
+			this.name = name;
+			this.colNo = colNo;
+		}
+
+		/**
+		 * 項目名称を取得します
+		 * @return 項目名称
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * 項目番号を取得します
+		 * @return 項目番号
+		 */
+		public int getColNo() {
+			return colNo;
+		}
+	}
+
+	/** talk_selects_tblの定義情報 */
+	public enum StorySelectsTable {
+		/** テーブル項目:story_select_id */
+		story_select_id ("story_select_id", 0),
+		/** テーブル項目:story_group_id */
+		story_group_id ("story_group_id", 1),
+		/** テーブル項目:answers_count */
+		answers_count ("answers_count", 2),
+		/** テーブル項目:first_answer_body */
+		first_answer_body ("first_answer_body", 3),
+		/** テーブル項目:first_story_group_id */
+		first_story_group_id ("first_story_group_id", 4),
+		/** テーブル項目:second_answer_body */
+		second_answer_body ("second_answer_body", 5),
+		/** テーブル項目:second_story_group_id */
+		second_story_group_id ("second_story_group_id", 6),
+		/** テーブル項目:third_answer_body */
+		third_answer_body ("third_answer_body", 7),
+		/** テーブル項目:third_story_group_id */
+		third_story_group_id ("third_story_group_id", 8),
+		/** テーブル項目:forth_answer_body */
+		forth_answer_body ("forth_answer_body", 9),
+		/** テーブル項目:forth_talk_story_id */
+		forth_story_group_id ("forth_story_group_id", 10);
+
+		/** 項目名称 */
+		private final String name;
+		/** 項目番号 */
+		private final int colNo;
+
+		/**
+		 * コンストラクタ
+		 * @param name 項目名称
+		 * @param colNo 項目番号
+		 */
+		private StorySelectsTable(String name, int colNo) {
+			this.name = name;
+			this.colNo = colNo;
+		}
+
+		/**
+		 * 項目名称を取得します
+		 * @return 項目名称
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * 項目番号を取得します
+		 * @return 項目番号
+		 */
+		public int getColNo() {
+			return colNo;
+		}
+	}
+
+	
 	/**
 	 * コンストラクタ
 	 * @param context コンテキスト
@@ -361,6 +529,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			createSql.append(String.format(SQL_CREATE_TBL, new Object[] { Tables.localItemTable.getName() }));
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PRIMARYS, new Object[] { LocalItemTable.id.getName(), "integer", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.talk_group_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.story_group_id.getName(), "integer", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.message.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.lon.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.lat.getName(), "text", })).append(",");
@@ -421,6 +590,56 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			// SQLの発行
 			db.execSQL(createSql.toString());
 
+			// talk_groups_tbleを作成
+			createSql = new StringBuilder();
+			createSql.append(String.format(SQL_CREATE_TBL, new Object[] { Tables.storyGroupsTable.getName() }));
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PRIMARYS, new Object[] { StoryGroupsTable.story_group_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StoryGroupsTable.area_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StoryGroupsTable.local_area_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StoryGroupsTable.background_file_name.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StoryGroupsTable.select_flg.getName(), "integer", }));
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StoryGroupsTable.is_read.getName(), "integer", }));
+			createSql.append(");");
+
+			// SQLの発行
+			db.execSQL(createSql.toString());
+						
+			
+			// talk_event_tblを作成
+			createSql = new StringBuilder();
+			createSql.append(String.format(SQL_CREATE_TBL, new Object[] { Tables.storyEventsTable.getName() }));
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PRIMARYS, new Object[] { StoryEventsTable.story_event_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StoryEventsTable.story_group_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StoryEventsTable.talk_name.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StoryEventsTable.talk_body.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StoryEventsTable.image_file_name.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StoryEventsTable.image_position_type.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StoryEventsTable.image_animation_type.getName(), "text", }));
+			createSql.append(");");
+
+			// SQLの発行
+			db.execSQL(createSql.toString());
+			
+
+			// talk_selects_tblを作成
+			createSql = new StringBuilder();
+			createSql.append(String.format(SQL_CREATE_TBL, new Object[] { Tables.storySelectsTable.getName() }));
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PRIMARYS, new Object[] { StorySelectsTable.story_select_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StorySelectsTable.story_group_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StorySelectsTable.answers_count.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StorySelectsTable.first_answer_body.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StorySelectsTable.first_story_group_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StorySelectsTable.second_answer_body.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StorySelectsTable.second_story_group_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StorySelectsTable.third_answer_body.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StorySelectsTable.third_story_group_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { StorySelectsTable.forth_answer_body.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { StorySelectsTable.forth_story_group_id.getName(), "integer", }));
+			createSql.append(");");
+
+			// SQLの発行
+			db.execSQL(createSql.toString());
+			
 			// コミット
 			db.setTransactionSuccessful();
 			

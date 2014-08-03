@@ -7,6 +7,7 @@ public class PinButton extends ImageButton {
 
 	public int id = 0;
 	public int talk_group_id = 0;
+	public int story_group_id = 0;
 	public String message = "";
 	public String lon = "";
 	public String lat = "";

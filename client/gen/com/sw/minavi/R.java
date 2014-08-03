@@ -52,23 +52,24 @@ public final class R {
         public static final int pop_h04_c_01=0x7f02001c;
         public static final int question=0x7f02001d;
         public static final int rurusy=0x7f02001e;
-        public static final int saruhutusonei=0x7f02001f;
-        public static final int setting_icon=0x7f020020;
-        public static final int setting_icon_s=0x7f020021;
-        public static final int shenkopp=0x7f020022;
-        public static final int smile_n=0x7f020023;
-        public static final int smile_s=0x7f020024;
-        public static final int stationsaruhutu=0x7f020025;
-        public static final int summerwars=0x7f020026;
-        public static final int t_embarrass_n=0x7f020027;
-        public static final int t_nomal_n=0x7f020028;
-        public static final int t_smile_n=0x7f020029;
-        public static final int talk_back=0x7f02002a;
-        public static final int talk_icon=0x7f02002b;
-        public static final int talk_icon_s=0x7f02002c;
-        public static final int waku_n=0x7f02002d;
-        public static final int yan=0x7f02002e;
-        public static final int yukkuri=0x7f02002f;
+        public static final int sarobetu=0x7f02001f;
+        public static final int saruhutusonei=0x7f020020;
+        public static final int setting_icon=0x7f020021;
+        public static final int setting_icon_s=0x7f020022;
+        public static final int shenkopp=0x7f020023;
+        public static final int smile_n=0x7f020024;
+        public static final int smile_s=0x7f020025;
+        public static final int stationsaruhutu=0x7f020026;
+        public static final int summerwars=0x7f020027;
+        public static final int t_embarrass_n=0x7f020028;
+        public static final int t_nomal_n=0x7f020029;
+        public static final int t_smile_n=0x7f02002a;
+        public static final int talk_back=0x7f02002b;
+        public static final int talk_icon=0x7f02002c;
+        public static final int talk_icon_s=0x7f02002d;
+        public static final int waku_n=0x7f02002e;
+        public static final int yan=0x7f02002f;
+        public static final int yukkuri=0x7f020030;
     }
     public static final class id {
         public static final int action_settings=0x7f080026;
@@ -114,9 +115,12 @@ public final class R {
     public static final class layout {
         public static final int activity_ar=0x7f030000;
         public static final int activity_main=0x7f030001;
-        public static final int activity_talk=0x7f030002;
-        public static final int activity_talk_nexus7_2013=0x7f030003;
-        public static final int talk_layout=0x7f030004;
+        public static final int activity_story=0x7f030002;
+        public static final int activity_story_menu=0x7f030003;
+        public static final int activity_story_nexus7_2013=0x7f030004;
+        public static final int activity_talk=0x7f030005;
+        public static final int activity_talk_nexus7_2013=0x7f030006;
+        public static final int talk_layout=0x7f030007;
     }
     public static final class menu {
         public static final int main=0x7f070000;

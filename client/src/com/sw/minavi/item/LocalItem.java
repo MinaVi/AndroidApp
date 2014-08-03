@@ -4,6 +4,7 @@ package com.sw.minavi.item;
 public class LocalItem {
 	private int id;
 	private int talk_group_id;
+	private int story_group_id;
 	private String message;
 	private double lon;
 	private double lat;
@@ -25,6 +26,14 @@ public class LocalItem {
 
 	public void setTalkGroupId(int talk_group_id) {
 		this.talk_group_id = talk_group_id;
+	}
+
+	public int getStoryGroupId() {
+		return this.story_group_id;
+	}
+
+	public void setStoryGroupId(int story_group_id) {
+		this.story_group_id = story_group_id;
 	}
 
 	public String getMessage() {
