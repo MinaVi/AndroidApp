@@ -214,6 +214,8 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 
 			int allowAngleOfView = 60; // 画角
 
+			int misorientation = 0; // 方位差
+
 			// 方位角±allowAngleOfView以内の範囲にあるか判定
 			boolean azimuthOK = false;
 			if (azimuth + allowAngleOfView > 359) {
@@ -231,6 +233,16 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				// どちらかの条件を満たしていれば範囲内とみなす
 				azimuthOK = okFlag1 || okFlag2;
 
+				if(okFlag1) {
+					// 0度～N度の範囲内にある時
+					// イベント方位に359を加算し、カメラ方向との方位差を求める
+					misorientation = (direction + 359) - azimuth;
+
+				} else if(okFlag2){
+					// イベント方位とカメラ方向の方位差を求める
+					misorientation = direction - azimuth;
+				}
+
 			} else if (azimuth - allowAngleOfView < 0) {
 				// 時計回りの方向に許容角度を減算した結果、1回転するケース
 
@@ -247,11 +259,23 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				// どちらかの条件を満たしていれば範囲内とみなす
 				azimuthOK = okFlag1 || okFlag2;
 
+				if(okFlag1) {
+					// イベント方位とカメラ方向の方位差を求める
+					misorientation = direction - azimuth;
+
+				} else if(okFlag2) {
+					// 0度～N度の範囲内にある時
+					// イベント方位を359を減算し、カメラ方向との方位差を求める
+					misorientation = (direction- 359) - azimuth;
+				}
+
 			} else {
 
 				int maxLimit = azimuth + allowAngleOfView;
 				int minLimit = azimuth - allowAngleOfView;
 				azimuthOK = (minLimit <= direction) && (direction <= maxLimit);
+
+				misorientation = direction - azimuth;
 			}
 
 			// 当該座標とイベントの距離が10[m]以内であるか判定
@@ -263,7 +287,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			if (distanceOK && azimuthOK) {
 				// 描画許可
 				// 既に登録済みのアイテムは追加しない(座標が移動してしまうため)
-				FrameLayout.LayoutParams layotParams = getRdmMrgnLayout();
+				FrameLayout.LayoutParams layotParams = getMrgnLayout(misorientation);
 
 				// 表示画像のサイズ修正
 				// リソースからbitmapを作成
@@ -277,14 +301,14 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 
 					layotParams.width = width;
 					layotParams.height = height;
-					
+
 				}
-				
+
 				if (!dispItemSet.contains(pin)) {
 					// frameLayout.addView(pin, pin.getId(), layotParams);
 					// dispItemSet.add(pin);
 				}
-				
+
 				addItemList.add(new Pair<PinButton, FrameLayout.LayoutParams>(
 						pin, layotParams));
 			}
@@ -420,25 +444,39 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		}
 	}
 
-	public FrameLayout.LayoutParams getRdmMrgnLayout() {
+	/**
+	 *
+	 * @param angle カメラ方位からイベント方位への方位差(-60～60)
+	 * @return
+	 */
+	public FrameLayout.LayoutParams getMrgnLayout(int angle) {
 		WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
 
 		DisplayMetrics displayMetrics = new DisplayMetrics();
 		display.getMetrics(displayMetrics);
 
+
 		int heightPixels = displayMetrics.heightPixels;
 		int widthPixels = displayMetrics.widthPixels;
 
-		int rdmHeight = (int) Math.round(Math.floor(Math.random()
-				* (heightPixels + 1)));
-		int rdmWidth = (int) Math.round(Math.floor(Math.random()
-				* (widthPixels + 1)));
+		int section = (int)((angle + 60) / 20);
+		double secWidth = heightPixels / 6;
 
-		if (heightPixels - rdmHeight < imgWidth)
-			rdmHeight = heightPixels - imgWidth;
-		if (widthPixels - rdmWidth < imgWidth)
-			rdmWidth = widthPixels - imgWidth;
+		int xPos = 0;
+		for(int i = 0; i < section; i++) {
+			xPos+=secWidth;
+		}
+
+//		int rdmHeight = (int) Math.round(Math.floor(Math.random()
+//				* (heightPixels + 1)));
+//		int rdmWidth = (int) Math.round(Math.floor(Math.random()
+//				* (widthPixels + 1)));
+
+//		if (heightPixels - rdmHeight < imgWidth)
+//			rdmHeight = heightPixels - imgWidth;
+//		if (widthPixels - rdmWidth < imgWidth)
+//			rdmWidth = widthPixels - imgWidth;
 
 		// FrameLayout.LayoutParams rLayoutParams = new
 		// FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -447,11 +485,12 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				imgWidth, imgHeight);
 		rLayoutParams.gravity = Gravity.NO_GRAVITY;
 		//rLayoutParams.setMargins(rdmWidth, rdmHeight, 0, 0);
-		
+
 		// TODO　調整中
 		// ランダムに配置
 		Random rdm = new Random();
-		rLayoutParams.setMargins(100 + rdm.nextInt(700)+100, 100, 0, 0);	// XperiaA用
+		rLayoutParams.setMargins(10 + xPos, 100, 0, 0);	// XperiaA用
+//		rLayoutParams.setMargins(100 + rdm.nextInt(700)+100, 100, 0, 0);	// XperiaA用
 		return rLayoutParams;
 	}
 
