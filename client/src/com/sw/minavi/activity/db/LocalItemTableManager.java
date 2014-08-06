@@ -68,7 +68,7 @@ public class LocalItemTableManager {
 				{ "11","11", "北大５", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
 				{ "12","1", "大通り", "141.347702", "43.059936", "smile_n", "auther6", "20130701000000" },
 				//{ "13","11", "麻生", "141.338918", "43.107020", "chitoge", "auther6", "20130701000000" },
-				
+
 				// 猿払村道の駅
 				//{ "14","13", "豊富温泉", "141.840295", "45.07146,", "chitoge", "auther6", "20130701000000" },
 				//{ "15","14", "温泉", "141.840273", "45.074233", "buraito", "auther6", "20130701000000" },
@@ -76,17 +76,17 @@ public class LocalItemTableManager {
 				{ "14","13", "豊富温泉", "141.840295", "45.07146", "chitoge", "auther6", "20130701000000" },
 				{ "15","14", "温泉", "141.840273", "45.074233", "buraito", "auther6", "20130701000000" },
 				{ "16","15", "温泉", "141.840273", "45.074233", "yan", "auther6", "20130701000000" },
-				
+
 				// 宗谷岬
 //				{ "16","15", "猿払村道の駅クイズ", "141.338320", "43.106800", "t_nomal_n", "auther6", "20130701000000" },
-				
-				
-				
+
+
+
 				// とよとみ温泉
 //				{ "17","17", "温泉", "141.338918", "43.059936", "yan", "auther6", "20130701000000" },
 //				{ "18","18", "豊富温泉", "141.338320", "43.106800", "rurusy", "auther6", "20130701000000" },
-				
-				
+
+
 		};
 
 		// 書き込み用のDBオブジェクトを取得
@@ -161,6 +161,42 @@ public class LocalItemTableManager {
 		} finally {
 			// DBクローズ
 			sqliteDB.close();
+		}
+		return values;
+	}
+
+	/**
+	 * 以下の条件に該当するlocal_item_tblのレコードをList形式で取得する<br/>
+	 * ・抽出項目：指定なし<br/>
+	 * ・抽出条件：指定なし<br/>
+	 * @return
+	 */
+	public ArrayList<LocalItem> GetRecordsDebug() {
+		ArrayList<LocalItem> values = new ArrayList<LocalItem>();
+
+		// サンプルデータの準備
+		String[][] datas = new String[][] {
+				{ "1","1", "message1", "139.701334", "35.658512", "question", "auther1", "20130701000000" },
+				{ "2","1", "message2", "139.701331", "35.658513", "question", "auther2", "20130701000000" },
+				{ "3","1", "message3", "139.701337", "35.658513", "question", "auther3", "20130701000000" },
+				{ "4","1", "message4", "139.701340", "35.658522", "question", "auther4", "20130701000000" },
+				{ "5","1", "message5", "139.701334", "35.658523", "question", "auther5", "20130701000000" },
+				{ "6","1", "Version2", "141.347506", "43.060656", "question", "auther6", "20130701000000" },
+		};
+		for(String[] record : datas) {
+
+			// LocalItemの生成・編集
+			LocalItem val = new LocalItem();
+			val.setId(Integer.valueOf(record[0]));
+			val.setTalkGroupId(Integer.valueOf(record[1]));
+			val.setMessage(record[2]);
+			val.setLon(Double.valueOf(record[3]).doubleValue());
+			val.setLat(Double.valueOf(record[4]).doubleValue());
+			val.setArImageName(record[5]);
+			val.setAuther(record[6]);
+			val.setCreateTime(record[7]);
+
+			values.add(val);
 		}
 		return values;
 	}

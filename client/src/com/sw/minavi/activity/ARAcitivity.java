@@ -1,13 +1,11 @@
 package com.sw.minavi.activity;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
@@ -18,12 +16,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -33,12 +28,15 @@ import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.item.LocalItem;
+import com.sw.minavi.item.OverlayView;
 import com.sw.minavi.item.Pair;
 import com.sw.minavi.item.PinButton;
 import com.sw.minavi.util.LocationUtilities;
 
 public class ARAcitivity extends Activity implements SensorEventListener,
 		LocationListener {
+
+	private static final int SECTOR = 12;
 
 	protected SensorManager sensorManager;
 	protected LocationManager locationManager;
@@ -66,7 +64,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 
 	Location curLocation = null;
 
-	HashSet<PinButton> dispItemSet = new HashSet<PinButton>();
+	HashMap<PinButton, FrameLayout.LayoutParams> pinToLayoutParamsMap = new HashMap<PinButton, FrameLayout.LayoutParams>();
 
 	int azimuth = 0;
 
@@ -92,7 +90,6 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		// デバック時に表示
 		TableLayout textViewLayer = (TableLayout) findViewById(R.id.text_view_layer);
 		textViewLayer.setVisibility(View.GONE);
-
 	}
 
 	@Override
@@ -135,6 +132,8 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 
 			// 表示情報の一覧を取得(当該座標の直近のデータのみ)
 			values = LocalItemTableManager.getInstance(helper).GetRecords();
+			// values =
+			// LocalItemTableManager.getInstance(helper).GetRecordsDebug();
 
 			// アイテムの描画
 			displayItems();
@@ -188,21 +187,12 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			return;
 		}
 
-		System.out.println("call displayItems");
-
-		// double curLon = 139.701334; // 現在位置から取得
-		// double curLat = 35.658517; // 現在位置から取得
-
 		double curLat = curLocation.getLatitude();
 		double curLon = curLocation.getLongitude();
-
-		// for (PinButton delPin : dispItemSet) {
-		// frameLayout.removeView(delPin);
-		// }
-		// dispItemSet.clear();
+		// double curLon = 139.701334;
+		// double curLat = 35.658517;
 
 		List<Pair<PinButton, FrameLayout.LayoutParams>> addItemList = new ArrayList<Pair<PinButton, FrameLayout.LayoutParams>>();
-
 		for (LocalItem val : values) {
 
 			// 2点間の距離を計算(当該座標とイベント座標)
@@ -213,8 +203,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 					val.getLat(), val.getLon());
 
 			int allowAngleOfView = 60; // 画角
-
-			int misorientation = 0; // 方位差
+			int misorientation = 0; // 2点間の方位差
 
 			// 方位角±allowAngleOfView以内の範囲にあるか判定
 			boolean azimuthOK = false;
@@ -233,12 +222,12 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				// どちらかの条件を満たしていれば範囲内とみなす
 				azimuthOK = okFlag1 || okFlag2;
 
-				if(okFlag1) {
+				if (okFlag1) {
 					// 0度～N度の範囲内にある時
 					// イベント方位に359を加算し、カメラ方向との方位差を求める
 					misorientation = (direction + 359) - azimuth;
 
-				} else if(okFlag2){
+				} else if (okFlag2) {
 					// イベント方位とカメラ方向の方位差を求める
 					misorientation = direction - azimuth;
 				}
@@ -259,18 +248,17 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				// どちらかの条件を満たしていれば範囲内とみなす
 				azimuthOK = okFlag1 || okFlag2;
 
-				if(okFlag1) {
+				if (okFlag1) {
+					// イベント方位を359を減算し、カメラ方向との方位差を求める
+					misorientation = (direction - 359) - azimuth;
+				} else if (okFlag2) {
+					// 0度～N度の範囲内にある時
 					// イベント方位とカメラ方向の方位差を求める
 					misorientation = direction - azimuth;
-
-				} else if(okFlag2) {
-					// 0度～N度の範囲内にある時
-					// イベント方位を359を減算し、カメラ方向との方位差を求める
-					misorientation = (direction- 359) - azimuth;
 				}
 
 			} else {
-
+				// 1回転しないケース
 				int maxLimit = azimuth + allowAngleOfView;
 				int minLimit = azimuth - allowAngleOfView;
 				azimuthOK = (minLimit <= direction) && (direction <= maxLimit);
@@ -285,14 +273,17 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			PinButton pin = createPiButton(val, direction, distance);
 
 			if (distanceOK && azimuthOK) {
-				// 描画許可
+				// 距離と方位が条件を描画満たすケース
+
 				// 既に登録済みのアイテムは追加しない(座標が移動してしまうため)
 				FrameLayout.LayoutParams layotParams = getMrgnLayout(misorientation);
 
 				// 表示画像のサイズ修正
 				// リソースからbitmapを作成
-				Bitmap image = BitmapFactory.decodeResource(getResources(),
-						getResources().getIdentifier(val.getArImageName(), "drawable", getPackageName()));
+				Bitmap image = BitmapFactory.decodeResource(
+						getResources(),
+						getResources().getIdentifier(val.getArImageName(),
+								"drawable", getPackageName()));
 
 				if (image != null) {
 					// 画像サイズ取得
@@ -301,45 +292,55 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 
 					layotParams.width = width;
 					layotParams.height = height;
-
 				}
 
-				if (!dispItemSet.contains(pin)) {
-					// frameLayout.addView(pin, pin.getId(), layotParams);
-					// dispItemSet.add(pin);
-				}
-
+				// ピンとレイアウトを画面描画対象のアイテムとして保存
 				addItemList.add(new Pair<PinButton, FrameLayout.LayoutParams>(
 						pin, layotParams));
 			}
 		}
 
-		ArrayList<PinButton> delButtonList = new ArrayList<PinButton>(
-				dispItemSet);
+		// 現在表示されているピンを全て削除
+		for (Map.Entry<PinButton, FrameLayout.LayoutParams> entry : pinToLayoutParamsMap
+				.entrySet()) {
+			frameLayout.removeView(entry.getKey());
+		}
+
+		// 追加対象のアイテムのループ
+		HashMap<PinButton, FrameLayout.LayoutParams> newPinToLayoutParamsMap = new HashMap<PinButton, FrameLayout.LayoutParams>();
 		for (Pair<PinButton, FrameLayout.LayoutParams> btnPosPair : addItemList) {
+
+			// ピン及びレイアウトを取得
 			PinButton pin = btnPosPair.getLeft();
-			FrameLayout.LayoutParams layotParams = btnPosPair.getRight();
+			FrameLayout.LayoutParams layoutParams = btnPosPair.getRight();
 
-			if (dispItemSet.contains(pin)) {
-				System.out.println(MessageFormat.format("既に描画されています。ID=[{0}]",
-						pin.getId()));
-				// そのまま描画させるので、削除対象ボタン一覧から削除
-				delButtonList.remove(pin);
-			} else {
-				System.out.println(MessageFormat.format("まだ描画されていません。ID=[{0}]",
-						pin.getId()));
-				// 描画対象ボタンの内、新しいボタンは新規に描画
-				frameLayout.addView(pin, pin.getId(), layotParams);
+			// 既に画面上に表示されているピンか判定
+			if (pinToLayoutParamsMap.containsKey(pin)) {
+				// 既に画面上に表示されているケース
 
-				dispItemSet.add(pin);
+				// 以前のレイアウトを取得
+				FrameLayout.LayoutParams oldLayoutParams = pinToLayoutParamsMap
+						.get(pin);
+
+				// レイアウトのマージンを再定義する(leftMarginのみ最新のものを適用)
+				layoutParams.setMargins(layoutParams.leftMargin,
+						oldLayoutParams.topMargin, oldLayoutParams.rightMargin,
+						oldLayoutParams.bottomMargin);
+
+				// ピンは再描画するため一度削除
+				frameLayout.removeView(pin);
 			}
+
+			// ピンをフレームに追加
+			frameLayout.addView(pin, pin.getId(), layoutParams);
+
+			// 最新の描画済みオブジェクトとして登録
+			newPinToLayoutParamsMap.put(pin, layoutParams);
 		}
 
-		// 不要になったボタンは削除
-		for (PinButton pin : delButtonList) {
-			frameLayout.removeView(pin);
-			dispItemSet.remove(pin);
-		}
+		// 現在のマップをクリアし、最新の描画済みオブジェクト情報を保存
+		pinToLayoutParamsMap.clear();
+		pinToLayoutParamsMap = newPinToLayoutParamsMap;
 	}
 
 	@Override
@@ -415,6 +416,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			int tmpAzimuth = (int) (LocationUtilities
 					.radianToDegreeForAzimuth(attitude[0]));
 
+			// 前回から方位差が10度ずれた場合のみ描画イベントを開始
 			boolean noChangeFLag = false;
 			if (tmpAzimuth + 10 > 359) {
 				noChangeFLag = (azimuth >= tmpAzimuth - 10) && (azimuth <= 359);
@@ -435,7 +437,6 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				noChangeFLag = (azimuth >= tmpAzimuth - 10)
 						&& (azimuth <= tmpAzimuth + 10);
 			}
-
 			if (!noChangeFLag) {
 				azimuth = tmpAzimuth;
 				preAzimuthText.setText(String.valueOf(azimuth));
@@ -446,58 +447,52 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 
 	/**
 	 *
-	 * @param angle カメラ方位からイベント方位への方位差(-60～60)
+	 * @param angle
+	 *            カメラ方位からイベント方位への方位差(-60～60)
 	 * @return
 	 */
 	public FrameLayout.LayoutParams getMrgnLayout(int angle) {
-		WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-		Display display = wm.getDefaultDisplay();
 
-		DisplayMetrics displayMetrics = new DisplayMetrics();
-		display.getMetrics(displayMetrics);
+		// オーバーレイビューの高さ・幅を取得
+		OverlayView overlay = (OverlayView) findViewById(R.id.overlay);
+		int heightPixels = overlay.getHeight();
+		int widthPixels = overlay.getWidth();
 
+		// 画面をN分割した際の幅(=パッディング)を求める
+		double paddingLeft = widthPixels / SECTOR;
 
-		int heightPixels = displayMetrics.heightPixels;
-		int widthPixels = displayMetrics.widthPixels;
+		// 画角をN分割した場合におけるイベント方位の割り当て位置を求める
+		int section = (int) ((angle + 60) / SECTOR);
 
-		int section = (int)((angle + 60) / 20);
-		double secWidth = heightPixels / 6;
-
-		int xPos = 0;
-		for(int i = 0; i < section; i++) {
-			xPos+=secWidth;
+		// パッディングを積み上げてLEFTの位置を求める
+		int leftPos = 0;
+		for (int i = 1; i < section; i++) {
+			leftPos += paddingLeft;
 		}
 
-//		int rdmHeight = (int) Math.round(Math.floor(Math.random()
-//				* (heightPixels + 1)));
-//		int rdmWidth = (int) Math.round(Math.floor(Math.random()
-//				* (widthPixels + 1)));
+		// 高さはランダム配置(画像の高さを考慮する)
+		int rdmHeight = (int) Math.round(Math.floor(Math.random()
+				* (heightPixels + 1)));
+		if (heightPixels - rdmHeight < imgWidth) {
+			rdmHeight = heightPixels - imgWidth;
+		}
 
-//		if (heightPixels - rdmHeight < imgWidth)
-//			rdmHeight = heightPixels - imgWidth;
-//		if (widthPixels - rdmWidth < imgWidth)
-//			rdmWidth = widthPixels - imgWidth;
-
-		// FrameLayout.LayoutParams rLayoutParams = new
-		// FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-		// FrameLayout.LayoutParams.WRAP_CONTENT);
 		FrameLayout.LayoutParams rLayoutParams = new FrameLayout.LayoutParams(
 				imgWidth, imgHeight);
 		rLayoutParams.gravity = Gravity.NO_GRAVITY;
-		//rLayoutParams.setMargins(rdmWidth, rdmHeight, 0, 0);
 
-		// TODO　調整中
-		// ランダムに配置
-		Random rdm = new Random();
-		rLayoutParams.setMargins(10 + xPos, 100, 0, 0);	// XperiaA用
-//		rLayoutParams.setMargins(100 + rdm.nextInt(700)+100, 100, 0, 0);	// XperiaA用
+		// TODO　調整中(leftの開始位置をずらす必要あり？)
+		rLayoutParams.setMargins(100 + leftPos, rdmHeight, 0, 0);
+		// rLayoutParams.setMargins(100 + rdm.nextInt(700)+100, 100, 0, 0); //
+		// XperiaA用
 		return rLayoutParams;
 	}
 
 	public PinButton createPiButton(LocalItem item, int azimuth, float distance) {
 
-		int useImage = getResources()
-				.getIdentifier(String.valueOf(item.getArImageName()), "drawable", getPackageName());
+		int useImage = getResources().getIdentifier(
+				String.valueOf(item.getArImageName()), "drawable",
+				getPackageName());
 
 		PinButton btn = new PinButton(this);
 		btn.setImageResource(useImage);
@@ -514,20 +509,22 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			@Override
 			public void onClick(View v) {
 				PinButton pin = (PinButton) v;
-				//
-				//				String showMessage = String.format(
-				//						"%s(id:%s, 経度:%s,緯度:%s, 方位角:%s,当該座標との距離:%s[m])",
-				//						new Object[] { pin.message, pin.id, pin.lon, pin.lat,
-				//								pin.azimuth, pin.distance });
-				//				Toast.makeText(ARAcitivity.this, showMessage,
-				//						Toast.LENGTH_SHORT).show();
 
-				Intent intent = new Intent();
-				intent.setClassName("com.sw.minavi", "com.sw.minavi.activity.TalkActivity");
-				intent.putExtra("pinId", pin.id);
-				intent.putExtra("talkGroupId", pin.talk_group_id);
-				startActivity(intent);
-				finish();
+				// TODO ボタンクリックイベント
+				String showMessage = String.format(
+						"%s(id:%s, 経度:%s,緯度:%s, 方位角:%s,当該座標との距離:%s[m])",
+						new Object[] { pin.message, pin.id, pin.lon, pin.lat,
+								pin.azimuth, pin.distance });
+				Toast.makeText(ARAcitivity.this, showMessage,
+						Toast.LENGTH_SHORT).show();
+
+				// Intent intent = new Intent();
+				// intent.setClassName("com.sw.minavi",
+				// "com.sw.minavi.activity.TalkActivity");
+				// intent.putExtra("pinId", pin.id);
+				// intent.putExtra("talkGroupId", pin.talk_group_id);
+				// startActivity(intent);
+				// finish();
 			}
 		});
 		return btn;
