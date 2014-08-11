@@ -128,4 +128,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 		this.camera.release();
 		this.camera = null;
 	}
+	
+	public Camera getCamera() {
+		return camera;
+	}
 }

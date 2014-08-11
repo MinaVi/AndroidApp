@@ -3,9 +3,9 @@ package com.sw.minavi.activity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
@@ -22,53 +22,75 @@ import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.LocalItemTableManager;
+import com.sw.minavi.item.CameraView;
 import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.OverlayView;
-import com.sw.minavi.item.Pair;
 import com.sw.minavi.item.PinButton;
+import com.sw.minavi.item.SensorFilter;
 import com.sw.minavi.util.LocationUtilities;
 
 public class ARAcitivity extends Activity implements SensorEventListener,
 		LocationListener {
 
-	private static final int SECTOR = 12;
+	/** 画面の分割数 */
+	public static final int SECTOR = 24;
 
+	/** センサ管理 */
 	protected SensorManager sensorManager;
+	/** 位置情報管理 */
 	protected LocationManager locationManager;
+	/** プロバイダ */
 	protected List<String> providers;
 
+	/** デバッグ用：座標 */
 	protected TextView geoText;
+	/** デバッグ用：ログメッセージ */
 	protected TextView logText;
+	/** デバッグ用：プロバイダ名 */
 	protected TextView provText;
+	/** デバッグ用：方位 */
 	protected TextView azimuthText;
+	/** デバッグ用：ピッチ */
 	protected TextView pitchText;
+	/** デバッグ用：ロール */
 	protected TextView rollText;
+	/** デバッグ用：以前の方位 */
 	protected TextView preAzimuthText;
-	protected FrameLayout frameLayout;
 
+	/** サーフェイスビューが配置されるレイアウト */
+	protected FrameLayout frameLayout;
+	
+	/** DB操作オブジェクト */
 	protected DatabaseOpenHelper helper;
 
+	/** 加速度と地磁気から求めた回転行列 */
 	float[] inRotationMatrix = new float[9];
+	/** 世界測地系に変換した回転行列 */
 	float[] outRotationMatrix = new float[9];
+	/** 加速度センサの取得値 */
 	float[] gravity = new float[3];
+	/** 地磁気センサの取得値 */
 	float[] geomagnetic = new float[3];
+	/** 回転角 */
 	float[] attitude = new float[3];
 
+	
 	int imgWidth = 0;
 	int imgHeight = 0;
 
 	Location curLocation = null;
 
-	HashMap<PinButton, FrameLayout.LayoutParams> pinToLayoutParamsMap = new HashMap<PinButton, FrameLayout.LayoutParams>();
+	HashMap<Integer, FrameLayout.LayoutParams> pinToLayoutParamsMap = new HashMap<Integer, FrameLayout.LayoutParams>();
 
 	int azimuth = 0;
 
 	ArrayList<LocalItem> values = new ArrayList<LocalItem>();
+	SensorFilter gravitySensorFilter = new SensorFilter();
+	SensorFilter magneticSensorFilter = new SensorFilter();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -164,12 +186,14 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		helper = new DatabaseOpenHelper(this);
 	}
 
+	private static boolean isDebug = false;
+
 	protected void refreshGeoLocation(Location location) {
 
 		String desc = location.getLongitude() + ", " + location.getLatitude();
 		geoText.setText(desc);
 
-		Toast.makeText(ARAcitivity.this, desc, Toast.LENGTH_SHORT).show();
+		//Toast.makeText(ARAcitivity.this, desc, Toast.LENGTH_SHORT).show();
 
 		// 表示情報の一覧を取得(当該座標の直近のデータのみ)
 		values = LocalItemTableManager.getInstance(helper).GetRecords();
@@ -177,8 +201,25 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		// 現在位置の保存
 		curLocation = location;
 
-		// アイテムの描画
-		displayItems();
+		if (isDebug == false) {
+
+			for (LocalItem val : values) {
+
+				// 描画許可・不許可問わず利用するので、このタイミングでピンを作成
+				PinButton pin = createPiButton(val, 0, 0);
+
+				// 仮のレイアウトを作成
+				FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(0, 0);
+
+				// 全てのピンをレイアウトに追加
+				frameLayout.addView(pin, pin.getId(), layoutParams);
+
+				pin.setVisibility(View.INVISIBLE);
+			}
+			// アイテムの描画
+			displayItems();
+			isDebug = true;
+		}
 	}
 
 	protected void displayItems() {
@@ -192,7 +233,7 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		// double curLon = 139.701334;
 		// double curLat = 35.658517;
 
-		List<Pair<PinButton, FrameLayout.LayoutParams>> addItemList = new ArrayList<Pair<PinButton, FrameLayout.LayoutParams>>();
+		HashMap<Integer, FrameLayout.LayoutParams> addPinIdToLayoutParamsMap = new HashMap<Integer, FrameLayout.LayoutParams>();
 		for (LocalItem val : values) {
 
 			// 2点間の距離を計算(当該座標とイベント座標)
@@ -202,7 +243,8 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			int direction = LocationUtilities.getDirection(curLat, curLon,
 					val.getLat(), val.getLon());
 
-			int allowAngleOfView = 60; // 画角
+			CameraView cameraView = (CameraView) findViewById(R.id.camera);
+			int allowAngleOfView = (int) cameraView.getCamera().getParameters().getHorizontalViewAngle(); // 画角
 			int misorientation = 0; // 2点間の方位差
 
 			// 方位角±allowAngleOfView以内の範囲にあるか判定
@@ -270,13 +312,13 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			boolean distanceOK = distance <= 1000;
 
 			// 描画許可・不許可問わず利用するので、このタイミングでピンを作成
-			PinButton pin = createPiButton(val, direction, distance);
+			// PinButton pin = createPiButton(val, direction, distance);
 
 			if (distanceOK && azimuthOK) {
 				// 距離と方位が条件を描画満たすケース
 
 				// 既に登録済みのアイテムは追加しない(座標が移動してしまうため)
-				FrameLayout.LayoutParams layotParams = getMrgnLayout(misorientation);
+				FrameLayout.LayoutParams layoutParams = getMrgnLayout(misorientation, allowAngleOfView);
 
 				// 表示画像のサイズ修正
 				// リソースからbitmapを作成
@@ -285,57 +327,54 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 						getResources().getIdentifier(val.getArImageName(),
 								"drawable", getPackageName()));
 
+				if (image == null) {
+					continue;
+				}
 				if (image != null) {
 					// 画像サイズ取得
 					int width = image.getWidth();
 					int height = image.getHeight();
 
-					layotParams.width = width;
-					layotParams.height = height;
+					layoutParams.width = width;
+					layoutParams.height = height;
 				}
 
 				// ピンとレイアウトを画面描画対象のアイテムとして保存
-				addItemList.add(new Pair<PinButton, FrameLayout.LayoutParams>(
-						pin, layotParams));
+				addPinIdToLayoutParamsMap.put(
+						val.getId(), layoutParams);
 			}
 		}
 
-		// 現在表示されているピンを全て削除
-		for (Map.Entry<PinButton, FrameLayout.LayoutParams> entry : pinToLayoutParamsMap
-				.entrySet()) {
-			frameLayout.removeView(entry.getKey());
-		}
+		HashMap<Integer, FrameLayout.LayoutParams> newPinToLayoutParamsMap = new HashMap<Integer, FrameLayout.LayoutParams>();
+		for (int viewIndex = 0; viewIndex < frameLayout.getChildCount(); viewIndex++) {
+			View childView = frameLayout.getChildAt(viewIndex);
+			if (childView.getClass().equals(PinButton.class)) {
+				if (addPinIdToLayoutParamsMap.containsKey(viewIndex)) {
 
-		// 追加対象のアイテムのループ
-		HashMap<PinButton, FrameLayout.LayoutParams> newPinToLayoutParamsMap = new HashMap<PinButton, FrameLayout.LayoutParams>();
-		for (Pair<PinButton, FrameLayout.LayoutParams> btnPosPair : addItemList) {
+					FrameLayout.LayoutParams layoutParams = addPinIdToLayoutParamsMap.get(viewIndex);
 
-			// ピン及びレイアウトを取得
-			PinButton pin = btnPosPair.getLeft();
-			FrameLayout.LayoutParams layoutParams = btnPosPair.getRight();
+					// 既に画面上に表示されているピンか判定
+					if (pinToLayoutParamsMap.containsKey(viewIndex)) {
+						// 既に画面上に表示されているケース
 
-			// 既に画面上に表示されているピンか判定
-			if (pinToLayoutParamsMap.containsKey(pin)) {
-				// 既に画面上に表示されているケース
+						// 以前のレイアウトを取得
+						FrameLayout.LayoutParams oldLayoutParams = pinToLayoutParamsMap
+								.get(viewIndex);
 
-				// 以前のレイアウトを取得
-				FrameLayout.LayoutParams oldLayoutParams = pinToLayoutParamsMap
-						.get(pin);
+						// レイアウトのマージンを再定義する(leftMarginのみ最新のものを適用)
+						layoutParams.setMargins(layoutParams.leftMargin,
+								oldLayoutParams.topMargin, oldLayoutParams.rightMargin,
+								oldLayoutParams.bottomMargin);
+					}
 
-				// レイアウトのマージンを再定義する(leftMarginのみ最新のものを適用)
-				layoutParams.setMargins(layoutParams.leftMargin,
-						oldLayoutParams.topMargin, oldLayoutParams.rightMargin,
-						oldLayoutParams.bottomMargin);
-
-				// ピンは再描画するため一度削除
-				frameLayout.removeView(pin);
+					childView.setLayoutParams(layoutParams);
+					childView.setVisibility(View.VISIBLE);
+					// 最新の描画済みオブジェクトとして登録
+					newPinToLayoutParamsMap.put(viewIndex, layoutParams);
+				} else {
+					childView.setVisibility(View.INVISIBLE);
+				}
 			}
-
-			// ピンをフレームに追加
-			frameLayout.addView(pin, pin.getId(), layoutParams);
-
-			// 最新の描画済みオブジェクトとして登録
-			newPinToLayoutParamsMap.put(pin, layoutParams);
 		}
 
 		// 現在のマップをクリアし、最新の描画済みオブジェクト情報を保存
@@ -347,8 +386,8 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 	public void onLocationChanged(Location location) {
 		provText.setText(location.getProvider());
 		refreshGeoLocation(location);
-		Toast.makeText(ARAcitivity.this, "onLocationChanged",
-				Toast.LENGTH_SHORT).show();
+		//		Toast.makeText(ARAcitivity.this, "onLocationChanged",
+		//				Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
@@ -368,23 +407,35 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 	}
 
 	@Override
-	public void onSensorChanged(SensorEvent event) {
+	public synchronized void onSensorChanged(SensorEvent event) {
 
 		// イベントが発生したセンサがどのセンサか判定する
 		switch (event.sensor.getType()) {
 		case Sensor.TYPE_MAGNETIC_FIELD:
 			// 地磁気センサから地磁気を取得
 			geomagnetic = event.values.clone();
+			magneticSensorFilter.addSample(geomagnetic);
+			if (!magneticSensorFilter.isSampleEnable()) {
+				return;
+			}
+			geomagnetic = magneticSensorFilter.getParam();
 			break;
 		case Sensor.TYPE_ACCELEROMETER:
 			// 加速度センサから加速度を取得
 			gravity = event.values.clone();
+
+			gravitySensorFilter.addSample(gravity);
+			if (!gravitySensorFilter.isSampleEnable()) {
+				return;
+			}
+			gravity = gravitySensorFilter.getParam();
 			break;
 		}
 
 		// 地磁気センサと加速度センサの両方が取得出来た時だけ、画面を更新する
-
 		if (geomagnetic != null && gravity != null) {
+
+			//synchronized (this) {
 
 			// 回転行列の取得
 			// <メモ>
@@ -416,32 +467,34 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 			int tmpAzimuth = (int) (LocationUtilities
 					.radianToDegreeForAzimuth(attitude[0]));
 
-			// 前回から方位差が10度ずれた場合のみ描画イベントを開始
+			// 前回から方位差がN度ずれた場合のみ描画イベントを開始
+			int limit = 8;
 			boolean noChangeFLag = false;
-			if (tmpAzimuth + 10 > 359) {
-				noChangeFLag = (azimuth >= tmpAzimuth - 10) && (azimuth <= 359);
+			if (tmpAzimuth + limit > 359) {
+				noChangeFLag = (azimuth >= tmpAzimuth - limit) && (azimuth <= 359);
 
 				if (!noChangeFLag) {
 					noChangeFLag = (azimuth >= 0)
-							&& (azimuth <= ((tmpAzimuth + 10) - 359));
+							&& (azimuth <= ((tmpAzimuth + limit) - 359));
 				}
 
-			} else if (tmpAzimuth - 10 < 0) {
-				noChangeFLag = (azimuth <= tmpAzimuth + 10) && (azimuth >= 0);
+			} else if (tmpAzimuth - limit < 0) {
+				noChangeFLag = (azimuth <= tmpAzimuth + limit) && (azimuth >= 0);
 
 				if (!noChangeFLag) {
 					noChangeFLag = (azimuth <= 359)
-							&& (azimuth >= (359 - (10 - tmpAzimuth)));
+							&& (azimuth >= (359 - (limit - tmpAzimuth)));
 				}
 			} else {
-				noChangeFLag = (azimuth >= tmpAzimuth - 10)
-						&& (azimuth <= tmpAzimuth + 10);
+				noChangeFLag = (azimuth >= tmpAzimuth - limit)
+						&& (azimuth <= tmpAzimuth + limit);
 			}
 			if (!noChangeFLag) {
 				azimuth = tmpAzimuth;
 				preAzimuthText.setText(String.valueOf(azimuth));
 				displayItems();
 			}
+			//}
 		}
 	}
 
@@ -449,26 +502,15 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 	 *
 	 * @param angle
 	 *            カメラ方位からイベント方位への方位差(-60～60)
+	 * @param allowAngleOfView 
 	 * @return
 	 */
-	public FrameLayout.LayoutParams getMrgnLayout(int angle) {
+	public FrameLayout.LayoutParams getMrgnLayout(int angle, int allowAngleOfView) {
 
 		// オーバーレイビューの高さ・幅を取得
 		OverlayView overlay = (OverlayView) findViewById(R.id.overlay);
 		int heightPixels = overlay.getHeight();
 		int widthPixels = overlay.getWidth();
-
-		// 画面をN分割した際の幅(=パッディング)を求める
-		double paddingLeft = widthPixels / SECTOR;
-
-		// 画角をN分割した場合におけるイベント方位の割り当て位置を求める
-		int section = (int) ((angle + 60) / SECTOR);
-
-		// パッディングを積み上げてLEFTの位置を求める
-		int leftPos = 0;
-		for (int i = 1; i < section; i++) {
-			leftPos += paddingLeft;
-		}
 
 		// 高さはランダム配置(画像の高さを考慮する)
 		int rdmHeight = (int) Math.round(Math.floor(Math.random()
@@ -481,10 +523,9 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				imgWidth, imgHeight);
 		rLayoutParams.gravity = Gravity.NO_GRAVITY;
 
-		// TODO　調整中(leftの開始位置をずらす必要あり？)
-		rLayoutParams.setMargins(100 + leftPos, rdmHeight, 0, 0);
-		// rLayoutParams.setMargins(100 + rdm.nextInt(700)+100, 100, 0, 0); //
-		// XperiaA用
+		double threshould = (double) (angle + allowAngleOfView) / (double) (allowAngleOfView * 2);
+
+		rLayoutParams.setMargins((int) (widthPixels * threshould), rdmHeight, 0, 0);
 		return rLayoutParams;
 	}
 
@@ -511,20 +552,20 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 				PinButton pin = (PinButton) v;
 
 				// TODO ボタンクリックイベント
-				String showMessage = String.format(
-						"%s(id:%s, 経度:%s,緯度:%s, 方位角:%s,当該座標との距離:%s[m])",
-						new Object[] { pin.message, pin.id, pin.lon, pin.lat,
-								pin.azimuth, pin.distance });
-				Toast.makeText(ARAcitivity.this, showMessage,
-						Toast.LENGTH_SHORT).show();
+				//				String showmessage = String.format(
+				//						"%s(id:%s, 経度:%s,緯度:%s, 方位角:%s,当該座標との距離:%s[m])",
+				//						new Object[] { pin.message, pin.id, pin.lon, pin.lat,
+				//								pin.azimuth, pin.distance });
+				//				Toast.makeText(ARAcitivity.this, showmessage,
+				//						Toast.LENGTH_SHORT).show();
 
-				// Intent intent = new Intent();
-				// intent.setClassName("com.sw.minavi",
-				// "com.sw.minavi.activity.TalkActivity");
-				// intent.putExtra("pinId", pin.id);
-				// intent.putExtra("talkGroupId", pin.talk_group_id);
-				// startActivity(intent);
-				// finish();
+				Intent intent = new Intent();
+				intent.setClassName("com.sw.minavi",
+						"com.sw.minavi.activity.TalkActivity");
+				intent.putExtra("pinId", pin.id);
+				intent.putExtra("talkGroupId", pin.talk_group_id);
+				startActivity(intent);
+				finish();
 			}
 		});
 		return btn;

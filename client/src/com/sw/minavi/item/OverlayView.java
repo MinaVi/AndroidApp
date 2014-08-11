@@ -2,7 +2,6 @@ package com.sw.minavi.item;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -43,19 +42,18 @@ public class OverlayView extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
-		Paint paint = new Paint();
-		paint.setStyle(Paint.Style.FILL);
-		paint.setARGB(100, 0, 0, 0);
-		// 中央十字表示
-		int len = height / 10;
-		paint.setARGB(255, 255, 0, 0);
-
-		final int sector = 12;
-		double padding = width / sector;
-		int sum = 0;
-		for(int i = 1; i < sector; i++) {
-			sum += padding;
-			canvas.drawLine(sum, 0, sum, height, paint);
-		}
+//		Paint paint = new Paint();
+//		paint.setStyle(Paint.Style.FILL);
+//		paint.setARGB(100, 0, 0, 0);
+//		// 中央十字表示
+//		int len = height / 10;
+//		paint.setARGB(255, 255, 0, 0);
+//
+//		double padding = width / ARAcitivity.SECTOR;
+//		int sum = 0;
+//		for(int i = 1; i < ARAcitivity.SECTOR; i++) {
+//			sum += padding;
+//			canvas.drawLine(sum, 0, sum, height, paint);
+//		}
 	}
 }
