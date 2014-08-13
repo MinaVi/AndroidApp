@@ -49,8 +49,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		} else if (v.getId() == R.id.ar_icon) {
 			Intent intent = new Intent(this, ARAcitivity.class);
 			startActivity(intent);
+		} else if (v.getId() == R.id.setting_icon) {
+			Intent intent = new Intent(this, GLARActivity.class);
+			startActivity(intent);
 		}
-
 	}
 
 }

@@ -57,6 +57,20 @@ public class LocationUtilities {
 	}
 
 	/**
+	 * 2点間を結ぶ方角を取得する(北を0として0～360の数値で方角を表現する)
+	 *
+	 * @param latitude1
+	 * @param longitude1
+	 * @param latitude2
+	 * @param longitude2
+	 * @return
+	 */
+	public static double getDirectionRad(double latitude1, double longitude1,
+			double latitude2, double longitude2) {
+		return degreesToRads(getDirection(latitude1, longitude1, latitude2, longitude2));
+	}
+
+	/**
 	 * ラジアンを度に変換する(方位角用)
 	 *
 	 * @param rad
@@ -79,5 +93,14 @@ public class LocationUtilities {
 	 */
 	public static int radianToDegree(float rad) {
 		return (int) Math.floor(Math.toDegrees(rad));
+	}
+
+	/**
+	 * 度からラジアンに変換する
+	 * @param degrees 度
+	 * @return ラジアン
+	 */
+	public static double degreesToRads(double degrees) {
+		return degrees * (Math.PI / 180f);
 	}
 }
