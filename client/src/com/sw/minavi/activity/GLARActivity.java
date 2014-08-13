@@ -274,7 +274,7 @@ public class GLARActivity extends Activity implements SensorEventListener, Locat
 		setContentView(myGLSurfaceView);
 
 		// ジェスチャーを検出する
-		this.gesDetector = new GestureDetector(this, myGLSurfaceView);
+		//this.gesDetector = new GestureDetector(this, myGLSurfaceView);
 
 		// カメラの生成、追加
 		this.cameraView = new GLCameraView(this);

@@ -42,7 +42,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private int[] textures = new int[1];
 
 	// レンダラークラス
-	public class OpenGLRenderer implements Renderer {
+	public class OpenGLRenderer implements Renderer, OnTouchListener {
 
 		float lightpos[] = { 0.0f, 0.0f, 4.0f, 0.0f };
 		float red[] = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -242,38 +242,20 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			}
 		}
 
-		public synchronized boolean onTouch(View v, MotionEvent event) {
-			// アクションで処理わける
+		@Override
+		public boolean onTouch(View view, MotionEvent event) {
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_MOVE:
-				// 最新のタッチされた場所を更新
-				//this.mTouch.set(event.getX(), event.getY(), 0.0f);
+				Toast.makeText(activityContext, "MOVE:" + event.getX() + "," + event.getY(), Toast.LENGTH_SHORT).show();
 				break;
-			case MotionEvent.ACTION_DOWN:
-				// タッチ位置を今の位置にする
-				//this.mTouch.set(event.getX(), event.getY(), 0.0f);
-
-				// 行列を計算用に取り出す
-				float[] modelView = new float[16];
-				float[] projection = new float[16];
-				//this.mProjectionStack.getMatrix(projection);
-				//this.mModelViewStack.getMatrix(modelView);
-
-				//this.mRay.updateRay((int) this.mTouch.x, (int) this.mTouch.y, modelView, projection);
-
-				// 板を触ってる
-				//				if (this.mRay.isHitRay(this.mHitArea) == true) {
-				//
-				//					// タッチが開始された場所をセット
-				//					mDragStart.set(this.mTouch);
-				//					// ドラッグ開始
-				//					this.mPlaneDrag = true;
-				//				}
+			case MotionEvent.ACTION_DOWN: 
+				Toast.makeText(activityContext, "DOWN:" + event.getX() + "," + event.getY(), Toast.LENGTH_SHORT).show();
 				break;
-			case MotionEvent.ACTION_UP:
-				//				this.mPlaneDrag = false;
+			case MotionEvent.ACTION_UP: 
+				Toast.makeText(activityContext, "UP:ViewPort:" + event.getX() + "," + event.getY() + ":CENTER:" + centerPos[0] + "," + centerPos[1] + "," + centerPos[2], Toast.LENGTH_SHORT).show();
 				break;
 			}
+
 			return true;
 		}
 	}
@@ -292,6 +274,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 		renderer = new OpenGLRenderer();
 		setRenderer(renderer);
+		setOnTouchListener(renderer);
 	}
 
 	@Override
@@ -314,8 +297,8 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	@Override
 	public boolean onScroll(MotionEvent event1, MotionEvent event2, float distx, float disty) {
-		eyepos[0] += distx * 0.01;
-		eyepos[1] += disty * 0.01;
+//		eyepos[0] += distx * 0.01;
+//		eyepos[1] += disty * 0.01;
 		return true;
 	}
 
@@ -340,8 +323,8 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		//
 		//		centerPos[0] = (float) (Math.cos(radian) * eyepos[2] + eyepos[0]);
 		//		centerPos[2] = (float) (Math.sin(radian) * eyepos[2] + eyepos[2]);
-		renderer.onTouch(this, event);
-		Toast.makeText(getContext(), event.getX() + "," + event.getY(), Toast.LENGTH_SHORT).show();
+		// renderer.onTouch(this, event);
+		//		Toast.makeText(getContext(), event.getX() + "," + event.getY(), Toast.LENGTH_SHORT).show();
 		return false;
 	}
 
