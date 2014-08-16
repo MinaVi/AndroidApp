@@ -9,6 +9,14 @@ package com.sw.minavi;
 
 public final class R {
     public static final class attr {
+        /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int val=0x7f010000;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -77,7 +85,7 @@ public final class R {
         public static final int yukkuri=0x7f020035;
     }
     public static final class id {
-        public static final int action_settings=0x7f080026;
+        public static final int action_settings=0x7f080032;
         public static final int answerTextFirstView=0x7f080022;
         public static final int answerTextForthView=0x7f080025;
         public static final int answerTextSecondView=0x7f080023;
@@ -88,8 +96,20 @@ public final class R {
         public static final int back_area=0x7f08001e;
         public static final int back_image=0x7f08001a;
         public static final int camera=0x7f080011;
+        public static final int centerXLabel=0x7f08002c;
+        public static final int centerXValue=0x7f08002d;
+        public static final int centerYLabel=0x7f08002e;
+        public static final int centerYValue=0x7f08002f;
+        public static final int centerZLabel=0x7f080030;
+        public static final int centerZValue=0x7f080031;
         public static final int chara_image_left=0x7f08001b;
         public static final int chara_image_right=0x7f08001c;
+        public static final int eyeXLabel=0x7f080026;
+        public static final int eyeXValue=0x7f080027;
+        public static final int eyeYLabel=0x7f080028;
+        public static final int eyeYValue=0x7f080029;
+        public static final int eyeZLabel=0x7f08002a;
+        public static final int eyeZValue=0x7f08002b;
         public static final int frame=0x7f080010;
         public static final int frame_image=0x7f08001d;
         public static final int geo=0x7f080008;
@@ -122,7 +142,8 @@ public final class R {
         public static final int activity_main=0x7f030001;
         public static final int activity_talk=0x7f030002;
         public static final int activity_talk_nexus7_2013=0x7f030003;
-        public static final int talk_layout=0x7f030004;
+        public static final int look_at=0x7f030004;
+        public static final int talk_layout=0x7f030005;
     }
     public static final class menu {
         public static final int main=0x7f070000;
@@ -159,4 +180,33 @@ public final class R {
          */
         public static final int AppTheme=0x7f060001;
     }
+    public static final class styleable {
+        /** Attributes that can be used with a LookAtView.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #LookAtView_val com.sw.minavi:val}</code></td><td></td></tr>
+           </table>
+           @see #LookAtView_val
+         */
+        public static final int[] LookAtView = {
+            0x7f010000
+        };
+        /**
+          <p>This symbol is the offset where the {@link com.sw.minavi.R.attr#val}
+          attribute's value can be found in the {@link #LookAtView} array.
+
+
+          <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name com.sw.minavi:val
+        */
+        public static final int LookAtView_val = 0;
+    };
 }

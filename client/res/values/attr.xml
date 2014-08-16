@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="val" format="string" />
+
+    <declare-styleable name="LookAtView">
+        <attr name="val" />
+    </declare-styleable>
+
+</resources>

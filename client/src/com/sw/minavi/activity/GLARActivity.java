@@ -15,17 +15,18 @@ import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.FrameLayout.LayoutParams;
-import android.widget.Toast;
 
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.item.ARGLSurfaceView;
 import com.sw.minavi.item.GLCameraView;
 import com.sw.minavi.item.LocalItem;
+import com.sw.minavi.item.LookAtView;
 import com.sw.minavi.item.SensorFilter;
 import com.sw.minavi.util.LocationUtilities;
 
-public class GLARActivity extends Activity implements SensorEventListener, LocationListener {
+public class GLARActivity extends Activity implements SensorEventListener,
+		LocationListener {
 
 	/** ジェスチャー検出器 */
 	private GestureDetector gesDetector = null;
@@ -69,13 +70,14 @@ public class GLARActivity extends Activity implements SensorEventListener, Locat
 
 	private ARGLSurfaceView myGLSurfaceView;
 	private GLCameraView cameraView;
+	private LookAtView lookAtView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// レイアウトを設定
-		//setContentView(R.layout.activity_main);
+		// setContentView(R.layout.activity_main);
 
 		// センサーサービスの起動
 		initSensorService();
@@ -199,19 +201,25 @@ public class GLARActivity extends Activity implements SensorEventListener, Locat
 
 			isGetLocation = true;
 
-			Toast.makeText(this, location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT).show();
+//			Toast.makeText(this,
+//					location.getLatitude() + "," + location.getLongitude(),
+//					Toast.LENGTH_SHORT).show();
 			addViews();
 
 		} else {
 			// 2回目の座標取得
-			double lengthInMeter = LocationUtilities.getDistance(location.getLatitude(), location.getLongitude(),
-					loadLocation.getLatitude(),
-					loadLocation.getLongitude(), 10) * 1000;
+			double lengthInMeter = LocationUtilities
+					.getDistance(location.getLatitude(),
+							location.getLongitude(),
+							loadLocation.getLatitude(),
+							loadLocation.getLongitude(), 10) * 1000;
 
 			if (lengthInMeter < 50) {
-				Toast.makeText(this,
-						location.getLatitude() + "," + location.getLongitude() + "," + lengthInMeter + "m",
-						Toast.LENGTH_SHORT).show();
+//				Toast.makeText(
+//						this,
+//						location.getLatitude() + "," + location.getLongitude()
+//								+ "," + lengthInMeter + "m", Toast.LENGTH_SHORT)
+//						.show();
 				return;
 			}
 
@@ -270,16 +278,17 @@ public class GLARActivity extends Activity implements SensorEventListener, Locat
 		locationItems = LocalItemTableManager.getInstance(helper).GetRecords();
 
 		// OpenGL用のビューの生成
-		this.myGLSurfaceView = new ARGLSurfaceView(this, loadLocation, locationItems);
-		setContentView(myGLSurfaceView);
+		this.lookAtView = new LookAtView(this);
+		this.cameraView = new GLCameraView(this);
+		this.myGLSurfaceView = new ARGLSurfaceView(this, loadLocation,
+				locationItems, lookAtView);
 
 		// ジェスチャーを検出する
-		//this.gesDetector = new GestureDetector(this, myGLSurfaceView);
+		// this.gesDetector = new GestureDetector(this, myGLSurfaceView);
 
-		// カメラの生成、追加
-		this.cameraView = new GLCameraView(this);
-		addContentView(cameraView,
-				new LayoutParams(LayoutParams.MATCH_PARENT,
-						LayoutParams.MATCH_PARENT));
+		setContentView(myGLSurfaceView);
+		addContentView(cameraView, new LayoutParams(LayoutParams.MATCH_PARENT,
+				LayoutParams.MATCH_PARENT));
+		addContentView(lookAtView, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 	}
 }
