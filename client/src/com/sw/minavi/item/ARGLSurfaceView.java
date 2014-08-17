@@ -28,6 +28,7 @@ import com.sw.minavi.model.Ground;
 import com.sw.minavi.model.LineOfSight;
 import com.sw.minavi.model.Model;
 import com.sw.minavi.model.TextModel;
+import com.sw.minavi.util.GLUtils;
 import com.sw.minavi.util.LocationUtilities;
 import com.sw.minavi.util.PhysicsUtil;
 
@@ -308,15 +309,15 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 				Vector3f rayStart = new Vector3f(eyepos);
 				Vector3f rayDir = new Vector3f(point);
-				Model model = getRayIntersectModel(rayStart, rayDir);
-				if(model != null) {
-					LocalItem item = model.getItem();
-					String message = MessageFormat.format(
-							"{0},{1}", item.getId(),
-							item.getArImageName());
 
-					Toast.makeText(activityContext, message,
-							Toast.LENGTH_SHORT).show();
+				Model model = getRayIntersectModel(rayStart, rayDir);
+				if (model != null) {
+					LocalItem item = model.getItem();
+					String message = MessageFormat.format("{0},{1}",
+							item.getId(), item.getArImageName());
+
+					Toast.makeText(activityContext, message, Toast.LENGTH_SHORT)
+							.show();
 				}
 				break;
 			}
@@ -327,42 +328,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		private Model getRayIntersectModel(Vector3f a, Vector3f b) {
 
 			for (Model model : models) {
-
 				for (Vector3f[] posList : model.getVector3f()) {
-
-					Vector3f rayDir = new Vector3f(b);
-					rayDir.sub(a);
-					rayDir.normalize();
-
-					// 法線の計算
-					Vector3f edge1 = new Vector3f(posList[1]);
-					Vector3f edge2 = new Vector3f(posList[2]);
-					edge1.sub(posList[0]);
-					edge2.sub(posList[0]);
-
-					// 点Pの計算
-					Vector3f p = new Vector3f();
-					p.cross(rayDir, edge2);
-					p.normalize();
-
-					float det = p.dot(edge1);
-					if (det > 0.000001) {
-
-						Vector3f t = new Vector3f();
-						t.sub(a, posList[0]);
-
-						float u = p.dot(t);
-
-						if ((u >= 0) && (u <= 1 * det)) {
-
-							Vector3f q = new Vector3f();
-							q.cross(t, edge1);
-
-							float v = q.dot(rayDir);
-							if ((v >= 0) && (u + v <= 1 * det)) {
-								return model;
-							}
-						}
+					if (GLUtils.intersect(a, b, posList)) {
+						return model;
 					}
 				}
 			}
