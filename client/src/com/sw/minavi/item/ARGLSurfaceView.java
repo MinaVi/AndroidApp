@@ -144,13 +144,13 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 					}
 				}
 				if(isIntersect) {
-					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, blue, 0);
-					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, blue, 0);
-					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, blue, 0);
+					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
+					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
+					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
 				} else {
-					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, gray, 0);
-					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, gray, 0);
-					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, gray, 0);
+					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, darkColor, 0);
+					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, darkColor, 0);
+					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, darkColor, 0);
 				}
 				model.draw(gl);
 			}
@@ -158,6 +158,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// ----------------------------------------------
 			// テキストの描画
 			// ----------------------------------------------
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
 			for (TextModel textModel : textModels) {
 				textModel.draw(gl);
 			}
