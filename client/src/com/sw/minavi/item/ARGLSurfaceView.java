@@ -27,6 +27,7 @@ import com.sw.minavi.model.Grid;
 import com.sw.minavi.model.Ground;
 import com.sw.minavi.model.LineOfSight;
 import com.sw.minavi.model.Model;
+import com.sw.minavi.model.TextModel;
 import com.sw.minavi.util.LocationUtilities;
 import com.sw.minavi.util.PhysicsUtil;
 
@@ -46,8 +47,8 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private List<LocalItem> locationItems;
 	private Location loadLocation;
 	private Context activityContext;
-	private int[] textures = new int[1];
 	private ArrayList<Model> models = new ArrayList<Model>();
+	private ArrayList<TextModel> textModels = new ArrayList<TextModel>();
 
 	private Handler handler;
 	private Runnable lookAtRunnable;
@@ -104,60 +105,6 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 					centerPos[1], centerPos[2], upPos[0], upPos[1], upPos[2]);
 			handler.post(lookAtRunnable);
 
-			// ------------------------------------------------
-			// 軸の描画
-			// ------------------------------------------------
-			// gl.glPushMatrix(); // マトリックス記憶
-			// gl.glEnable(GL10.GL_DEPTH_TEST);
-			// gl.glDepthFunc(GL10.GL_LEQUAL);
-			// gl.glDepthMask(true);
-			// gl.glLineWidth(5.0f);
-			// gl.glMaterialfv(GL10.GL_FRONT_AND_BACK,
-			// GL10.GL_AMBIENT_AND_DIFFUSE, white, 0);
-			// ground.draw(gl);
-			// gl.glPopMatrix(); // マトリックスを戻す
-
-			// ------------------------------------------------
-			// グリッドの描画
-			// ------------------------------------------------
-			// gl.glPushMatrix(); // マトリックス記憶
-			// // デプテスト
-			// gl.glEnable(GL10.GL_DEPTH_TEST);
-			// gl.glDepthFunc(GL10.GL_LEQUAL);
-			// gl.glDepthMask(true);
-			//
-			// // アルファテスト
-			// gl.glEnable(GL10.GL_ALPHA_TEST);
-			// gl.glAlphaFunc(GL10.GL_GEQUAL, 0.1f);
-			//
-			// // テクスチャ
-			// gl.glEnable(GL10.GL_TEXTURE_2D);
-			// // 線の長さ
-			// gl.glLineWidth(1.0f);
-			// gl.glMaterialfv(GL10.GL_FRONT_AND_BACK,
-			// GL10.GL_AMBIENT_AND_DIFFUSE, green, 0);
-			// grid.drawGrid(gl, 20, 20, 10, 10);
-			//
-			// gl.glLineWidth(10.0f);
-			// Grid.drawLine(gl, eyepos[0], eyepos[1], eyepos[2], centerPos[0],
-			// centerPos[1], centerPos[2]);
-			// gl.glPopMatrix(); // マトリックスを戻す
-
-			// ------------------------------------------------
-			// ???の描画
-			// ------------------------------------------------
-			// gl.glPushMatrix(); // マトリックス記憶
-			// gl.glEnable(GL10.GL_DEPTH_TEST);
-			// gl.glDepthFunc(GL10.GL_LEQUAL);
-			// gl.glDepthMask(true);
-			// gl.glLineWidth(10.0f);
-			// gl.glMaterialfv(GL10.GL_FRONT_AND_BACK,
-			// GL10.GL_AMBIENT_AND_DIFFUSE, green, 0);
-			// // lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
-			// // centerPos[0], centerPos[1], centerPos[2]);
-			// gl.glPopMatrix(); // マトリックスを戻す
-			//
-
 			// デプステスト
 			// gl.glEnable(GL10.GL_DEPTH_TEST);
 			// gl.glDepthFunc(GL10.GL_LEQUAL); gl.glDepthMask(true);
@@ -181,11 +128,49 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, gray, 0);
 			gl.glMaterialf(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, 80f);
 
+			// ----------------------------------------------
+			// モデルの描画
+			// ----------------------------------------------
 			Collections.sort(models, new ModelComparator());
 			for (Model model : models) {
-				// 描画
 				model.draw(gl);
+			}
 
+			// ----------------------------------------------
+			// テキストの描画
+			// ----------------------------------------------
+			for (TextModel textModel : textModels) {
+				textModel.draw(gl);
+			}
+
+			// ------------------------------------------------
+			// 軸の描画
+			// ------------------------------------------------
+			// gl.glPushMatrix(); // マトリックス記憶
+			// gl.glEnable(GL10.GL_DEPTH_TEST);
+			// gl.glDepthFunc(GL10.GL_LEQUAL);
+			// gl.glDepthMask(true);
+			// gl.glLineWidth(5.0f);
+			// gl.glMaterialfv(GL10.GL_FRONT_AND_BACK,
+			// GL10.GL_AMBIENT_AND_DIFFUSE, white, 0);
+			// ground.draw(gl);
+			// gl.glPopMatrix(); // マトリックスを戻す
+
+			// ------------------------------------------------
+			// グリッドの描画
+			// ------------------------------------------------
+			// // マトリックス記憶
+			// gl.glPushMatrix();
+			//
+			// gl.glLineWidth(1.0f);
+			// grid.drawGrid(gl, 50, 50, 1.0f, 1.0f);
+			// // マトリックスを戻す
+			// gl.glPopMatrix();
+
+			// ----------------------------------------------
+			// 視点-モデル間の線分の描画
+			// ----------------------------------------------
+			for (Model model : models) {
 				// マトリックス記憶
 				gl.glPushMatrix();
 				gl.glLineWidth(10.0f);
@@ -195,6 +180,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				gl.glPopMatrix();
 			}
 
+			// ----------------------------------------------
+			// 視点-注視点間の線分の描画
+			// ----------------------------------------------
 			// マトリックス記憶
 			gl.glPushMatrix();
 			gl.glLineWidth(10.0f);
@@ -203,6 +191,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// マトリックスを戻す
 			gl.glPopMatrix();
 
+			// ----------------------------------------------
+			// 視点-RayTo間の線分の描画
+			// ----------------------------------------------
 			if (point != null) {
 				gl.glPushMatrix(); // マトリックス記憶
 
@@ -243,7 +234,8 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			upPos[1] = 1;
 			upPos[2] = 0;
 
-			ground.initialize(gl, config);
+			int[] textures = new int[1];
+			int[] buffers = new int[1];
 
 			for (LocalItem locationItem : locationItems) {
 				Bitmap image = BitmapFactory.decodeResource(
@@ -255,6 +247,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				// テクスチャを生成
 				gl.glEnable(GL10.GL_TEXTURE_2D);
 				gl.glGenTextures(1, textures, 0);
+				gl.glGenTextures(1, buffers, 0);
 
 				double itemLatitude = locationItem.getLat();
 				double itemLongitude = locationItem.getLon();
@@ -276,11 +269,17 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				float xPos = (float) (Math.cos(azimuthRad) * scaleLength + eyepos[0]);
 				float zPos = (float) (Math.sin(azimuthRad) * scaleLength + eyepos[2]);
 
-				float degree = (float) (Math.atan2(xPos - eyepos[0], zPos
+				int degree = (int) (Math.atan2(xPos - eyepos[0], zPos
 						- eyepos[2]) * 180d / Math.PI) + 180;
 
 				models.add(new Model(xPos, 0, zPos, degree, textures, image,
 						locationItem));
+
+				textModels.add(new TextModel(xPos, 0, zPos, degree,
+						MessageFormat.format("ID[{0}]:Msg[{1}]:Img[{2}]",
+								locationItem.getId(),
+								locationItem.getMessage(),
+								locationItem.getArImageName()), buffers));
 			}
 		}
 
@@ -308,9 +307,16 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 						.getRayTo(x, y, eye, look, up, width, height);
 
 				Vector3f rayStart = new Vector3f(eyepos);
-				Vector3f rayDir = new Vector3f(centerPos);
-				if (isHitArea(rayStart, rayDir)) {
+				Vector3f rayDir = new Vector3f(point);
+				Model model = getRayIntersectModel(rayStart, rayDir);
+				if(model != null) {
+					LocalItem item = model.getItem();
+					String message = MessageFormat.format(
+							"{0},{1}", item.getId(),
+							item.getArImageName());
 
+					Toast.makeText(activityContext, message,
+							Toast.LENGTH_SHORT).show();
 				}
 				break;
 			}
@@ -318,59 +324,49 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			return true;
 		}
 
-		private boolean isHitArea(Vector3f rayStart, Vector3f rayEnd) {
+		private Model getRayIntersectModel(Vector3f a, Vector3f b) {
 
 			for (Model model : models) {
 
-				Vector3f[] posList = model.getVector3f(0, 0, 0);
+				for (Vector3f[] posList : model.getVector3f()) {
 
-				Vector3f rayDir = new Vector3f(rayEnd);
-				rayDir.sub(rayStart);
-				rayDir.normalize();
+					Vector3f rayDir = new Vector3f(b);
+					rayDir.sub(a);
+					rayDir.normalize();
 
-				// 法線の計算
-				Vector3f t0 = new Vector3f(posList[1]);
-				Vector3f t1 = new Vector3f(posList[2]);
-				t0.sub(posList[0]);
-				t1.sub(posList[0]);
-				Vector3f normal = new Vector3f();
-				normal.cross(t0, t1);
-				normal.normalize();
+					// 法線の計算
+					Vector3f edge1 = new Vector3f(posList[1]);
+					Vector3f edge2 = new Vector3f(posList[2]);
+					edge1.sub(posList[0]);
+					edge2.sub(posList[0]);
 
-				// 線分判定
-				Vector3f xp = new Vector3f(posList[0]);
-				xp.sub(rayStart);
-				float xpn = xp.dot(normal);
-				float vn = rayDir.dot(normal);
+					// 点Pの計算
+					Vector3f p = new Vector3f();
+					p.cross(rayDir, edge2);
+					p.normalize();
 
-				// カリングと発散を外す
-				if (-0.00001f <= vn) {
-					continue;
+					float det = p.dot(edge1);
+					if (det > 0.000001) {
+
+						Vector3f t = new Vector3f();
+						t.sub(a, posList[0]);
+
+						float u = p.dot(t);
+
+						if ((u >= 0) && (u <= 1 * det)) {
+
+							Vector3f q = new Vector3f();
+							q.cross(t, edge1);
+
+							float v = q.dot(rayDir);
+							if ((v >= 0) && (u + v <= 1 * det)) {
+								return model;
+							}
+						}
+					}
 				}
-
-				// 当たってる場所までの長さ
-				float t = xpn / vn;
-
-				// 後ろ向きのRAYは無視する
-				if (t < 0.0f) {
-					continue;
-				}
-
-				LocalItem item = model.getItem();
-				String message = MessageFormat.format("{0},{1}", item.getId(),
-						item.getArImageName());
-				// String message = MessageFormat.format(
-				// "rayStart[{0}]:rayDir[{1}]:HitArea[{2},{3},{4},{5}]",
-				// rayStart.toString(), rayDir.toString(),
-				// posList[0].toString(), posList[1].toString(),
-				// posList[2].toString(), posList[3].toString());
-				Toast.makeText(activityContext, message, Toast.LENGTH_SHORT)
-						.show();
-
-				return true;
 			}
-
-			return false;
+			return null;
 		}
 	}
 

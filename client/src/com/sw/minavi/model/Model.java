@@ -18,12 +18,13 @@ public class Model {
 	private FloatBuffer normalBuffer; // 法線用バッファ
 	private FloatBuffer textureBuffer; // テクスチャ用バッファ
 	private float[] vertex;
-	private float x, y, z, degree;
+	private float x, y, z;
+	private int degree;
 	private int[] textures;
 	private Bitmap image;
 	private LocalItem item;
 
-	public Model(float x, float y, float z, float degree, int[] textures,
+	public Model(float x, float y, float z, int degree, int[] textures,
 			Bitmap image, LocalItem item) {
 		this.x = x;
 		this.y = y;
@@ -33,9 +34,38 @@ public class Model {
 		this.textures = textures;
 		this.item = item;
 
-		vertex = new float[] { -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f,
-				1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f, -1.0f, -1.0f,
-				0.0f, };
+		float[] relativeVertex = new float[] {
+				-1.0f, -1.0f, 0.0f,
+				 1.0f, -1.0f, 0.0f,
+				 1.0f,  1.0f, 0.0f,
+				 1.0f,  1.0f, 0.0f,
+				-1.0f,  1.0f, 0.0f,
+				-1.0f, -1.0f, 0.0f, };
+
+		int index = 0;
+		float[] midPoint = new float[] { 0.0f, 0.0f, 0.0f };
+		float[] tmpVertex = new float[18];
+		while (index < relativeVertex.length) {
+			// 1件分の頂点を配列化
+			float[] v = new float[] {
+					relativeVertex[index + 0],
+					relativeVertex[index + 1],
+					relativeVertex[index + 2] };
+
+			// 中点midPointを基点に頂点の位置をdegree度回転させる
+			float[] rotateV =com.sw.minavi.util.GLUtils.getRotatePos(v, midPoint, -degree);
+
+			// xyzの値を元に平行移動し、頂点の絶対座標を算出
+			tmpVertex[index + 0] = rotateV[0] + x;
+			tmpVertex[index + 1] = rotateV[1] + y;
+			tmpVertex[index + 2] = rotateV[2] + z;
+			index += 3;
+		}
+		vertex = tmpVertex;
+
+//		vertex = new float[] { -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f,
+//				1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f, -1.0f, -1.0f,
+//				0.0f, };
 		ByteBuffer vb = ByteBuffer.allocateDirect(vertex.length * 4);
 		vb.order(ByteOrder.nativeOrder());
 		buffer = vb.asFloatBuffer();
@@ -62,8 +92,8 @@ public class Model {
 	public void draw(GL10 gl) {
 		gl.glPushMatrix(); // マトリックス記憶
 
-		gl.glTranslatef(x, y, z);
-		gl.glRotatef(degree, 0, 1, 0);
+		//gl.glTranslatef(x, y, z);
+		//gl.glRotatef(degree, 0, 1, 0);
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 
 		if (image != null) {
@@ -93,20 +123,19 @@ public class Model {
 		gl.glPopMatrix(); // マトリックスを戻す
 	}
 
-	public Vector3f[] getVector3f(float posX, float posY, float posZ) {
-		return new Vector3f[] {
-				new Vector3f(vertex[0] + posX, vertex[1] + posY, vertex[2]
-						+ posZ),
-				new Vector3f(vertex[3] + posX, vertex[4] + posY, vertex[5]
-						+ posZ),
-				new Vector3f(vertex[6] + posX, vertex[7] + posY, vertex[8]
-						+ posZ),
-				new Vector3f(vertex[9] + posX, vertex[10] + posY, vertex[11]
-						+ posZ),
-				new Vector3f(vertex[12] + posX, vertex[13] + posY, vertex[14]
-						+ posZ),
-				new Vector3f(vertex[15] + posX, vertex[16] + posY, vertex[17]
-						+ posZ), };
+	public Vector3f[][] getVector3f() {
+		Vector3f[][] triangles = new Vector3f[2][3];
+		triangles[0] = new Vector3f[] {
+				new Vector3f(vertex[0], vertex[1], vertex[2]),
+				new Vector3f(vertex[3], vertex[4], vertex[5]),
+				new Vector3f(vertex[6], vertex[7], vertex[8]),};
+
+		triangles[1] = new Vector3f[] {
+				new Vector3f(vertex[9], vertex[10], vertex[11]),
+				new Vector3f(vertex[12], vertex[13], vertex[14]),
+				new Vector3f(vertex[15], vertex[16], vertex[17]), };
+
+		return triangles;
 	}
 
 	public float getX() {
@@ -121,6 +150,10 @@ public class Model {
 		return z;
 	}
 
+	public float getDegree() {
+		return degree;
+	}
+
 	public LocalItem getItem() {
 		return item;
 	}
@@ -131,4 +164,5 @@ public class Model {
 		double dz = this.z - ez;
 		return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
 	}
+
 }

@@ -5,7 +5,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class Ground {
@@ -22,10 +21,7 @@ public class Ground {
 			1, 0, 2, 0, 3, 0
 	};
 
-	/*
-	 * データの初期化 
-	 */
-	public void initialize(GL10 gl, EGLConfig config) {
+	public Ground() {
 
 		ByteBuffer vbb = ByteBuffer.allocateDirect(axis.length * 4);
 		vbb.order(ByteOrder.nativeOrder());
