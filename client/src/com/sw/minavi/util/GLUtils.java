@@ -35,6 +35,8 @@ public class GLUtils {
 		Vector3f edge2 = new Vector3f(vertexList[2]);
 		edge1.sub(vertexList[0]);
 		edge2.sub(vertexList[0]);
+		edge1.normalize();
+		edge2.normalize();
 
 		// 点Pの計算
 		Vector3f p = new Vector3f();
@@ -46,6 +48,7 @@ public class GLUtils {
 
 			Vector3f t = new Vector3f();
 			t.sub(a, vertexList[0]);
+			//t.normalize();
 
 			float u = p.dot(t);
 
@@ -53,6 +56,7 @@ public class GLUtils {
 
 				Vector3f q = new Vector3f();
 				q.cross(t, edge1);
+				q.normalize();
 
 				float v = q.dot(ray);
 				if ((v >= 0) && (u + v <= 1 * det)) {

@@ -40,11 +40,12 @@ public class Model {
 				 1.0f,  1.0f, 0.0f,
 				 1.0f,  1.0f, 0.0f,
 				-1.0f,  1.0f, 0.0f,
-				-1.0f, -1.0f, 0.0f, };
+				-1.0f, -1.0f, 0.0f,
+		};
 
 		int index = 0;
 		float[] midPoint = new float[] { 0.0f, 0.0f, 0.0f };
-		float[] tmpVertex = new float[18];
+		float[] tmpVertex = new float[relativeVertex.length];
 		while (index < relativeVertex.length) {
 			// 1件分の頂点を配列化
 			float[] v = new float[] {
@@ -63,25 +64,32 @@ public class Model {
 		}
 		vertex = tmpVertex;
 
-//		vertex = new float[] { -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f,
-//				1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f, -1.0f, -1.0f,
-//				0.0f, };
 		ByteBuffer vb = ByteBuffer.allocateDirect(vertex.length * 4);
 		vb.order(ByteOrder.nativeOrder());
 		buffer = vb.asFloatBuffer();
 		buffer.put(vertex);
 		buffer.position(0);
 
-		float normal[] = { 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-				1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, };
+		float normal[] = {
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f,
+				};
 		ByteBuffer nb = ByteBuffer.allocateDirect(normal.length * 4);
 		nb.order(ByteOrder.nativeOrder());
 		normalBuffer = nb.asFloatBuffer();
 		normalBuffer.put(normal);
 		normalBuffer.position(0);
 
-		float texture[] = { 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f, };
+		float texture[] = {
+				0.0f, 1.0f, 1.0f,
+				1.0f, 1.0f, 0.0f,
+				1.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 1.0f,
+		};
 		ByteBuffer tb = ByteBuffer.allocateDirect(texture.length * 4);
 		tb.order(ByteOrder.nativeOrder());
 		textureBuffer = tb.asFloatBuffer();
@@ -94,8 +102,8 @@ public class Model {
 
 		//gl.glTranslatef(x, y, z);
 		//gl.glRotatef(degree, 0, 1, 0);
-		gl.glEnable(GL10.GL_TEXTURE_2D);
 
+		gl.glEnable(GL10.GL_TEXTURE_2D);
 		if (image != null) {
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
 			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,

@@ -79,7 +79,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		float yellow[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 		float darkColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		float brightColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		Vector3f point;
+		Vector3f rayTo;
 
 		@Override
 		public void onDrawFrame(GL10 gl) {
@@ -132,8 +132,26 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// ----------------------------------------------
 			// モデルの描画
 			// ----------------------------------------------
+			Vector3f eyePosVec = new Vector3f(eyepos);
+			Vector3f centerPosVec = new Vector3f(centerPos);
 			Collections.sort(models, new ModelComparator());
 			for (Model model : models) {
+
+				boolean isIntersect = false;
+				for (Vector3f[] vertexList : model.getVector3f()) {
+					if (GLUtils.intersect(eyePosVec, centerPosVec, vertexList)) {
+						isIntersect = true;
+					}
+				}
+				if(isIntersect) {
+					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, blue, 0);
+					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, blue, 0);
+					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, blue, 0);
+				} else {
+					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, gray, 0);
+					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, gray, 0);
+					gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, gray, 0);
+				}
 				model.draw(gl);
 			}
 
@@ -171,22 +189,27 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// ----------------------------------------------
 			// 視点-モデル間の線分の描画
 			// ----------------------------------------------
-			for (Model model : models) {
-				// マトリックス記憶
-				gl.glPushMatrix();
-				gl.glLineWidth(10.0f);
-				lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
-						model.getX(), model.getY(), model.getZ());
-				// マトリックスを戻す
-				gl.glPopMatrix();
-			}
+			// for (Model model : models) {
+			// // マトリックス記憶
+			// gl.glPushMatrix();
+			// gl.glLineWidth(10.0f);
+			// lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
+			// model.getX(), model.getY(), model.getZ());
+			// // マトリックスを戻す
+			// gl.glPopMatrix();
+			// }
 
 			// ----------------------------------------------
 			// 視点-注視点間の線分の描画
 			// ----------------------------------------------
 			// マトリックス記憶
 			gl.glPushMatrix();
+
+			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, red, 0);
+			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, red, 0);
+			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, red, 0);
 			gl.glLineWidth(10.0f);
+
 			lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
 					centerPos[0], centerPos[1], centerPos[2]);
 			// マトリックスを戻す
@@ -195,15 +218,16 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// ----------------------------------------------
 			// 視点-RayTo間の線分の描画
 			// ----------------------------------------------
-			if (point != null) {
+			if (rayTo != null) {
 				gl.glPushMatrix(); // マトリックス記憶
 
+				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, green, 0);
+				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, green, 0);
+				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, green, 0);
 				gl.glLineWidth(10.0f);
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK,
-						GL10.GL_AMBIENT_AND_DIFFUSE, green, 0);
 
 				lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
-						point.x, point.y, point.z);
+						rayTo.x, rayTo.y, rayTo.z);
 				gl.glPopMatrix(); // マトリックスを戻す
 			}
 		}
@@ -304,13 +328,11 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				int width = getWidth();
 				int height = getHeight();
 
-				point = PhysicsUtil
+				Vector3f rayFrom = new Vector3f(eyepos);
+				rayTo = PhysicsUtil
 						.getRayTo(x, y, eye, look, up, width, height);
 
-				Vector3f rayStart = new Vector3f(eyepos);
-				Vector3f rayDir = new Vector3f(point);
-
-				Model model = getRayIntersectModel(rayStart, rayDir);
+				Model model = getRayIntersectModel(rayFrom, rayTo);
 				if (model != null) {
 					LocalItem item = model.getItem();
 					String message = MessageFormat.format("{0},{1}",
