@@ -41,15 +41,16 @@ import com.sw.minavi.util.PhysicsUtil;
 
 public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener {
 
+	private float viewWidth;
+	private float viewHeight;
+
 	private Ground ground = new Ground();
 	private Grid grid = new Grid();
 	private LineOfSight lineOfSight = new LineOfSight();
-	private float angle = 0.0f;
+
 	private float eyepos[] = new float[3];
 	private float centerPos[] = new float[3];
 	private float upPos[] = new float[3];
-	private float viewWidth = 0;
-	private int viewHeight;
 
 	private OpenGLRenderer renderer;
 	private List<LocalItem> locationItems;
@@ -61,6 +62,10 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private Handler handler;
 	private Runnable lookAtRunnable;
 	private LookAtView lookAtView;
+	private double azimuthRad;
+	private float pitch;
+	private float roll;
+	private int azimuth;
 
 	{
 		lookAtRunnable = new Runnable() {
@@ -140,14 +145,20 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// モデルの描画
 			// ----------------------------------------------
 			Vector3f eyePosVec = new Vector3f(eyepos);
-			Vector3f centerPosVec = new Vector3f(centerPos);
+			//Vector3f centerPosVec = new Vector3f(centerPos);
+			List<Vector3f> arcSightList = getArcSight(45);
+
 			Collections.sort(models, new ModelComparator());
 			for (Model model : models) {
 
 				boolean isIntersect = false;
 				for (Vector3f[] vertexList : model.getVector3f()) {
-					if (GLUtils.intersect(eyePosVec, centerPosVec, vertexList)) {
-						isIntersect = true;
+					for (Vector3f arcSightTo : arcSightList) {
+						if (GLUtils.intersect(eyePosVec, arcSightTo,
+								vertexList)) {
+							isIntersect = true;
+							break;
+						}
 					}
 				}
 				if (isIntersect) {
@@ -498,10 +509,40 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		return false;
 	}
 
-	public void changeCenterPos(double radian, float pitch, float roll) {
-		centerPos[0] = (float) (Math.cos(radian) * eyepos[2] + eyepos[0]);
+	public void changeAzimuthEvent(double radian, float pitch, float roll) {
+		this.azimuthRad = radian;
+		this.azimuth = LocationUtilities
+				.radianToDegreeForAzimuth((float) radian);
+		this.pitch = pitch;
+		this.roll = roll;
+		getCenterPos();
+	}
+
+	private void getCenterPos() {
+		centerPos[0] = (float) (Math.cos(azimuthRad) * eyepos[2] + eyepos[0]);
 		centerPos[1] = (float) ((Math.cos(roll) * eyepos[2] + eyepos[1]) * -1.0);
-		centerPos[2] = (float) (Math.sin(radian) * eyepos[2] + eyepos[2]);
+		centerPos[2] = (float) (Math.sin(azimuthRad) * eyepos[2] + eyepos[2]);
+	}
+
+	private List<Vector3f> getArcSight(int sight) {
+
+		List<Vector3f> arcSightPointList = new ArrayList<Vector3f>();
+
+		int centerAngle = sight / 2;
+
+		for (int i = 1; i <= centerAngle; i++) {
+			double radian = LocationUtilities.degreesToRads(i + azimuth);
+			arcSightPointList.add(new Vector3f((float) (Math.cos(radian)
+					* eyepos[2] + eyepos[0]), centerPos[1], (float) (Math
+					.sin(radian) * eyepos[2] + eyepos[2])));
+		}
+		for (int i = -centerAngle; i <= -1; i++) {
+			double radian = LocationUtilities.degreesToRads(i + azimuth);
+			arcSightPointList.add(new Vector3f((float) (Math.cos(radian)
+					* eyepos[2] + eyepos[0]), centerPos[1], (float) (Math
+					.sin(radian) * eyepos[2] + eyepos[2])));
+		}
+		return arcSightPointList;
 	}
 
 	public Vector3f getMiddlePoint(float x0, float y0, float z0, float x1,

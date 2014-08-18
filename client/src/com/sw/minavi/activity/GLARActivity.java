@@ -181,7 +181,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			isGetAzimuth = true;
 
 			if (myGLSurfaceView != null) {
-				myGLSurfaceView.changeCenterPos(azimuthRad, pitch, roll);
+				myGLSurfaceView.changeAzimuthEvent(azimuthRad, pitch, roll);
 			}
 		}
 	}
