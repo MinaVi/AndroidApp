@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -12,7 +14,12 @@ import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.PixelFormat;
 import android.location.Location;
 import android.opengl.GLSurfaceView;
@@ -143,7 +150,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 						isIntersect = true;
 					}
 				}
-				if(isIntersect) {
+				if (isIntersect) {
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
@@ -224,9 +231,12 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			if (rayTo != null) {
 				gl.glPushMatrix(); // マトリックス記憶
 
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, green, 0);
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, green, 0);
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, green, 0);
+				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, green,
+						0);
+				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, green,
+						0);
+				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR,
+						green, 0);
 				gl.glLineWidth(10.0f);
 
 				lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
@@ -262,20 +272,78 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			upPos[1] = 1;
 			upPos[2] = 0;
 
-			int[] textures = new int[1];
-			int[] buffers = new int[1];
+			HashSet<String> arImgNameSet = new HashSet<String>();
+			for (LocalItem locationItem : locationItems) {
+				arImgNameSet.add(locationItem.getArImageName());
+			}
+			int[] arImgTextures = new int[arImgNameSet.size()];
+			int[] textImgTextures = new int[locationItems.size()];
+			arImgNameSet.clear();
+
+			gl.glGenTextures(arImgTextures.length, arImgTextures, 0);
+			gl.glGenTextures(textImgTextures.length, textImgTextures, 0);
+
+			int arImgTextureIndex = 0;
+			int textImgTextureIndex = 0;
+			HashMap<String, Integer> arImgNameToTextIdMap = new HashMap<String, Integer>();
 
 			for (LocalItem locationItem : locationItems) {
-				Bitmap image = BitmapFactory.decodeResource(
-						getResources(),
-						getResources().getIdentifier(
-								locationItem.getArImageName(), "drawable",
-								activityContext.getPackageName()));
 
-				// テクスチャを生成
-				gl.glEnable(GL10.GL_TEXTURE_2D);
-				gl.glGenTextures(1, textures, 0);
-				gl.glGenTextures(1, buffers, 0);
+				int arImgTextureId;
+				{
+					Bitmap arImgBitmap = BitmapFactory.decodeResource(
+							getResources(),
+							getResources().getIdentifier(
+									locationItem.getArImageName(), "drawable",
+									activityContext.getPackageName()));
+					if (arImgNameToTextIdMap.containsKey(locationItem
+							.getArImageName())) {
+						arImgTextureId = arImgNameToTextIdMap.get(locationItem
+								.getArImageName());
+					} else {
+						arImgTextureId = arImgTextures[arImgTextureIndex++];
+						arImgNameToTextIdMap.put(locationItem.getArImageName(),
+								arImgTextureId);
+					}
+
+					gl.glBindTexture(GL10.GL_TEXTURE_2D, arImgTextureId);
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+							GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+							GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+					android.opengl.GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0,
+							arImgBitmap, 0);
+					arImgBitmap.recycle();
+				}
+
+				int textImgTextureId;
+				Bitmap textBitmap = Bitmap.createBitmap(256, 256,
+						Config.ARGB_8888);
+				{
+					Canvas canvas = new Canvas(textBitmap);
+					Paint paint = new Paint();
+					paint.setColor(Color.WHITE);
+					paint.setStyle(Style.FILL);
+					canvas.drawColor(0);
+					canvas.drawText(MessageFormat.format(
+							"ID[{0}]:Msg[{1}]:Img[{2}]", locationItem.getId(),
+							locationItem.getMessage(),
+							locationItem.getArImageName()), 0, 15, paint);
+
+					textImgTextureId = textImgTextures[textImgTextureIndex++];
+
+					// テクスチャ情報の設定
+					gl.glBindTexture(GL10.GL_TEXTURE_2D, textImgTextureId);
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+							GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+							GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST);
+					android.opengl.GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0,
+							textBitmap, 0);
+
+					// bitmapを破棄
+					textBitmap.recycle();
+				}
 
 				double itemLatitude = locationItem.getLat();
 				double itemLongitude = locationItem.getLon();
@@ -300,14 +368,11 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				int degree = (int) (Math.atan2(xPos - eyepos[0], zPos
 						- eyepos[2]) * 180d / Math.PI) + 180;
 
-				models.add(new Model(xPos, 0, zPos, degree, textures, image,
+				models.add(new Model(xPos, 0, zPos, degree, arImgTextureId,
 						locationItem));
 
 				textModels.add(new TextModel(xPos, 0, zPos, degree,
-						MessageFormat.format("ID[{0}]:Msg[{1}]:Img[{2}]",
-								locationItem.getId(),
-								locationItem.getMessage(),
-								locationItem.getArImageName()), buffers));
+						textImgTextureId));
 			}
 		}
 

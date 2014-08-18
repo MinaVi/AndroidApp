@@ -7,9 +7,6 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
-import android.graphics.Bitmap;
-import android.opengl.GLUtils;
-
 import com.sw.minavi.item.LocalItem;
 
 public class Model {
@@ -20,41 +17,33 @@ public class Model {
 	private float[] vertex;
 	private float x, y, z;
 	private int degree;
-	private int[] textures;
-	private Bitmap image;
+	private int arImgTextureId;
 	private LocalItem item;
 
-	public Model(float x, float y, float z, int degree, int[] textures,
-			Bitmap image, LocalItem item) {
+	public Model(float x, float y, float z, int degree, int arImgTextureId,
+			LocalItem item) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.degree = degree;
-		this.image = image;
-		this.textures = textures;
+		this.arImgTextureId = arImgTextureId;
 		this.item = item;
 
-		float[] relativeVertex = new float[] {
-				-1.0f, -1.0f, 0.0f,
-				 1.0f, -1.0f, 0.0f,
-				 1.0f,  1.0f, 0.0f,
-				 1.0f,  1.0f, 0.0f,
-				-1.0f,  1.0f, 0.0f,
-				-1.0f, -1.0f, 0.0f,
-		};
+		float[] relativeVertex = new float[] { -1.0f, -1.0f, 0.0f, 1.0f, -1.0f,
+				0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f,
+				-1.0f, -1.0f, 0.0f, };
 
 		int index = 0;
 		float[] midPoint = new float[] { 0.0f, 0.0f, 0.0f };
 		float[] tmpVertex = new float[relativeVertex.length];
 		while (index < relativeVertex.length) {
 			// 1件分の頂点を配列化
-			float[] v = new float[] {
-					relativeVertex[index + 0],
-					relativeVertex[index + 1],
-					relativeVertex[index + 2] };
+			float[] v = new float[] { relativeVertex[index + 0],
+					relativeVertex[index + 1], relativeVertex[index + 2] };
 
 			// 中点midPointを基点に頂点の位置をdegree度回転させる
-			float[] rotateV =com.sw.minavi.util.GLUtils.getRotatePos(v, midPoint, -degree);
+			float[] rotateV = com.sw.minavi.util.GLUtils.getRotatePos(v,
+					midPoint, -degree);
 
 			// xyzの値を元に平行移動し、頂点の絶対座標を算出
 			tmpVertex[index + 0] = rotateV[0] + x;
@@ -70,26 +59,16 @@ public class Model {
 		buffer.put(vertex);
 		buffer.position(0);
 
-		float normal[] = {
-				0.0f, 0.0f, 1.0f,
-				0.0f, 0.0f, 1.0f,
-				0.0f, 0.0f, 1.0f,
-				0.0f, 0.0f, 1.0f,
-				0.0f, 0.0f, 1.0f,
-				0.0f, 0.0f, 1.0f,
-				};
+		float normal[] = { 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+				1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, };
 		ByteBuffer nb = ByteBuffer.allocateDirect(normal.length * 4);
 		nb.order(ByteOrder.nativeOrder());
 		normalBuffer = nb.asFloatBuffer();
 		normalBuffer.put(normal);
 		normalBuffer.position(0);
 
-		float texture[] = {
-				0.0f, 1.0f, 1.0f,
-				1.0f, 1.0f, 0.0f,
-				1.0f, 0.0f, 0.0f,
-				0.0f, 0.0f, 1.0f,
-		};
+		float texture[] = { 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f, };
 		ByteBuffer tb = ByteBuffer.allocateDirect(texture.length * 4);
 		tb.order(ByteOrder.nativeOrder());
 		textureBuffer = tb.asFloatBuffer();
@@ -100,18 +79,11 @@ public class Model {
 	public void draw(GL10 gl) {
 		gl.glPushMatrix(); // マトリックス記憶
 
-		//gl.glTranslatef(x, y, z);
-		//gl.glRotatef(degree, 0, 1, 0);
+		// gl.glTranslatef(x, y, z);
+		// gl.glRotatef(degree, 0, 1, 0);
 
 		gl.glEnable(GL10.GL_TEXTURE_2D);
-		if (image != null) {
-			gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
-			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
-					GL10.GL_LINEAR);
-			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
-					GL10.GL_LINEAR);
-			GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, image, 0);
-		}
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, arImgTextureId);
 
 		// 背景透過イメージの有効化
 		gl.glEnable(GL10.GL_BLEND);
@@ -136,7 +108,7 @@ public class Model {
 		triangles[0] = new Vector3f[] {
 				new Vector3f(vertex[0], vertex[1], vertex[2]),
 				new Vector3f(vertex[3], vertex[4], vertex[5]),
-				new Vector3f(vertex[6], vertex[7], vertex[8]),};
+				new Vector3f(vertex[6], vertex[7], vertex[8]), };
 
 		triangles[1] = new Vector3f[] {
 				new Vector3f(vertex[9], vertex[10], vertex[11]),

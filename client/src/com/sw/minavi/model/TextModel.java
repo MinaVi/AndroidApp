@@ -6,14 +6,6 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
-import android.opengl.GLUtils;
-
 public class TextModel {
 	private FloatBuffer buffer; // 頂点用バッファ
 	private float[] vertex;
@@ -21,16 +13,14 @@ public class TextModel {
 	private int degree;
 	private float[] positions;
 	private FloatBuffer posBuffer;
-	private String text;
-	private int[] textures;
+	private int textureId;
 
-	public TextModel(float x, float y, float z, int degree, String text, int[] textures) {
+	public TextModel(float x, float y, float z, int degree, int textureId) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.degree = degree;
-		this.text = text;
-		this.textures = textures;
+		this.textureId = textureId;
 
 		vertex = new float[] { 0.0f, 0.0f,// 左上
 				0.0f, 1.0f,// 左下
@@ -61,28 +51,9 @@ public class TextModel {
 
 		gl.glTranslatef(x, y, z);
 		gl.glRotatef(degree, 0, 1, 0);
+
 		gl.glEnable(GL10.GL_TEXTURE_2D);
-
-		Bitmap bitmap = Bitmap.createBitmap(256, 256, Config.ARGB_8888);
-		{
-			Canvas canvas = new Canvas(bitmap);
-			Paint paint = new Paint();
-			paint.setColor(Color.WHITE);
-			paint.setStyle(Style.FILL);
-			canvas.drawColor(0);
-			canvas.drawText(text, 0, 15, paint);
-		}
-
-		// テクスチャ情報の設定
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
-				GL10.GL_NEAREST);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
-				GL10.GL_NEAREST);
-		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-
-		// bitmapを破棄
-		bitmap.recycle();
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId);
 
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, buffer);
