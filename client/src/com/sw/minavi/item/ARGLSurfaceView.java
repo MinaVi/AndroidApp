@@ -61,7 +61,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	private Handler handler;
 	private Runnable lookAtRunnable;
-	private LookAtView lookAtView;
+	private DebugView debugView;
 	private double azimuthRad;
 	private float pitch;
 	private float roll;
@@ -72,7 +72,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 			@Override
 			public void run() {
-				lookAtView.updateStatus(eyepos[0], eyepos[1], eyepos[2],
+				debugView.updateStatus(eyepos[0], eyepos[1], eyepos[2],
 						centerPos[0], centerPos[1], centerPos[2], upPos[0],
 						upPos[1], upPos[2]);
 			}
@@ -454,13 +454,13 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	// サーフェースビューのコンストラクタ
 	public ARGLSurfaceView(Context context, Location loadLocation,
-			List<LocalItem> locationItems, LookAtView lookAtView) {
+			List<LocalItem> locationItems, DebugView debugView) {
 		super(context);
 
 		this.activityContext = context;
 		this.loadLocation = loadLocation;
 		this.locationItems = locationItems;
-		this.lookAtView = lookAtView;
+		this.debugView = debugView;
 		this.handler = new Handler();
 
 		setZOrderOnTop(true);
