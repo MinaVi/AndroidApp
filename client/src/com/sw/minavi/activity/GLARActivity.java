@@ -14,6 +14,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.widget.FrameLayout.LayoutParams;
 
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
@@ -166,13 +167,37 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			SensorManager.getRotationMatrix(inRotationMatrix, null, gravity,
 					geomagnetic);
 
-			// 回転行列を世界座標系を変換する
-			SensorManager.remapCoordinateSystem(inRotationMatrix,
-					SensorManager.AXIS_X, SensorManager.AXIS_Y,
-					outRotationMatrix);
+			int dir = this.getWindowManager().getDefaultDisplay().getRotation();
 
-			// 回転角の取得
-			SensorManager.getOrientation(inRotationMatrix, attitude);
+			switch (dir) {
+			case Surface.ROTATION_0:
+				SensorManager.remapCoordinateSystem(inRotationMatrix,
+						SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_X,
+						outRotationMatrix);
+				SensorManager.getOrientation(outRotationMatrix, attitude);
+				break;
+
+			case Surface.ROTATION_90:
+				SensorManager.getOrientation(inRotationMatrix, attitude);
+				break;
+
+			case Surface.ROTATION_180:
+				SensorManager.remapCoordinateSystem(inRotationMatrix,
+						SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X,
+						outRotationMatrix);
+				SensorManager.getOrientation(outRotationMatrix, attitude);
+				break;
+
+			case Surface.ROTATION_270:
+				SensorManager.remapCoordinateSystem(inRotationMatrix,
+						SensorManager.AXIS_MINUS_X, SensorManager.AXIS_MINUS_Y,
+						outRotationMatrix);
+				SensorManager.getOrientation(outRotationMatrix, attitude);
+				break;
+
+			default:
+				break;
+			}
 
 			// 方位(ラジアン)、ピッチ、ロールを取得
 			azimuthRad = attitude[0];
