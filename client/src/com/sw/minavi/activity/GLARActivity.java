@@ -310,7 +310,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// 周辺情報を取得
 		// TODO 範囲によって取得情報をフィルタリング
-		locationItems = LocalItemTableManager.getInstance(helper).GetRecords();
+		locationItems = LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation);
 
 		// ジェスチャーを検出する
 		// this.gesDetector = new GestureDetector(this, myGLSurfaceView);
@@ -321,11 +321,15 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		this.myGLSurfaceView = new ARGLSurfaceView(this, loadLocation,
 				locationItems, debugView);
 
+		// 生成したビューを画面に追加
 		setContentView(myGLSurfaceView);
 		addContentView(cameraView, new LayoutParams(LayoutParams.MATCH_PARENT,
 				LayoutParams.MATCH_PARENT));
-
 		addContentView(debugView, new LayoutParams(LayoutParams.MATCH_PARENT,
 				LayoutParams.MATCH_PARENT));
+
+		// デバッグ情報の更新
+		debugView.updateLocation(loadLocation.getLatitude(),
+				loadLocation.getLongitude());
 	}
 }

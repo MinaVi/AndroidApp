@@ -419,15 +419,15 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 //					Toast.makeText(activityContext, message, Toast.LENGTH_SHORT)
 //							.show();
-					
+
 					Intent intent = new Intent();
 					intent.setClassName("com.sw.minavi",
 							"com.sw.minavi.activity.TalkActivity");
 					intent.putExtra("pinId", item.getId());
 					intent.putExtra("talkGroupId", item.getTalkGroupId());
 					getContext().startActivity(intent);
-					
-					
+
+
 				}
 				break;
 			}
