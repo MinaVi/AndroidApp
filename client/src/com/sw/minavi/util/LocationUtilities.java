@@ -15,7 +15,7 @@ public class LocationUtilities {
 	 *            経度2
 	 * @param precision
 	 *            精度(小数点以下の桁数)
-	 * @return 2点間の距離(km)
+	 * @return 2点間の距離(m)
 	 */
 	public static float getDistance(double latitude1, double longitude1,
 			double latitude2, double longitude2, int precision) {

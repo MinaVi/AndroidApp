@@ -184,8 +184,8 @@ public class LocalItemTableManager {
 			// 取得したデータをレコード毎に処理する
 			while (cursor.moveToNext()) {
 
-				double latitude = Double.valueOf(cursor.getString(LocalItemTable.lon.getColNo())).doubleValue();
-				double longitude = Double.valueOf(cursor.getString(LocalItemTable.lat.getColNo())).doubleValue();
+				double latitude = Double.valueOf(cursor.getString(LocalItemTable.lat.getColNo())).doubleValue();
+				double longitude = Double.valueOf(cursor.getString(LocalItemTable.lon.getColNo())).doubleValue();
 
 				// 指定した位置との距離[m]を算出
 				double lengthInMeter = LocationUtilities.getDirection(location.getLatitude(), location.getLongitude(), latitude, longitude);

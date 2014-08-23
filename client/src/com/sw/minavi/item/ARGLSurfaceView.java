@@ -362,11 +362,10 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				double loadLatitude = loadLocation.getLatitude();
 				double loadLongitude = loadLocation.getLongitude();
 
-				// double lengthInMeter = LocationUtilities.getDistance(
-				// itemLatitude, itemLongitude, loadLatitude,
-				// loadLongitude, 10) * 1000.0;
-				// double azimuth = LocationUtilities.getDirection(itemLatitude,
-				// itemLongitude, loadLatitude, loadLongitude);
+				double lengthInMeter = LocationUtilities.getDistance(
+						itemLatitude, itemLongitude, loadLatitude,
+						loadLongitude, 10) * 1000.0;
+
 				double azimuthRad = LocationUtilities.getDirectionRad(
 						itemLatitude, itemLongitude, loadLatitude,
 						loadLongitude);
