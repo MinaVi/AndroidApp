@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -12,7 +14,12 @@ import javax.vecmath.Vector3f;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.PixelFormat;
 import android.location.Location;
 import android.opengl.GLSurfaceView;
@@ -34,15 +41,16 @@ import com.sw.minavi.util.PhysicsUtil;
 
 public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener {
 
+	private float viewWidth;
+	private float viewHeight;
+
 	private Ground ground = new Ground();
 	private Grid grid = new Grid();
 	private LineOfSight lineOfSight = new LineOfSight();
-	private float angle = 0.0f;
+
 	private float eyepos[] = new float[3];
 	private float centerPos[] = new float[3];
 	private float upPos[] = new float[3];
-	private float viewWidth = 0;
-	private int viewHeight;
 
 	private OpenGLRenderer renderer;
 	private List<LocalItem> locationItems;
@@ -53,14 +61,18 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	private Handler handler;
 	private Runnable lookAtRunnable;
-	private LookAtView lookAtView;
+	private DebugView debugView;
+	private double azimuthRad;
+	private float pitch;
+	private float roll;
+	private int azimuth;
 
 	{
 		lookAtRunnable = new Runnable() {
 
 			@Override
 			public void run() {
-				lookAtView.updateStatus(eyepos[0], eyepos[1], eyepos[2],
+				debugView.updateStatus(eyepos[0], eyepos[1], eyepos[2],
 						centerPos[0], centerPos[1], centerPos[2], upPos[0],
 						upPos[1], upPos[2]);
 			}
@@ -133,17 +145,23 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// モデルの描画
 			// ----------------------------------------------
 			Vector3f eyePosVec = new Vector3f(eyepos);
-			Vector3f centerPosVec = new Vector3f(centerPos);
+			//Vector3f centerPosVec = new Vector3f(centerPos);
+			List<Vector3f> arcSightList = getArcSight(45);
+
 			Collections.sort(models, new ModelComparator());
 			for (Model model : models) {
 
 				boolean isIntersect = false;
 				for (Vector3f[] vertexList : model.getVector3f()) {
-					if (GLUtils.intersect(eyePosVec, centerPosVec, vertexList)) {
-						isIntersect = true;
+					for (Vector3f arcSightTo : arcSightList) {
+						if (GLUtils.intersect(eyePosVec, arcSightTo,
+								vertexList)) {
+							isIntersect = true;
+							break;
+						}
 					}
 				}
-				if(isIntersect) {
+				if (isIntersect) {
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
@@ -224,9 +242,12 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			if (rayTo != null) {
 				gl.glPushMatrix(); // マトリックス記憶
 
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, green, 0);
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, green, 0);
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, green, 0);
+				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, green,
+						0);
+				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, green,
+						0);
+				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR,
+						green, 0);
 				gl.glLineWidth(10.0f);
 
 				lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
@@ -262,20 +283,78 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			upPos[1] = 1;
 			upPos[2] = 0;
 
-			int[] textures = new int[1];
-			int[] buffers = new int[1];
+			HashSet<String> arImgNameSet = new HashSet<String>();
+			for (LocalItem locationItem : locationItems) {
+				arImgNameSet.add(locationItem.getArImageName());
+			}
+			int[] arImgTextures = new int[arImgNameSet.size()];
+			int[] textImgTextures = new int[locationItems.size()];
+			arImgNameSet.clear();
+
+			gl.glGenTextures(arImgTextures.length, arImgTextures, 0);
+			gl.glGenTextures(textImgTextures.length, textImgTextures, 0);
+
+			int arImgTextureIndex = 0;
+			int textImgTextureIndex = 0;
+			HashMap<String, Integer> arImgNameToTextIdMap = new HashMap<String, Integer>();
 
 			for (LocalItem locationItem : locationItems) {
-				Bitmap image = BitmapFactory.decodeResource(
-						getResources(),
-						getResources().getIdentifier(
-								locationItem.getArImageName(), "drawable",
-								activityContext.getPackageName()));
 
-				// テクスチャを生成
-				gl.glEnable(GL10.GL_TEXTURE_2D);
-				gl.glGenTextures(1, textures, 0);
-				gl.glGenTextures(1, buffers, 0);
+				int arImgTextureId;
+				{
+					Bitmap arImgBitmap = BitmapFactory.decodeResource(
+							getResources(),
+							getResources().getIdentifier(
+									locationItem.getArImageName(), "drawable",
+									activityContext.getPackageName()));
+					if (arImgNameToTextIdMap.containsKey(locationItem
+							.getArImageName())) {
+						arImgTextureId = arImgNameToTextIdMap.get(locationItem
+								.getArImageName());
+					} else {
+						arImgTextureId = arImgTextures[arImgTextureIndex++];
+						arImgNameToTextIdMap.put(locationItem.getArImageName(),
+								arImgTextureId);
+					}
+
+					gl.glBindTexture(GL10.GL_TEXTURE_2D, arImgTextureId);
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+							GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+							GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+					android.opengl.GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0,
+							arImgBitmap, 0);
+					arImgBitmap.recycle();
+				}
+
+				int textImgTextureId;
+				Bitmap textBitmap = Bitmap.createBitmap(256, 256,
+						Config.ARGB_8888);
+				{
+					Canvas canvas = new Canvas(textBitmap);
+					Paint paint = new Paint();
+					paint.setColor(Color.WHITE);
+					paint.setStyle(Style.FILL);
+					canvas.drawColor(0);
+					canvas.drawText(MessageFormat.format(
+							"ID[{0}]:Msg[{1}]:Img[{2}]", locationItem.getId(),
+							locationItem.getMessage(),
+							locationItem.getArImageName()), 0, 15, paint);
+
+					textImgTextureId = textImgTextures[textImgTextureIndex++];
+
+					// テクスチャ情報の設定
+					gl.glBindTexture(GL10.GL_TEXTURE_2D, textImgTextureId);
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+							GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+							GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST);
+					android.opengl.GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0,
+							textBitmap, 0);
+
+					// bitmapを破棄
+					textBitmap.recycle();
+				}
 
 				double itemLatitude = locationItem.getLat();
 				double itemLongitude = locationItem.getLon();
@@ -300,14 +379,11 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				int degree = (int) (Math.atan2(xPos - eyepos[0], zPos
 						- eyepos[2]) * 180d / Math.PI) + 180;
 
-				models.add(new Model(xPos, 0, zPos, degree, textures, image,
+				models.add(new Model(xPos, 0, zPos, degree, arImgTextureId,
 						locationItem));
 
 				textModels.add(new TextModel(xPos, 0, zPos, degree,
-						MessageFormat.format("ID[{0}]:Msg[{1}]:Img[{2}]",
-								locationItem.getId(),
-								locationItem.getMessage(),
-								locationItem.getArImageName()), buffers));
+						textImgTextureId));
 			}
 		}
 
@@ -378,13 +454,13 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	// サーフェースビューのコンストラクタ
 	public ARGLSurfaceView(Context context, Location loadLocation,
-			List<LocalItem> locationItems, LookAtView lookAtView) {
+			List<LocalItem> locationItems, DebugView debugView) {
 		super(context);
 
 		this.activityContext = context;
 		this.loadLocation = loadLocation;
 		this.locationItems = locationItems;
-		this.lookAtView = lookAtView;
+		this.debugView = debugView;
 		this.handler = new Handler();
 
 		setZOrderOnTop(true);
@@ -433,10 +509,40 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		return false;
 	}
 
-	public void changeCenterPos(double radian, float pitch, float roll) {
-		centerPos[0] = (float) (Math.cos(radian) * eyepos[2] + eyepos[0]);
+	public void changeAzimuthEvent(double radian, float pitch, float roll) {
+		this.azimuthRad = radian;
+		this.azimuth = LocationUtilities
+				.radianToDegreeForAzimuth((float) radian);
+		this.pitch = pitch;
+		this.roll = roll;
+		getCenterPos();
+	}
+
+	private void getCenterPos() {
+		centerPos[0] = (float) (Math.cos(azimuthRad) * eyepos[2] + eyepos[0]);
 		centerPos[1] = (float) ((Math.cos(roll) * eyepos[2] + eyepos[1]) * -1.0);
-		centerPos[2] = (float) (Math.sin(radian) * eyepos[2] + eyepos[2]);
+		centerPos[2] = (float) (Math.sin(azimuthRad) * eyepos[2] + eyepos[2]);
+	}
+
+	private List<Vector3f> getArcSight(int sight) {
+
+		List<Vector3f> arcSightPointList = new ArrayList<Vector3f>();
+
+		int centerAngle = sight / 2;
+
+		for (int i = 1; i <= centerAngle; i++) {
+			double radian = LocationUtilities.degreesToRads(i + azimuth);
+			arcSightPointList.add(new Vector3f((float) (Math.cos(radian)
+					* eyepos[2] + eyepos[0]), centerPos[1], (float) (Math
+					.sin(radian) * eyepos[2] + eyepos[2])));
+		}
+		for (int i = -centerAngle; i <= -1; i++) {
+			double radian = LocationUtilities.degreesToRads(i + azimuth);
+			arcSightPointList.add(new Vector3f((float) (Math.cos(radian)
+					* eyepos[2] + eyepos[0]), centerPos[1], (float) (Math
+					.sin(radian) * eyepos[2] + eyepos[2])));
+		}
+		return arcSightPointList;
 	}
 
 	public Vector3f getMiddlePoint(float x0, float y0, float z0, float x1,

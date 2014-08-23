@@ -16,7 +16,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int val=0x7f010000;
+        public static final int debug=0x7f010000;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -85,7 +85,7 @@ containing a value of this type.
         public static final int yukkuri=0x7f020035;
     }
     public static final class id {
-        public static final int action_settings=0x7f080032;
+        public static final int action_settings=0x7f08003c;
         public static final int answerTextFirstView=0x7f080022;
         public static final int answerTextForthView=0x7f080025;
         public static final int answerTextSecondView=0x7f080023;
@@ -93,6 +93,8 @@ containing a value of this type.
         public static final int answer_area=0x7f080021;
         public static final int ar_icon=0x7f080015;
         public static final int azimuth=0x7f080002;
+        public static final int azimuthLabel=0x7f080036;
+        public static final int azimuthValue=0x7f080037;
         public static final int back_area=0x7f08001e;
         public static final int back_image=0x7f08001a;
         public static final int camera=0x7f080011;
@@ -113,6 +115,8 @@ containing a value of this type.
         public static final int frame=0x7f080010;
         public static final int frame_image=0x7f08001d;
         public static final int geo=0x7f080008;
+        public static final int latitudeLabel=0x7f080032;
+        public static final int latitudeValue=0x7f080033;
         public static final int lblAzimuth=0x7f080001;
         public static final int lblPitch=0x7f080003;
         public static final int lblRoll=0x7f080005;
@@ -122,13 +126,19 @@ containing a value of this type.
         public static final int lbl_prov=0x7f08000b;
         public static final int location_button=0x7f08000f;
         public static final int log=0x7f08000a;
+        public static final int longitudeLabel=0x7f080034;
+        public static final int longitudeValue=0x7f080035;
         public static final int map_icon=0x7f080017;
         public static final int nameText=0x7f08001f;
         public static final int overlay=0x7f080012;
         public static final int pitch=0x7f080004;
+        public static final int pitchLabel=0x7f08003a;
+        public static final int pitchValue=0x7f08003b;
         public static final int prevAzimuth=0x7f08000e;
         public static final int provider=0x7f08000c;
         public static final int roll=0x7f080006;
+        public static final int rollLabel=0x7f080038;
+        public static final int rollValue=0x7f080039;
         public static final int setting_icon=0x7f080018;
         public static final int tableRow1=0x7f080016;
         public static final int tableRow2=0x7f080013;
@@ -142,7 +152,7 @@ containing a value of this type.
         public static final int activity_main=0x7f030001;
         public static final int activity_talk=0x7f030002;
         public static final int activity_talk_nexus7_2013=0x7f030003;
-        public static final int look_at=0x7f030004;
+        public static final int debug_view=0x7f030004;
         public static final int talk_layout=0x7f030005;
     }
     public static final class menu {
@@ -181,22 +191,22 @@ containing a value of this type.
         public static final int AppTheme=0x7f060001;
     }
     public static final class styleable {
-        /** Attributes that can be used with a LookAtView.
+        /** Attributes that can be used with a DebugView.
            <p>Includes the following attributes:</p>
            <table>
            <colgroup align="left" />
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
-           <tr><td><code>{@link #LookAtView_val com.sw.minavi:val}</code></td><td></td></tr>
+           <tr><td><code>{@link #DebugView_debug com.sw.minavi:debug}</code></td><td></td></tr>
            </table>
-           @see #LookAtView_val
+           @see #DebugView_debug
          */
-        public static final int[] LookAtView = {
+        public static final int[] DebugView = {
             0x7f010000
         };
         /**
-          <p>This symbol is the offset where the {@link com.sw.minavi.R.attr#val}
-          attribute's value can be found in the {@link #LookAtView} array.
+          <p>This symbol is the offset where the {@link com.sw.minavi.R.attr#debug}
+          attribute's value can be found in the {@link #DebugView} array.
 
 
           <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
@@ -205,8 +215,8 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.sw.minavi:val
+          @attr name com.sw.minavi:debug
         */
-        public static final int LookAtView_val = 0;
+        public static final int DebugView_debug = 0;
     };
 }

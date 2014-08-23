@@ -8,38 +8,38 @@ public class SensorFilter {
 	private ArrayList<Float> mSecond = new ArrayList<Float>();
 	private ArrayList<Float> mThrad = new ArrayList<Float>();
 
-	public int sampleCount = 12;//サンプリング数
-	public int sampleNum = 6;//サンプリングした値の使用値のインデックス
+	public int sampleCount = 12;// サンプリング数
+	public int sampleNum = 6;// サンプリングした値の使用値のインデックス
 
-	private float[] mParam = new float[3];//フィルタをかけた後の値
+	private float[] mParam = new float[3];// フィルタをかけた後の値
 
-	private boolean mSampleEnable = false;//規定のサンプリング数に達したか
+	private boolean mSampleEnable = false;// 規定のサンプリング数に達したか
 
 	/**
 	 * フィルタをかけた値を返す
+	 *
 	 * @return
 	 */
-	public float[] getParam()
-	{
+	public float[] getParam() {
 		return mParam;
 	}
 
 	/**
 	 * サンプリングする値を追加
-	 * @param sample 要素３のfloatの配列オブジェクト
+	 *
+	 * @param sample
+	 *            要素３のfloatの配列オブジェクト
 	 */
-	public void addSample(float[] sample)
-	{
-		//サンプリング数の追加
+	public void addSample(float[] sample) {
+		// サンプリング数の追加
 		mFirst.add(sample[0]);
 		mSecond.add(sample[1]);
 		mThrad.add(sample[2]);
 
-		//必要なサンプリング数に達したら
-		if (mFirst.size() == sampleCount)
-		{
-			//メディアンフィルタ(サンプリング数をソートして中央値を使用)かけて値を取得
-			//その値にさらにローパスフィルタをかける
+		// 必要なサンプリング数に達したら
+		if (mFirst.size() == sampleCount) {
+			// メディアンフィルタ(サンプリング数をソートして中央値を使用)かけて値を取得
+			// その値にさらにローパスフィルタをかける
 
 			ArrayList<Float> lst = (ArrayList<Float>) mFirst.clone();
 			Collections.sort(lst);
@@ -55,7 +55,7 @@ public class SensorFilter {
 
 			mSampleEnable = true;
 
-			//一番最初の値を削除
+			// 一番最初の値を削除
 			mFirst.remove(0);
 			mSecond.remove(0);
 			mThrad.remove(0);
@@ -64,10 +64,17 @@ public class SensorFilter {
 
 	/**
 	 * 規定のサンプリング数に達したか
+	 *
 	 * @return
 	 */
-	public boolean isSampleEnable()
-	{
+	public boolean isSampleEnable() {
 		return mSampleEnable;
+	}
+
+	public void clearSamples() {
+		mFirst.clear();
+		mSecond.clear();
+		mThrad.clear();
+		mSampleEnable = false;
 	}
 }
