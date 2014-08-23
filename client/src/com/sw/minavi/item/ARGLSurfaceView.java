@@ -13,6 +13,7 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -28,7 +29,6 @@ import android.os.Handler;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.sw.minavi.model.Grid;
 import com.sw.minavi.model.Ground;
@@ -414,11 +414,20 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				Model model = getRayIntersectModel(rayFrom, rayTo);
 				if (model != null) {
 					LocalItem item = model.getItem();
-					String message = MessageFormat.format("{0},{1}",
-							item.getId(), item.getArImageName());
+//					String message = MessageFormat.format("{0},{1}",
+//							item.getId(), item.getArImageName());
 
-					Toast.makeText(activityContext, message, Toast.LENGTH_SHORT)
-							.show();
+//					Toast.makeText(activityContext, message, Toast.LENGTH_SHORT)
+//							.show();
+					
+					Intent intent = new Intent();
+					intent.setClassName("com.sw.minavi",
+							"com.sw.minavi.activity.TalkActivity");
+					intent.putExtra("pinId", item.getId());
+					intent.putExtra("talkGroupId", item.getTalkGroupId());
+					getContext().startActivity(intent);
+					
+					
 				}
 				break;
 			}
