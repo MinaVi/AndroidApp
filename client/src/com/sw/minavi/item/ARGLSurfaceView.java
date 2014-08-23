@@ -362,16 +362,16 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				double loadLatitude = loadLocation.getLatitude();
 				double loadLongitude = loadLocation.getLongitude();
 
-				double lengthInMeter = LocationUtilities.getDistance(
-						itemLatitude, itemLongitude, loadLatitude,
-						loadLongitude, 10) * 1000.0;
+				float[] results = new float[1];
+				Location.distanceBetween(loadLatitude, loadLongitude, itemLatitude,
+						itemLongitude, results);
 
 				double azimuthRad = LocationUtilities.getDirectionRad(
 						itemLatitude, itemLongitude, loadLatitude,
 						loadLongitude);
 
-				// float scaleLength = (float) (lengthInMeter / 1000.0);
-				float scaleLength = 5;
+				float scaleLength = results[0];
+				//float scaleLength = 5;
 				float xPos = (float) (Math.cos(azimuthRad) * scaleLength + eyepos[0]);
 				float zPos = (float) (Math.sin(azimuthRad) * scaleLength + eyepos[2]);
 
@@ -413,11 +413,11 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				Model model = getRayIntersectModel(rayFrom, rayTo);
 				if (model != null) {
 					LocalItem item = model.getItem();
-//					String message = MessageFormat.format("{0},{1}",
-//							item.getId(), item.getArImageName());
+					//					String message = MessageFormat.format("{0},{1}",
+					//							item.getId(), item.getArImageName());
 
-//					Toast.makeText(activityContext, message, Toast.LENGTH_SHORT)
-//							.show();
+					//					Toast.makeText(activityContext, message, Toast.LENGTH_SHORT)
+					//							.show();
 
 					Intent intent = new Intent();
 					intent.setClassName("com.sw.minavi",
@@ -425,7 +425,6 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 					intent.putExtra("pinId", item.getId());
 					intent.putExtra("talkGroupId", item.getTalkGroupId());
 					getContext().startActivity(intent);
-
 
 				}
 				break;

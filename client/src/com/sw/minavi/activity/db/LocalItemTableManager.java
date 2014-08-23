@@ -10,7 +10,6 @@ import android.location.Location;
 import com.sw.minavi.activity.db.DatabaseOpenHelper.LocalItemTable;
 import com.sw.minavi.activity.db.DatabaseOpenHelper.Tables;
 import com.sw.minavi.item.LocalItem;
-import com.sw.minavi.util.LocationUtilities;
 
 /**
  * local_item_tblに関するデータ抽出・追加・更新・削除機能を提供するクラス
@@ -187,9 +186,9 @@ public class LocalItemTableManager {
 				double latitude = Double.valueOf(cursor.getString(LocalItemTable.lat.getColNo())).doubleValue();
 				double longitude = Double.valueOf(cursor.getString(LocalItemTable.lon.getColNo())).doubleValue();
 
-				// 指定した位置との距離[m]を算出
-				double lengthInMeter = LocationUtilities.getDirection(location.getLatitude(), location.getLongitude(), latitude, longitude);
-				if (lengthInMeter > 300) {
+				float[] results = new float[1];
+				Location.distanceBetween(location.getLatitude(), location.getLongitude(), latitude, longitude, results);
+				if (results[0] > 300) {
 					continue;
 				}
 
