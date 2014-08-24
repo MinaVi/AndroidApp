@@ -111,6 +111,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// SensorManagerの解除
 		sensorManager.unregisterListener(this);
+		finish();
 	}
 
 	@Override
