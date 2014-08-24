@@ -75,15 +75,15 @@
         android:layout_height="wrap_content" >
 
         <TextView
-            android:id="@+id/centerXLabel"
+            android:id="@+id/lookXLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
-            android:text="centerX"
+            android:text="lookX"
             android:textColor="#ff0000" />
 
         <TextView
-            android:id="@+id/centerXValue"
+            android:id="@+id/lookXValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -97,15 +97,15 @@
         android:layout_height="wrap_content" >
 
         <TextView
-            android:id="@+id/centerYLabel"
+            android:id="@+id/lookYLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
-            android:text="centerY"
+            android:text="lookY"
             android:textColor="#ff0000" />
 
         <TextView
-            android:id="@+id/centerYValue"
+            android:id="@+id/lookYValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -119,15 +119,15 @@
         android:layout_height="wrap_content" >
 
         <TextView
-            android:id="@+id/centerZLabel"
+            android:id="@+id/lookZLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
-            android:text="centerZ"
+            android:text="lookZ"
             android:textColor="#ff0000" />
 
         <TextView
-            android:id="@+id/centerZValue"
+            android:id="@+id/lookZValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"

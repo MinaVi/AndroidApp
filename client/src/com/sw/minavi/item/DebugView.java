@@ -1,5 +1,7 @@
 package com.sw.minavi.item;
 
+import javax.vecmath.Vector3f;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +17,9 @@ public class DebugView extends TableLayout {
 	private TextView eyeX;
 	private TextView eyeY;
 	private TextView eyeZ;
-	private TextView centerX;
-	private TextView centerY;
-	private TextView centerZ;
+	private TextView lookX;
+	private TextView lookY;
+	private TextView lookZ;
 	// sensor
 	private TextView latitude;
 	private TextView longitude;
@@ -35,9 +37,9 @@ public class DebugView extends TableLayout {
 		this.eyeX = (TextView) layout.findViewById(R.id.eyeXValue);
 		this.eyeY = (TextView) layout.findViewById(R.id.eyeYValue);
 		this.eyeZ = (TextView) layout.findViewById(R.id.eyeZValue);
-		this.centerX = (TextView) layout.findViewById(R.id.centerXValue);
-		this.centerY = (TextView) layout.findViewById(R.id.centerYValue);
-		this.centerZ = (TextView) layout.findViewById(R.id.centerZValue);
+		this.lookX = (TextView) layout.findViewById(R.id.lookXValue);
+		this.lookY = (TextView) layout.findViewById(R.id.lookYValue);
+		this.lookZ = (TextView) layout.findViewById(R.id.lookZValue);
 
 		// sensor
 		this.latitude = (TextView) layout.findViewById(R.id.latitudeValue);
@@ -52,14 +54,18 @@ public class DebugView extends TableLayout {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 	}
 
-	public void updateStatus(float eyeX, float eyeY, float eyeZ, float centerX,
-			float centerY, float centerZ, float upX, float upY, float upZ) {
-		this.eyeX.setText(String.valueOf(eyeX));
-		this.eyeY.setText(String.valueOf(eyeY));
-		this.eyeZ.setText(String.valueOf(eyeZ));
-		this.centerX.setText(String.valueOf(centerX));
-		this.centerY.setText(String.valueOf(centerY));
-		this.centerZ.setText(String.valueOf(centerZ));
+	public void updateStatus(Camera3D camera) {
+
+		Vector3f eye = camera.getEye();
+		Vector3f look = camera.getLook();
+		Vector3f up = camera.getUp();
+
+		this.eyeX.setText(String.valueOf(eye.x));
+		this.eyeY.setText(String.valueOf(eye.y));
+		this.eyeZ.setText(String.valueOf(eye.z));
+		this.lookX.setText(String.valueOf(look.x));
+		this.lookY.setText(String.valueOf(look.y));
+		this.lookZ.setText(String.valueOf(look.z));
 	}
 
 	public void updateLocation(double latitude, double longitude) {

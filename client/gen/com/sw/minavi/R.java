@@ -98,12 +98,6 @@ containing a value of this type.
         public static final int back_area=0x7f08001e;
         public static final int back_image=0x7f08001a;
         public static final int camera=0x7f080011;
-        public static final int centerXLabel=0x7f08002c;
-        public static final int centerXValue=0x7f08002d;
-        public static final int centerYLabel=0x7f08002e;
-        public static final int centerYValue=0x7f08002f;
-        public static final int centerZLabel=0x7f080030;
-        public static final int centerZValue=0x7f080031;
         public static final int chara_image_left=0x7f08001b;
         public static final int chara_image_right=0x7f08001c;
         public static final int eyeXLabel=0x7f080026;
@@ -128,6 +122,12 @@ containing a value of this type.
         public static final int log=0x7f08000a;
         public static final int longitudeLabel=0x7f080034;
         public static final int longitudeValue=0x7f080035;
+        public static final int lookXLabel=0x7f08002c;
+        public static final int lookXValue=0x7f08002d;
+        public static final int lookYLabel=0x7f08002e;
+        public static final int lookYValue=0x7f08002f;
+        public static final int lookZLabel=0x7f080030;
+        public static final int lookZValue=0x7f080031;
         public static final int map_icon=0x7f080017;
         public static final int nameText=0x7f08001f;
         public static final int overlay=0x7f080012;
