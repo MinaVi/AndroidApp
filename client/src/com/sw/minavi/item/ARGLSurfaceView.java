@@ -48,9 +48,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private Grid grid = new Grid();
 	private LineOfSight lineOfSight = new LineOfSight();
 
-	private float eyepos[] = new float[3];
-	private float centerPos[] = new float[3];
-	private float upPos[] = new float[3];
+	private Camera3D camera;
 
 	private OpenGLRenderer renderer;
 	private List<LocalItem> locationItems;
@@ -72,9 +70,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 			@Override
 			public void run() {
-				debugView.updateStatus(eyepos[0], eyepos[1], eyepos[2],
-						centerPos[0], centerPos[1], centerPos[2], upPos[0],
-						upPos[1], upPos[2]);
+				debugView.updateStatus(camera);
 			}
 		};
 	}
@@ -98,8 +94,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 			gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-			Vector3f middlePoint = getMiddlePoint(eyepos[0], eyepos[1],
-					eyepos[2], centerPos[0], centerPos[1], centerPos[2]);
+			Vector3f eye = camera.getEye();
+			Vector3f look = camera.getLook();
+			Vector3f middlePoint = getMiddlePoint(eye, look);
 
 			// ライティングをON
 			gl.glEnable(GL10.GL_LIGHTING);
@@ -114,8 +111,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			gl.glLoadIdentity();
 
 			// カメラ位置を設定
-			GLU.gluLookAt(gl, eyepos[0], eyepos[1], eyepos[2], centerPos[0],
-					centerPos[1], centerPos[2], upPos[0], upPos[1], upPos[2]);
+			camera.gluLookAt(gl);
+			//			GLU.gluLookAt(gl, eyepos[0], eyepos[1], eyepos[2], centerPos[0],
+			//					centerPos[1], centerPos[2], upPos[0], upPos[1], upPos[2]);
 			handler.post(lookAtRunnable);
 
 			// デプステスト
@@ -144,17 +142,14 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// ----------------------------------------------
 			// モデルの描画
 			// ----------------------------------------------
-			Vector3f eyePosVec = new Vector3f(eyepos);
-			//Vector3f centerPosVec = new Vector3f(centerPos);
 			List<Vector3f> arcSightList = getArcSight(45);
-
 			Collections.sort(models, new ModelComparator());
 			for (Model model : models) {
 
 				boolean isIntersect = false;
 				for (Vector3f[] vertexList : model.getVector3f()) {
 					for (Vector3f arcSightTo : arcSightList) {
-						if (GLUtils.intersect(eyePosVec, arcSightTo,
+						if (GLUtils.intersect(eye, arcSightTo,
 								vertexList)) {
 							isIntersect = true;
 							break;
@@ -231,8 +226,8 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, red, 0);
 			gl.glLineWidth(10.0f);
 
-			lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
-					centerPos[0], centerPos[1], centerPos[2]);
+			lineOfSight.drawLine(gl, eye.x, eye.y - 1, eye.z, look.x, look.y, look.z);
+
 			// マトリックスを戻す
 			gl.glPopMatrix();
 
@@ -250,7 +245,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 						green, 0);
 				gl.glLineWidth(10.0f);
 
-				lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
+				lineOfSight.drawLine(gl, eye.x, eye.y - 1, eye.z,
 						rayTo.x, rayTo.y, rayTo.z);
 				gl.glPopMatrix(); // マトリックスを戻す
 			}
@@ -271,17 +266,6 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 			gl.glClearColor(0.0f, 0.0f, 0.0f, 0);
 			gl.glClearDepthf(1.0f);
-			eyepos[0] = 0;
-			eyepos[1] = 0.5f;
-			eyepos[2] = 5;
-
-			centerPos[0] = 0;
-			centerPos[1] = 0;
-			centerPos[2] = 0;
-
-			upPos[0] = 0;
-			upPos[1] = 1;
-			upPos[2] = 0;
 
 			HashSet<String> arImgNameSet = new HashSet<String>();
 			for (LocalItem locationItem : locationItems) {
@@ -307,6 +291,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 							getResources().getIdentifier(
 									locationItem.getArImageName(), "drawable",
 									activityContext.getPackageName()));
+
 					if (arImgNameToTextIdMap.containsKey(locationItem
 							.getArImageName())) {
 						arImgTextureId = arImgNameToTextIdMap.get(locationItem
@@ -372,11 +357,11 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 				float scaleLength = results[0];
 				//float scaleLength = 5;
-				float xPos = (float) (Math.cos(azimuthRad) * scaleLength + eyepos[0]);
-				float zPos = (float) (Math.sin(azimuthRad) * scaleLength + eyepos[2]);
+				Vector3f eye = camera.getEye();
+				float xPos = (float) (Math.cos(azimuthRad) * scaleLength + eye.x);
+				float zPos = (float) (Math.sin(azimuthRad) * scaleLength + eye.z);
 
-				int degree = (int) (Math.atan2(xPos - eyepos[0], zPos
-						- eyepos[2]) * 180d / Math.PI) + 180;
+				int degree = (int) (Math.atan2(xPos - eye.x, zPos - eye.z) * 180d / Math.PI) + 180;
 
 				models.add(new Model(xPos, 0, zPos, degree, arImgTextureId,
 						locationItem));
@@ -396,9 +381,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				break;
 
 			case MotionEvent.ACTION_UP:
-				Vector3f eye = new Vector3f(eyepos);
-				Vector3f look = new Vector3f(centerPos);
-				Vector3f up = new Vector3f(upPos);
+				Vector3f eye = camera.getEye();
+				Vector3f look = camera.getLook();
+				Vector3f up = camera.getUp();
 
 				int x = (int) event.getX();
 				int y = (int) event.getY();
@@ -406,11 +391,10 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				int width = getWidth();
 				int height = getHeight();
 
-				Vector3f rayFrom = new Vector3f(eyepos);
 				rayTo = PhysicsUtil
 						.getRayTo(x, y, eye, look, up, width, height);
 
-				Model model = getRayIntersectModel(rayFrom, rayTo);
+				Model model = getRayIntersectModel(eye, rayTo);
 				if (model != null) {
 					LocalItem item = model.getItem();
 					//					String message = MessageFormat.format("{0},{1}",
@@ -448,8 +432,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	class ModelComparator implements Comparator<Model> {
 		public int compare(Model s, Model t) {
-			float ds = s.distance(eyepos[0], eyepos[1], eyepos[2]);
-			float dt = t.distance(eyepos[0], eyepos[1], eyepos[2]);
+			Vector3f eye = camera.getEye();
+			float ds = s.distance(eye.x, eye.y, eye.z);
+			float dt = t.distance(eye.x, eye.y, eye.z);
 			if (ds == dt)
 				return 0;
 			else if (ds < dt)
@@ -473,6 +458,11 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		setZOrderOnTop(true);
 		getHolder().setFormat(PixelFormat.TRANSLUCENT);
 		setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+
+		camera = new Camera3D(activityContext,
+				new float[] { 0.0f, 0.5f, 5.0f },
+				new float[] { 0.0f, 0.0f, 0.0f },
+				new float[] { 0.0f, 1.0f, 0.0f });
 
 		renderer = new OpenGLRenderer();
 		setRenderer(renderer);
@@ -522,13 +512,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				.radianToDegreeForAzimuth((float) radian);
 		this.pitch = pitch;
 		this.roll = roll;
-		getCenterPos();
-	}
-
-	private void getCenterPos() {
-		centerPos[0] = (float) (Math.cos(azimuthRad) * eyepos[2] + eyepos[0]);
-		centerPos[1] = (float) ((Math.cos(roll) * eyepos[2] + eyepos[1]) * -1.0);
-		centerPos[2] = (float) (Math.sin(azimuthRad) * eyepos[2] + eyepos[2]);
+		camera.rotateLook((float) azimuthRad, roll);
 	}
 
 	private List<Vector3f> getArcSight(int sight) {
@@ -537,26 +521,30 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 		int centerAngle = sight / 2;
 
+		Vector3f eye = camera.getEye();
+		Vector3f look = camera.getLook();
+
 		for (int i = 1; i <= centerAngle; i++) {
 			double radian = LocationUtilities.degreesToRads(i + azimuth);
-			arcSightPointList.add(new Vector3f((float) (Math.cos(radian)
-					* eyepos[2] + eyepos[0]), centerPos[1], (float) (Math
-					.sin(radian) * eyepos[2] + eyepos[2])));
+			float x = (float) (Math.cos(radian) * eye.z + eye.x);
+			float y = look.y;
+			float z = (float) (Math.sin(radian) * eye.z + eye.z);
+			arcSightPointList.add(new Vector3f(x, y, z));
 		}
 		for (int i = -centerAngle; i <= -1; i++) {
 			double radian = LocationUtilities.degreesToRads(i + azimuth);
-			arcSightPointList.add(new Vector3f((float) (Math.cos(radian)
-					* eyepos[2] + eyepos[0]), centerPos[1], (float) (Math
-					.sin(radian) * eyepos[2] + eyepos[2])));
+			float x = (float) (Math.cos(radian) * eye.z + eye.x);
+			float y = look.y;
+			float z = (float) (Math.sin(radian) * eye.z + eye.z);
+			arcSightPointList.add(new Vector3f(x, y, z));
 		}
 		return arcSightPointList;
 	}
 
-	public Vector3f getMiddlePoint(float x0, float y0, float z0, float x1,
-			float y1, float z1) {
-		float x = (x1 + x0) / 2.0f;
-		float y = (y1 + y0) / 2.0f;
-		float z = (z1 + z0) / 2.0f;
+	public Vector3f getMiddlePoint(Vector3f v0, Vector3f v1) {
+		float x = (v1.x + v0.x) / 2.0f;
+		float y = (v1.y + v0.y) / 2.0f;
+		float z = (v1.z + v0.z) / 2.0f;
 
 		return new Vector3f(x, y, z);
 	}
