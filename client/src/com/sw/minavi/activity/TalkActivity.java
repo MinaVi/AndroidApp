@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -55,9 +56,9 @@ public class TalkActivity extends Activity implements OnClickListener {
 	private ArrayList<TalkBeans> answerTextsForth = new ArrayList<TalkBeans>();
 
 	// ARからのIDを格納
-	private int pinId = 0;
 	private int areaId = 0;
 	private int arTalkGroupId = 0;
+	private boolean isAr = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -81,10 +82,11 @@ public class TalkActivity extends Activity implements OnClickListener {
 		//charaImageLeft.setVisibility(View.GONE);
 		charaImageRight.setVisibility(View.GONE);
 
-		pinId = getIntent().getExtras().getInt("pinId");
-
 		arTalkGroupId = getIntent().getExtras().getInt("talkGroupId");
 
+		if (getIntent().hasExtra("isAr")) {
+			isAr = getIntent().getExtras().getBoolean("isAr");
+		}
 		// test
 		//setTestTexts();
 
@@ -176,8 +178,8 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 		} else if (textCount == talkTexts.size()) {
 			textCount = 0;
-			nameTextView.setText("naviko");
-			talkTextView.setText("end");
+			nameTextView.setText("");
+			talkTextView.setText("");
 			if (talkTexts.get(textCount).getPosition() == 0) {
 				charaImageLeft.setImageResource(talkTexts.get(textCount).getImageId());
 			} else {
@@ -185,14 +187,22 @@ public class TalkActivity extends Activity implements OnClickListener {
 				charaImageRight.setImageResource(talkTexts.get(textCount).getImageId());
 			}
 
-			// test
-			// setTestTexts();
-			// 次の会話内容セット
-			// イベントセット
-			ArrayList<TalkGroup> talkGroup = getTalkGroupIds();
-			charaImageRight.setVisibility(View.GONE);
-			setTexts(talkGroup);
+			if (isAr) {
+				Intent intent = new Intent();
+				intent.setClassName("com.sw.minavi",
+						"com.sw.minavi.activity.GLARActivity");
+				startActivity(intent);
+				finish();
+			} else {
 
+				// test
+				// setTestTexts();
+				// 次の会話内容セット
+				// イベントセット
+				ArrayList<TalkGroup> talkGroup = getTalkGroupIds();
+				charaImageRight.setVisibility(View.GONE);
+				setTexts(talkGroup);
+			}
 		} else {
 			nameTextView.setText(talkTexts.get(textCount).getTalkName());
 			talkTextView.setText(talkTexts.get(textCount).getFirstTalkStr());
@@ -230,17 +240,18 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 			// 取得されたグループから対象のグループを選択
 			for (int i = 0; i < groups.size(); i++) {
-				if(groups.get(i).getTalkGroupId() == arTalkGroupId){
+				if (groups.get(i).getTalkGroupId() == arTalkGroupId) {
 
 					group = groups.get(i);
 					break;
-					
+
 				}
 			}
 
 			if (group.getBackGroundFileNmae() != null && group.getBackGroundFileNmae().length() > 0) {
 				// 背景を特殊背景に変える
-				backImage.setImageResource(getResources().getIdentifier(group.getBackGroundFileNmae(), "drawable", getPackageName()));
+				backImage.setImageResource(getResources().getIdentifier(group.getBackGroundFileNmae(), "drawable",
+						getPackageName()));
 			}
 
 			// エリアが指定されている場合は、エリア情報のみ
