@@ -59,6 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
             android:layout_marginTop="390dp"
+            android:text="Na"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
@@ -69,6 +70,7 @@
             android:layout_marginTop="420dp"
             android:clickable="true"
             android:onClick="onClick"
+            android:text="hoge"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <LinearLayout
