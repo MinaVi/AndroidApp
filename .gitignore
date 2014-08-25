@@ -1,5 +1,3 @@
 *.project
 *.classpath
 *.properties
-client/bin/resources.ap_
-client/bin/MinaviAndroidApp.apk

@@ -425,7 +425,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 							"com.sw.minavi.activity.TalkActivity");
 					intent.putExtra("pinId", item.getId());
 					intent.putExtra("talkGroupId", item.getTalkGroupId());
+					intent.putExtra("isAr", true);
 					getContext().startActivity(intent);
+					
 					
 					
 				}
