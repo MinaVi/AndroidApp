@@ -30,9 +30,11 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.sw.minavi.R;
 import com.sw.minavi.model.Grid;
 import com.sw.minavi.model.Ground;
 import com.sw.minavi.model.LineOfSight;
+import com.sw.minavi.model.Lockon;
 import com.sw.minavi.model.Model;
 import com.sw.minavi.model.TextModel;
 import com.sw.minavi.util.GLUtils;
@@ -56,6 +58,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private Context activityContext;
 	private ArrayList<Model> models = new ArrayList<Model>();
 	private ArrayList<TextModel> textModels = new ArrayList<TextModel>();
+	private Lockon lockOn;
 
 	private Handler handler;
 	private Runnable lookAtRunnable;
@@ -64,6 +67,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private float pitch;
 	private float roll;
 	private int azimuth;
+	private MiniMap miniMap;
 
 	{
 		lookAtRunnable = new Runnable() {
@@ -73,6 +77,19 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				debugView.updateStatus(camera);
 			}
 		};
+	}
+
+	private class MiniMapHandler extends Handler implements Runnable {
+		private void startSyncMap() {
+			this.postDelayed(this, 1000);
+		}
+
+		@Override
+		public void run() {
+			miniMap.syncMap(camera, models);
+			this.postDelayed(this, 10);
+		}
+
 	}
 
 	// レンダラークラス
@@ -88,6 +105,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		float darkColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		float brightColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		Vector3f rayTo;
+		float angle = 0.0f;
 
 		@Override
 		public void onDrawFrame(GL10 gl) {
@@ -216,6 +234,14 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// }
 
 			// ----------------------------------------------
+			// テキストの描画
+			// ----------------------------------------------
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
+			lockOn.draw(gl, camera, azimuth, roll, angle);
+
+			// ----------------------------------------------
 			// 視点-注視点間の線分の描画
 			// ----------------------------------------------
 			// マトリックス記憶
@@ -249,6 +275,8 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 						rayTo.x, rayTo.y, rayTo.z);
 				gl.glPopMatrix(); // マトリックスを戻す
 			}
+
+			angle += 1.0f;
 		}
 
 		@Override
@@ -273,6 +301,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			}
 			int[] arImgTextures = new int[arImgNameSet.size()];
 			int[] textImgTextures = new int[locationItems.size()];
+			int[] etcImgTextures = new int[1];
 			arImgNameSet.clear();
 
 			gl.glGenTextures(arImgTextures.length, arImgTextures, 0);
@@ -369,6 +398,26 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				textModels.add(new TextModel(xPos, 0, zPos, degree,
 						textImgTextureId));
 			}
+
+			{
+
+				Bitmap etcImgBitmap = BitmapFactory.decodeResource(
+						getResources(),
+						R.drawable.sight_large);
+
+				int etcImgTextureId = etcImgTextures[0];
+
+				gl.glBindTexture(GL10.GL_TEXTURE_2D, etcImgTextureId);
+				gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+						GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+				gl.glTexParameterf(GL10.GL_TEXTURE_2D,
+						GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+				android.opengl.GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0,
+						etcImgBitmap, 0);
+				etcImgBitmap.recycle();
+
+				lockOn = new Lockon(etcImgTextureId);
+			}
 		}
 
 		@Override
@@ -446,13 +495,14 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	// サーフェースビューのコンストラクタ
 	public ARGLSurfaceView(Context context, Location loadLocation,
-			List<LocalItem> locationItems, DebugView debugView) {
+			List<LocalItem> locationItems, DebugView debugView, MiniMap miniMap) {
 		super(context);
 
 		this.activityContext = context;
 		this.loadLocation = loadLocation;
 		this.locationItems = locationItems;
 		this.debugView = debugView;
+		this.miniMap = miniMap;
 		this.handler = new Handler();
 
 		setZOrderOnTop(true);
@@ -467,6 +517,8 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		renderer = new OpenGLRenderer();
 		setRenderer(renderer);
 		setOnTouchListener(renderer);
+
+		new MiniMapHandler().startSyncMap();
 	}
 
 	@Override

@@ -29,9 +29,14 @@ public class Model {
 		this.arImgTextureId = arImgTextureId;
 		this.item = item;
 
-		float[] relativeVertex = new float[] { -1.0f, -1.0f, 0.0f, 1.0f, -1.0f,
-				0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-				-1.0f, -1.0f, 0.0f, };
+		float[] relativeVertex = new float[] {
+				-1.0f, -1.0f, 0.0f,
+				1.0f, -1.0f, 0.0f,
+				1.0f, 1.0f, 0.0f,
+				1.0f, 1.0f, 0.0f,
+				-1.0f, 1.0f, 0.0f,
+				-1.0f, -1.0f, 0.0f,
+		};
 
 		int index = 0;
 		float[] midPoint = new float[] { 0.0f, 0.0f, 0.0f };

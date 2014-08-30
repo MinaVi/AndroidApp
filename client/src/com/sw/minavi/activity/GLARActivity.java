@@ -15,14 +15,17 @@ import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Surface;
+import android.view.View;
 import android.widget.FrameLayout.LayoutParams;
 
+import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.item.ARGLSurfaceView;
 import com.sw.minavi.item.DebugView;
 import com.sw.minavi.item.GLCameraView;
 import com.sw.minavi.item.LocalItem;
+import com.sw.minavi.item.MiniMap;
 import com.sw.minavi.item.SensorFilter;
 import com.sw.minavi.util.LocationUtilities;
 
@@ -72,13 +75,14 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	private ARGLSurfaceView myGLSurfaceView;
 	private GLCameraView cameraView;
 	private DebugView debugView;
+	private MiniMap miniMap;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// レイアウトを設定
-		// setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_gl);
 
 		// センサーサービスの起動
 		initSensorService();
@@ -310,6 +314,8 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// 周辺情報を取得
 		// TODO 範囲によって取得情報をフィルタリング
+		loadLocation.setLongitude(141.343739);
+		loadLocation.setLatitude(43.072665);
 		locationItems = LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation);
 
 		// ジェスチャーを検出する
@@ -318,8 +324,9 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		// OpenGL用のビューの生成
 		this.debugView = new DebugView(this);
 		this.cameraView = new GLCameraView(this);
+		this.miniMap = new MiniMap(this);
 		this.myGLSurfaceView = new ARGLSurfaceView(this, loadLocation,
-				locationItems, debugView);
+				locationItems, debugView, miniMap);
 
 		// 生成したビューを画面に追加
 		setContentView(myGLSurfaceView);
@@ -327,6 +334,9 @@ public class GLARActivity extends Activity implements SensorEventListener,
 				LayoutParams.MATCH_PARENT));
 		addContentView(debugView, new LayoutParams(LayoutParams.MATCH_PARENT,
 				LayoutParams.MATCH_PARENT));
+		addContentView(miniMap, new LayoutParams(300,
+				400));
+		miniMap.setVisibility(View.GONE);
 
 		// デバッグ情報の更新
 		debugView.updateLocation(loadLocation.getLatitude(),
