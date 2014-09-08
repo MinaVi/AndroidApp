@@ -244,6 +244,42 @@
             android:text="0.0"
             android:textColor="#ff0000" >
         </TextView>
+
     </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/talkGroupIdLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="talkGroupId"
+            android:textColor="#ff0000" />
+
+        <TextView
+            android:id="@+id/talkGroupIdValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="0"
+            android:textColor="#ff0000" />
+    </TableRow>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <Button
+            android:id="@+id/serBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:onClick="onClick"
+            android:text="サーチ" />
+    </RelativeLayout>
 
 </TableLayout>

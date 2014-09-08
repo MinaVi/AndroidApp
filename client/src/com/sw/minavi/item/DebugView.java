@@ -26,6 +26,7 @@ public class DebugView extends TableLayout {
 	private TextView azimuth;
 	private TextView roll;
 	private TextView pitch;
+	private TextView talkGroupId;
 
 	public DebugView(Context context) {
 		super(context);
@@ -47,6 +48,9 @@ public class DebugView extends TableLayout {
 		this.azimuth = (TextView) layout.findViewById(R.id.azimuthValue);
 		this.roll = (TextView) layout.findViewById(R.id.rollValue);
 		this.pitch = (TextView) layout.findViewById(R.id.pitchValue);
+		
+		// Id
+		this.talkGroupId = (TextView) layout.findViewById(R.id.talkGroupIdValue);
 	}
 
 	@Override
@@ -78,5 +82,9 @@ public class DebugView extends TableLayout {
 		this.roll.setText(String.valueOf(roll));
 		this.pitch.setText(String.valueOf(pitch));
 
+	}
+	
+	public void updateID(int id) {
+		this.talkGroupId.setText(String.valueOf(id));
 	}
 }

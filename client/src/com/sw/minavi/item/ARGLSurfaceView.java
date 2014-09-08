@@ -50,13 +50,13 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private Grid grid = new Grid();
 	private LineOfSight lineOfSight = new LineOfSight();
 
-	private Camera3D camera;
+	public Camera3D camera;
 
 	private OpenGLRenderer renderer;
 	private List<LocalItem> locationItems;
 	private Location loadLocation;
 	private Context activityContext;
-	private ArrayList<Model> models = new ArrayList<Model>();
+	public ArrayList<Model> models = new ArrayList<Model>();
 	private ArrayList<TextModel> textModels = new ArrayList<TextModel>();
 	private Lockon lockOn;
 
@@ -68,6 +68,8 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private float roll;
 	private int azimuth;
 	private MiniMap miniMap;
+	
+	public int centerObjectId = 0;
 
 	{
 		lookAtRunnable = new Runnable() {
@@ -311,6 +313,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			int textImgTextureIndex = 0;
 			HashMap<String, Integer> arImgNameToTextIdMap = new HashMap<String, Integer>();
 
+			
 			for (LocalItem locationItem : locationItems) {
 
 				int arImgTextureId;
@@ -398,6 +401,20 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				textModels.add(new TextModel(xPos, 0, zPos, degree,
 						textImgTextureId));
 			}
+			
+			// 中心との最近隣を計算
+			float nearDist = 1000;
+			for (Model m : models) {
+				//Vector3f eye = camera.getEye();
+				Vector3f look = camera.getLook();
+				float ds = m.distance(look.x, look.y, look.z);
+				if(ds < nearDist){
+					nearDist = ds;
+					centerObjectId = m.getItem().getTalkGroupId();
+				}
+			}
+			
+			debugView.updateID(centerObjectId);
 
 			{
 
@@ -430,6 +447,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				break;
 
 			case MotionEvent.ACTION_UP:
+				
 				Vector3f eye = camera.getEye();
 				Vector3f look = camera.getLook();
 				Vector3f up = camera.getUp();

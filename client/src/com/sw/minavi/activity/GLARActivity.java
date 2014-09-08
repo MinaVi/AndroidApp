@@ -3,6 +3,8 @@ package com.sw.minavi.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.vecmath.Vector3f;
+
 import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -16,6 +18,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.FrameLayout.LayoutParams;
 
 import com.sw.minavi.R;
@@ -27,10 +30,11 @@ import com.sw.minavi.item.GLCameraView;
 import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.MiniMap;
 import com.sw.minavi.item.SensorFilter;
+import com.sw.minavi.model.Model;
 import com.sw.minavi.util.LocationUtilities;
 
 public class GLARActivity extends Activity implements SensorEventListener,
-		LocationListener {
+		LocationListener, OnClickListener {
 
 	/** ジェスチャー検出器 */
 	private GestureDetector gesDetector = null;
@@ -327,7 +331,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		this.miniMap = new MiniMap(this);
 		this.myGLSurfaceView = new ARGLSurfaceView(this, loadLocation,
 				locationItems, debugView, miniMap);
-
+		
 		// 生成したビューを画面に追加
 		setContentView(myGLSurfaceView);
 		addContentView(cameraView, new LayoutParams(LayoutParams.MATCH_PARENT,
@@ -342,4 +346,33 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		debugView.updateLocation(loadLocation.getLatitude(),
 				loadLocation.getLongitude());
 	}
+	
+	public void onClick(View v) {
+		
+		// 中心との最近隣を計算
+		float nearDist = 1000;
+		int id = 0;
+		for (Model m : this.myGLSurfaceView.models) {
+			Vector3f eye = this.myGLSurfaceView.camera.getEye();
+			float ds = m.distance(eye.x, eye.y, eye.z);
+			if(ds < nearDist){
+				nearDist = ds;
+				id = m.getItem().getTalkGroupId();
+			}
+		}
+		
+		debugView.updateID(id);
+		
+		
+		if(id != 0){
+//			Intent intent = new Intent();
+//			intent.setClassName("com.sw.minavi",
+//					"com.sw.minavi.activity.TalkActivity");
+//			intent.putExtra("pinId", 0);
+//			intent.putExtra("talkGroupId", this.myGLSurfaceView.centerObjectId);
+//			startActivity(intent);
+//			finish();
+		}
+	}
+	
 }
