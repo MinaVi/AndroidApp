@@ -318,8 +318,8 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// 周辺情報を取得
 		// TODO 範囲によって取得情報をフィルタリング
-		loadLocation.setLongitude(141.343739);
-		loadLocation.setLatitude(43.072665);
+		loadLocation.setLongitude(loadLocation.getLongitude());
+		loadLocation.setLatitude(loadLocation.getLatitude());
 		locationItems = LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation);
 
 		// ジェスチャーを検出する

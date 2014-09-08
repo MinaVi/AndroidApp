@@ -29,7 +29,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout1"
-        android:layout_width="180dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
@@ -64,10 +64,10 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/answer_back_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignBottom="@+id/linearLayout2"
         android:layout_alignParentLeft="true"
         android:src="@drawable/nomal_s" />
 

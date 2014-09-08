@@ -10,115 +10,180 @@
         android:layout_weight="0.00" >
 
         <ImageView
-            android:id="@+id/back_image"
+            android:id="@+id/back_btn"
             android:layout_width="match_parent"
-            android:layout_height="378dp"
-            android:layout_marginTop="50dp"
-            android:layout_weight="0.00"
+            android:layout_height="match_parent"
             android:scaleType="fitXY"
-            android:src="@drawable/menu_back" />
+            android:src="@drawable/summerwars" />
 
         <ImageView
             android:id="@+id/chara_image_left"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="top"
-            android:layout_marginRight="100dp"
-            android:layout_marginTop="100dp"
+            android:layout_width="250dp"
+            android:layout_height="400dp"
+            android:layout_gravity="bottom"
             android:src="@drawable/nomal_n" />
 
         <ImageView
             android:id="@+id/chara_image_right"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:layout_marginLeft="100dp"
-            android:layout_marginTop="100dp"
-            android:src="@drawable/t_nomal_n" />
+            android:layout_width="250dp"
+            android:layout_height="400dp"
+            android:layout_gravity="right|bottom"
+            android:src="@drawable/nomal_n" />
 
         <ImageView
             android:id="@+id/frame_image"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.00"
+            android:layout_height="200dp"
+            android:layout_gravity="bottom"
             android:scaleType="fitXY"
-            android:src="@drawable/talk_back" />
+            android:src="@drawable/minavi_parts_34" />
 
-        <LinearLayout
-            android:id="@+id/back_area"
-            android:layout_width="83dp"
-            android:layout_height="57dp"
-            android:layout_marginLeft="250dp"
-            android:onClick="onClick"
-            android:orientation="vertical" >
-        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_gravity="bottom"
+            android:gravity="top" >
 
-        <TextView
-            android:id="@+id/nameText"
+            <TextView
+                android:id="@+id/talkText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="50dp"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:text="text"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/nameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:text="name"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/answer_back_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="100dp"
+            android:alpha="200"
+            android:src="@drawable/minavi_parts_03"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/talk_back_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="390dp"
-            android:text="Na"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:id="@+id/talkText"
-            android:layout_width="288dp"
-            android:layout_height="49dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="420dp"
-            android:clickable="true"
             android:onClick="onClick"
-            android:text="hoge"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:src="@drawable/minavi_parts_21" />
 
         <LinearLayout
             android:id="@+id/answer_area"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:orientation="vertical" >
+            android:layout_marginBottom="100dp"
+            android:orientation="vertical"
+            android:visibility="gone" >
 
             <TextView
                 android:id="@+id/answerTextFirstView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:background="#00000000"
+                android:alpha="255"
                 android:clickable="true"
                 android:onClick="onClick"
                 android:text="Large Text"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/answerTextSecondView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:background="#00000000"
                 android:clickable="true"
                 android:onClick="onClick"
                 android:text="Large Text"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/answerTextThirdView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:background="#00000000"
                 android:clickable="true"
                 android:onClick="onClick"
                 android:text="Large Text"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/answerTextForthView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="#00000000"
                 android:clickable="true"
                 android:onClick="onClick"
                 android:text="Large Text"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="25sp"
+                android:textStyle="bold" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right" >
+
+            <ImageView
+                android:id="@+id/check_area_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:src="@drawable/minavi_parts_41" />
+
+            <ImageView
+                android:id="@+id/ar_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:src="@drawable/minavi_parts_40" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:orientation="vertical" >
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:gravity="right" >
+
+        </RelativeLayout>
 
     </FrameLayout>
 

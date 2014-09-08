@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,7 +27,7 @@ import com.sw.minavi.item.TalkEvent;
 import com.sw.minavi.item.TalkGroup;
 import com.sw.minavi.item.TalkSelect;
 
-public class TalkActivity extends Activity implements OnClickListener {
+public class TalkActivity extends Activity implements OnClickListener, LocationListener {
 
 	private DatabaseOpenHelper helper;
 
@@ -38,7 +43,10 @@ public class TalkActivity extends Activity implements OnClickListener {
 	private ImageView backImage;
 	private ImageView charaImageLeft;
 	private ImageView charaImageRight;
-
+	private ImageView answerBackImage;
+	private ImageView arBtn;
+	private ImageView checkAreaBtn;
+	
 	private ArrayList<TalkBeans> talkTexts = new ArrayList<TalkBeans>();
 	private int textCount = 0;
 
@@ -48,6 +56,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 	private int answerCount = 0;
 	// 選択肢テキスト
 	private ArrayList<TalkBeans> answerTexts = new ArrayList<TalkBeans>();
+	
 	// 選択肢の数だけ分岐
 	private ArrayList<TalkBeans> answerTextsFirst = new ArrayList<TalkBeans>();
 	private ArrayList<TalkBeans> answerTextsSecond = new ArrayList<TalkBeans>();
@@ -58,6 +67,12 @@ public class TalkActivity extends Activity implements OnClickListener {
 	private int pinId = 0;
 	private int areaId = 0;
 	private int arTalkGroupId = 0;
+	
+	// 位置情報取得用
+    private OnGetLocationListener mListener = null;
+    
+    private static final int INTERVAL_TIME = 1000 * 60 * 3;  // 3分
+    private static final int INTERVAL_DISTANCE = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +88,14 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 		answersArea = (LinearLayout) findViewById(R.id.answer_area);
 		answersArea.setVisibility(View.GONE);
+		answerBackImage = (ImageView) findViewById(R.id.answer_back_image);
+		answerBackImage.setVisibility(View.GONE);
 
-		backImage = (ImageView) findViewById(R.id.back_image);
+		backImage = (ImageView) findViewById(R.id.back_btn);
 		charaImageLeft = (ImageView) findViewById(R.id.chara_image_left);
 		charaImageRight = (ImageView) findViewById(R.id.chara_image_right);
+		arBtn = (ImageView) findViewById(R.id.ar_btn);
+		checkAreaBtn = (ImageView) findViewById(R.id.check_area_btn);
 
 		//charaImageLeft.setVisibility(View.GONE);
 		charaImageRight.setVisibility(View.GONE);
@@ -116,8 +135,11 @@ public class TalkActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		if (v.getId() == R.id.back_area) {
+		if (v.getId() == R.id.talk_back_btn) {
 			finish();
+		}else if (v.getId() == R.id.ar_btn){
+			Intent intent = new Intent(this, GLARActivity.class);
+			startActivity(intent);
 		} else if (selectingFlg == true) {
 			// 一旦トーク内容リセット
 			talkTexts = null;
@@ -129,21 +151,25 @@ public class TalkActivity extends Activity implements OnClickListener {
 				talkTexts = answerTextsFirst;
 				selectingFlg = false;
 				answersArea.setVisibility(View.GONE);
+				answerBackImage.setVisibility(View.GONE);
 				viewText();
 			} else if (v.getId() == R.id.answerTextSecondView) {
 				talkTexts = answerTextsSecond;
 				selectingFlg = false;
 				answersArea.setVisibility(View.GONE);
+				answerBackImage.setVisibility(View.GONE);
 				viewText();
 			} else if (v.getId() == R.id.answerTextThirdView) {
 				talkTexts = answerTextsThird;
 				selectingFlg = false;
 				answersArea.setVisibility(View.GONE);
+				answerBackImage.setVisibility(View.GONE);
 				viewText();
 			} else if (v.getId() == R.id.answerTextForthView) {
 				talkTexts = answerTextsForth;
 				selectingFlg = false;
 				answersArea.setVisibility(View.GONE);
+				answerBackImage.setVisibility(View.GONE);
 				viewText();
 			}
 		} else if (v.getId() == R.id.talkText) {
@@ -172,12 +198,13 @@ public class TalkActivity extends Activity implements OnClickListener {
 				answerTextForthView.setBackgroundColor(Color.WHITE);
 			}
 
+			answerBackImage.setVisibility(View.VISIBLE);
 			answersArea.setVisibility(View.VISIBLE);
 
 		} else if (textCount == talkTexts.size()) {
 			textCount = 0;
-			nameTextView.setText("naviko");
-			talkTextView.setText("end");
+			nameTextView.setText("");
+			talkTextView.setText("");
 			if (talkTexts.get(textCount).getPosition() == 0) {
 				charaImageLeft.setImageResource(talkTexts.get(textCount).getImageId());
 			} else {
@@ -192,8 +219,17 @@ public class TalkActivity extends Activity implements OnClickListener {
 			ArrayList<TalkGroup> talkGroup = getTalkGroupIds();
 			charaImageRight.setVisibility(View.GONE);
 			setTexts(talkGroup);
+			
+			// メニュー表示
+			arBtn.setVisibility(View.VISIBLE);
+			checkAreaBtn.setVisibility(View.VISIBLE);
 
 		} else {
+
+			// メニュー非表示
+			arBtn.setVisibility(View.GONE);
+			checkAreaBtn.setVisibility(View.GONE);
+			
 			nameTextView.setText(talkTexts.get(textCount).getTalkName());
 			talkTextView.setText(talkTexts.get(textCount).getFirstTalkStr());
 			if (talkTexts.get(textCount).getPosition() == 0) {
@@ -330,4 +366,92 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 		return texts;
 	}
+	
+	/**
+	 * LocationMnager取得
+	 * @param context
+	 * @return
+	 */
+	private LocationManager getLocationManager(Context context) {
+		
+		return (LocationManager)context
+				.getSystemService(Context.LOCATION_SERVICE);
+		
+	}
+
+	 /**
+	  * 結果通知リスナー
+	  */
+	public interface OnGetLocationListener {
+		
+		/**
+		 * 緯度、経度取得完了通知
+		 * @param latitude     緯度
+		 * @param longitude    経度
+		 */
+		public void onGetLocation(double latitude, double longitude);
+	}
+	
+	/**
+	 * 位置情報の取得
+	 * @param context
+	 * @param listener
+	 */
+	public void startLocationUpdate(
+    		Context context, OnGetLocationListener listener) {
+		
+		mListener = listener;
+		
+		// LocationManager取得
+		LocationManager mgr = getLocationManager(context);
+		if(mgr != null) {
+			// 位置情報取得
+			mgr.requestLocationUpdates(
+					LocationManager.GPS_PROVIDER,  // Provider（GPS）
+					//LocationManager.NETWORK_PROVIDER, // Provider（無線ネットワーク）
+					INTERVAL_TIME,                    // 通知時間
+					INTERVAL_DISTANCE,                // 最小距離
+					this);
+		}
+	}
+	
+	
+	/**
+	 * 位置情報取得終了
+	 * @param context
+	 */
+	public void finishGettingLocation(Context context) {
+		
+		LocationManager mgr = getLocationManager(context);
+		if(mgr != null) {
+			// 位置情報取得終了
+			mgr.removeUpdates(this);
+		}
+		mListener = null;
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }
