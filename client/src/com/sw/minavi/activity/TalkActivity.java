@@ -3,20 +3,28 @@ package com.sw.minavi.activity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sw.minavi.R;
 import com.sw.minavi.activity.beans.TalkBeans;
@@ -27,9 +35,8 @@ import com.sw.minavi.activity.db.TalkSelectsTableManager;
 import com.sw.minavi.item.TalkEvent;
 import com.sw.minavi.item.TalkGroup;
 import com.sw.minavi.item.TalkSelect;
-import com.sw.minavi.util.LocationUtilities;
 
-public class TalkActivity extends Activity implements OnClickListener, LocationListener {
+public class TalkActivity extends Activity implements OnClickListener {
 
 	private DatabaseOpenHelper helper;
 
@@ -79,6 +86,9 @@ public class TalkActivity extends Activity implements OnClickListener, LocationL
 	private LocationManager locationManager;
 	/** プロバイダ */
 	private List<String> providers;
+	private LocationListener locationListener;
+	private Timer locationTimer;
+	long time;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -150,24 +160,7 @@ public class TalkActivity extends Activity implements OnClickListener, LocationL
 			Intent intent = new Intent(this, GLARActivity.class);
 			startActivity(intent);
 		} else if (v.getId() == R.id.check_area_btn) {
-			initLocationService();
-//
-//			progBar.setVisibility(View.VISIBLE);
-//
-//			//			while (loadLocation == null) {
-//			//
-//			//			}
-//			int count = 0;
-//			while (count < 4) {
-//				count++;
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//			progBar.setVisibility(View.GONE);
+			startLocationService();
 
 		} else if (selectingFlg == true) {
 			// 一旦トーク内容リセット
@@ -397,64 +390,134 @@ public class TalkActivity extends Activity implements OnClickListener, LocationL
 		return texts;
 	}
 
-	private void initLocationService() {
+	private void startLocationService() {
 		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-		providers = locationManager.getProviders(true);
-
-		// 全プロバイダの登録
-		for (String provider : providers) {
-			locationManager.requestLocationUpdates(provider, 0, 1, this);
+		// 位置情報機能非搭載端末の場合
+		if (locationManager == null) {
+			// 何も行いません
+			return;
 		}
-	}
 
-	@Override
-	public void onLocationChanged(Location location) {
-		if (loadLocation == null) {
-			// 1回目の座標取得
+		// @see http://developer.android.com/reference/android/location/LocationManager.html#getBestProvider%28android.location.Criteria,%20boolean%29
+		final Criteria criteria = new Criteria();
+		// PowerRequirement は設定しないのがベストプラクティス
+		// Accuracy は設定しないのがベストプラクティス
+		//criteria.setAccuracy(Criteria.ACCURACY_FINE);	← Accuracy で最もやってはいけないパターン
+		// 以下は必要により
+		criteria.setBearingRequired(false); // 方位不要
+		criteria.setSpeedRequired(false); // 速度不要
+		criteria.setAltitudeRequired(false); // 高度不要
 
-			// ロード中の座標を更新
-			loadLocation = location;
+		final String provider = locationManager.getBestProvider(criteria, true);
+		if (provider == null) {
+			// 位置情報が有効になっていない場合は、Google Maps アプリライクな [現在地機能を改善] ダイアログを起動します。
+			new AlertDialog.Builder(this)
+					.setTitle("現在地機能を改善")
+					.setMessage(
+							"現在、位置情報は一部有効ではないものがあります。次のように設定すると、もっともすばやく正確に現在地を検出できるようになります:\n\n● 位置情報の設定でGPSとワイヤレスネットワークをオンにする\n\n● Wi-Fiをオンにする")
+					.setPositiveButton("設定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(final DialogInterface dialog, final int which) {
+							// 端末の位置情報設定画面へ遷移
+							try {
+								startActivity(new Intent("android.settings.LOCATION_SOURCE_SETTINGS"));
+							} catch (final ActivityNotFoundException e) {
+								// 位置情報設定画面がない糞端末の場合は、仕方ないので何もしない
+							}
+						}
+					})
+					.setNegativeButton("スキップ", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(final DialogInterface dialog, final int which) {
+						} // 何も行わない
+					})
+					.create()
+					.show();
 
-		} else {
-			// 2回目の座標取得
-			double lengthInMeter = LocationUtilities
-					.getDistance(location.getLatitude(),
-							location.getLongitude(),
-							loadLocation.getLatitude(),
-							loadLocation.getLongitude(), 10) * 1000;
+			stopLocationService();
+			return;
+		}
 
-			if (lengthInMeter < 50) {
-				// Toast.makeText(
-				// this,
-				// location.getLatitude() + "," + location.getLongitude()
-				// + "," + lengthInMeter + "m", Toast.LENGTH_SHORT)
-				// .show();
-				return;
+		// 最後に取得できた位置情報が5分以内のものであれば有効とします。
+//		final Location lastKnownLocation = locationManager.getLastKnownLocation(provider);
+//		// XXX - 必要により判断の基準を変更してください。
+//		if (lastKnownLocation != null && (new Date().getTime() - lastKnownLocation.getTime()) <= (5 * 60 * 1000L)) {
+//			setLocation(lastKnownLocation);
+//			return;
+//		}
+
+		// Toast の表示と LocationListener の生存時間を決定するタイマーを起動します。
+		locationTimer = new Timer(true);
+		time = 0L;
+		final Handler handler = new Handler();
+		locationTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						if (time == 1000L) {
+							Toast.makeText(TalkActivity.this, "現在地を特定しています。", Toast.LENGTH_LONG).show();
+						} else if (time >= (30 * 1000L)) {
+							Toast.makeText(TalkActivity.this, "現在地を特定できませんでした。", Toast.LENGTH_LONG).show();
+							stopLocationService();
+						}
+						time = time + 1000L;
+					}
+				});
+			}
+		}, 0L, 1000L);
+
+		// 位置情報の取得を開始します。
+		locationListener = new LocationListener() {
+			@Override
+			public void onLocationChanged(final Location location) {
+				setLocation(location);
 			}
 
-			// ロード中の座標を更新
-			loadLocation = location;
+			@Override
+			public void onProviderDisabled(final String provider) {
+			}
 
-			// TODO 再レンダリング
+			@Override
+			public void onProviderEnabled(final String provider) {
+			}
+
+			@Override
+			public void onStatusChanged(final String provider, final int status, final Bundle extras) {
+			}
+		};
+		locationManager.requestLocationUpdates(provider, 60000, 0, locationListener);
+
+	}
+
+	void stopLocationService() {
+		if (locationTimer != null) {
+			locationTimer.cancel();
+			locationTimer.purge();
+			locationTimer = null;
 		}
-
+		if (locationManager != null) {
+			if (locationListener != null) {
+				locationManager.removeUpdates(locationListener);
+				locationListener = null;
+			}
+			locationManager = null;
+		}
 	}
 
-	@Override
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
+	void setLocation(final Location location) {
+		stopLocationService();
+		loadLocation = location;
 
-	}
+		// TODO: ここに位置情報が取得できた場合の処理を記述します。
 
-	@Override
-	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
+		Toast.makeText(
+				this,
+				location.getLatitude() + "," + location.getLongitude()
+				, Toast.LENGTH_SHORT)
+				.show();
+		return;
 
 	}
 
