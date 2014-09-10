@@ -2,6 +2,7 @@ package com.sw.minavi.activity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,7 +13,9 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -88,6 +91,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 	private List<String> providers;
 	private LocationListener locationListener;
 	private Timer locationTimer;
+	private StringBuffer city;
 	long time;
 
 	@Override
@@ -161,6 +165,16 @@ public class TalkActivity extends Activity implements OnClickListener {
 			startActivity(intent);
 		} else if (v.getId() == R.id.check_area_btn) {
 			startLocationService();
+
+			if (city != null) {
+				textCount = 1;
+				talkTexts = new ArrayList<TalkBeans>();
+				talkTexts.add(new TalkBeans(null, null, 0, 0, 0));
+				nameTextView.setText("ミナ");
+				talkTextView.setText("現在地は「" +
+						city + "」です");
+				charaImageLeft.setImageResource(R.drawable.nomal_n);
+			}
 
 		} else if (selectingFlg == true) {
 			// 一旦トーク内容リセット
@@ -439,12 +453,12 @@ public class TalkActivity extends Activity implements OnClickListener {
 		}
 
 		// 最後に取得できた位置情報が5分以内のものであれば有効とします。
-//		final Location lastKnownLocation = locationManager.getLastKnownLocation(provider);
-//		// XXX - 必要により判断の基準を変更してください。
-//		if (lastKnownLocation != null && (new Date().getTime() - lastKnownLocation.getTime()) <= (5 * 60 * 1000L)) {
-//			setLocation(lastKnownLocation);
-//			return;
-//		}
+		//		final Location lastKnownLocation = locationManager.getLastKnownLocation(provider);
+		//		// XXX - 必要により判断の基準を変更してください。
+		//		if (lastKnownLocation != null && (new Date().getTime() - lastKnownLocation.getTime()) <= (5 * 60 * 1000L)) {
+		//			setLocation(lastKnownLocation);
+		//			return;
+		//		}
 
 		// Toast の表示と LocationListener の生存時間を決定するタイマーを起動します。
 		locationTimer = new Timer(true);
@@ -511,14 +525,22 @@ public class TalkActivity extends Activity implements OnClickListener {
 		loadLocation = location;
 
 		// TODO: ここに位置情報が取得できた場合の処理を記述します。
+		Geocoder mGeocoder = new Geocoder(getApplicationContext(), Locale.JAPAN);
 
-		Toast.makeText(
-				this,
-				location.getLatitude() + "," + location.getLongitude()
-				, Toast.LENGTH_SHORT)
-				.show();
-		return;
+		try {
+			List<Address> addrs = mGeocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+
+			city = new StringBuffer();
+			for (Address addr : addrs) {
+				int idx = addr.getMaxAddressLineIndex();
+				for (int i = 1; i <= idx; i++) {
+					city.append(addr.getAddressLine(i));
+				}
+			}
+			return;
+		} catch (Exception e) {
+			return;
+		}
 
 	}
-
 }
