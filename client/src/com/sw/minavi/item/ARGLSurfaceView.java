@@ -68,7 +68,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private float roll;
 	private int azimuth;
 	private MiniMap miniMap;
-	
+
 	public int centerObjectId = 0;
 
 	{
@@ -236,7 +236,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// }
 
 			// ----------------------------------------------
-			// テキストの描画
+			// ロックオンサイトの描画
 			// ----------------------------------------------
 			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
 			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
@@ -254,7 +254,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, red, 0);
 			gl.glLineWidth(10.0f);
 
-			lineOfSight.drawLine(gl, eye.x, eye.y - 1, eye.z, look.x, look.y, look.z);
+			//			lineOfSight.drawLine(gl, eye.x, eye.y - 1, eye.z, look.x, look.y, look.z);
 
 			// マトリックスを戻す
 			gl.glPopMatrix();
@@ -273,8 +273,8 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 						green, 0);
 				gl.glLineWidth(10.0f);
 
-				lineOfSight.drawLine(gl, eye.x, eye.y - 1, eye.z,
-						rayTo.x, rayTo.y, rayTo.z);
+				//				lineOfSight.drawLine(gl, eye.x, eye.y - 1, eye.z,
+				//						rayTo.x, rayTo.y, rayTo.z);
 				gl.glPopMatrix(); // マトリックスを戻す
 			}
 
@@ -313,7 +313,6 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			int textImgTextureIndex = 0;
 			HashMap<String, Integer> arImgNameToTextIdMap = new HashMap<String, Integer>();
 
-			
 			for (LocalItem locationItem : locationItems) {
 
 				int arImgTextureId;
@@ -353,10 +352,19 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 					paint.setColor(Color.WHITE);
 					paint.setStyle(Style.FILL);
 					canvas.drawColor(0);
+					//					canvas.drawText(MessageFormat.format(
+					//							"ID[{0}]:Msg[{1}]:Img[{2}]", locationItem.getId(),
+					//							locationItem.getMessage(),
+					//							locationItem.getArImageName()), 0, 15, paint);
+
+					float[] results = new float[1];
+					Location.distanceBetween(loadLocation.getLatitude(),
+							loadLocation.getLongitude(),
+							locationItem.getLat(), locationItem.getLon(), results);
+
 					canvas.drawText(MessageFormat.format(
-							"ID[{0}]:Msg[{1}]:Img[{2}]", locationItem.getId(),
-							locationItem.getMessage(),
-							locationItem.getArImageName()), 0, 15, paint);
+							"場所[{0}]:距離[{1}m]", locationItem.getMessage(), results[0]
+							), 0, 20, paint);
 
 					textImgTextureId = textImgTextures[textImgTextureIndex++];
 
@@ -387,8 +395,12 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 						itemLatitude, itemLongitude, loadLatitude,
 						loadLongitude);
 
-				float scaleLength = results[0];
-				//float scaleLength = 5;
+				float scaleLength;
+
+				// TODO 元に戻す
+				//scaleLength = 5;
+				scaleLength = results[0];
+
 				Vector3f eye = camera.getEye();
 				float xPos = (float) (Math.cos(azimuthRad) * scaleLength + eye.x);
 				float zPos = (float) (Math.sin(azimuthRad) * scaleLength + eye.z);
@@ -397,23 +409,23 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 				models.add(new Model(xPos, 0, zPos, degree, arImgTextureId,
 						locationItem));
-
 				textModels.add(new TextModel(xPos, 0, zPos, degree,
 						textImgTextureId));
+
 			}
-			
+
 			// 中心との最近隣を計算
 			float nearDist = 1000;
 			for (Model m : models) {
 				//Vector3f eye = camera.getEye();
 				Vector3f look = camera.getLook();
 				float ds = m.distance(look.x, look.y, look.z);
-				if(ds < nearDist){
+				if (ds < nearDist) {
 					nearDist = ds;
 					centerObjectId = m.getItem().getTalkGroupId();
 				}
 			}
-			
+
 			debugView.updateID(centerObjectId);
 
 			{
@@ -447,7 +459,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				break;
 
 			case MotionEvent.ACTION_UP:
-				
+
 				Vector3f eye = camera.getEye();
 				Vector3f look = camera.getLook();
 				Vector3f up = camera.getUp();
@@ -470,13 +482,14 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 					//					Toast.makeText(activityContext, message, Toast.LENGTH_SHORT)
 					//							.show();
 
-					Intent intent = new Intent();
-					intent.setClassName("com.sw.minavi",
-							"com.sw.minavi.activity.TalkActivity");
-					intent.putExtra("pinId", item.getId());
-					intent.putExtra("talkGroupId", item.getTalkGroupId());
-					getContext().startActivity(intent);
-
+					if (item.getTalkGroupId() != 0) {
+						Intent intent = new Intent();
+						intent.setClassName("com.sw.minavi",
+								"com.sw.minavi.activity.TalkActivity");
+						intent.putExtra("pinId", item.getId());
+						intent.putExtra("talkGroupId", item.getTalkGroupId());
+						getContext().startActivity(intent);
+					}
 				}
 				break;
 			}

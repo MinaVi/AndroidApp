@@ -69,6 +69,10 @@ public class TalkGroupsTableManager {
 				{ "14", "2", "0", "onsen", "0" },
 				{ "15", "2", "0", "hoteltoyotomi", "0" },
 				
+				// もさっぷ
+				{ "16", "3", "0", "yashiki_n", "0" },
+				
+				
 				
 				
 		};

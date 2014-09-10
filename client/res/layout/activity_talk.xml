@@ -70,7 +70,7 @@
         </RelativeLayout>
 
         <ImageView
-            android:id="@+id/answer_back_image"
+            android:id="@+id/chara_img"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
@@ -184,6 +184,14 @@
             android:gravity="right" >
 
         </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#000000" />
 
     </FrameLayout>
 

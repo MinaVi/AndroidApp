@@ -70,7 +70,7 @@
         </RelativeLayout>
 
         <ImageView
-            android:id="@+id/answer_back_image"
+            android:id="@+id/chara_img"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
@@ -157,12 +157,14 @@
                 android:id="@+id/check_area_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:onClick="onClick"
                 android:src="@drawable/minavi_parts_41" />
 
             <ImageView
                 android:id="@+id/ar_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:onClick="onClick"
                 android:src="@drawable/minavi_parts_40" />
 
         </LinearLayout>
@@ -182,6 +184,15 @@
             android:gravity="right" >
 
         </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#000000"
+            android:visibility="visible" />
 
     </FrameLayout>
 
