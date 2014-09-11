@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
@@ -59,21 +58,23 @@ public class SettingsActivity extends PreferenceActivity {
 		// Add 'general' preferences.
 		addPreferencesFromResource(R.xml.pref_general);
 
-		// Add 'notifications' preferences, and a corresponding header.
-		PreferenceCategory fakeHeader = new PreferenceCategory(this);
-
-		// Add 'data and sync' preferences, and a corresponding header.
-		fakeHeader = new PreferenceCategory(this);
-		fakeHeader.setTitle(R.string.pref_header_data_sync);
-		getPreferenceScreen().addPreference(fakeHeader);
-		addPreferencesFromResource(R.xml.pref_data_sync);
+//		// Add 'notifications' preferences, and a corresponding header.
+//		PreferenceCategory fakeHeader = new PreferenceCategory(this);
+//
+//		// Add 'data and sync' preferences, and a corresponding header.
+//		fakeHeader = new PreferenceCategory(this);
+//		fakeHeader.setTitle(R.string.pref_header_data_sync);
+//		getPreferenceScreen().addPreference(fakeHeader);
+//		addPreferencesFromResource(R.xml.pref_data_sync);
 
 		// Bind the summaries of EditText/List/Dialog/Ringtone preferences to
 		// their values. When their values change, their summaries are updated
 		// to reflect the new value, per the Android Design guidelines.
 		bindPreferenceSummaryToValue(findPreference("name"));
 		bindPreferenceSummaryToValue(findPreference("country"));
-		bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+		bindPreferenceSummaryToValue(findPreference("sex"));
+		bindPreferenceSummaryToValue(findPreference("age"));
+//		bindPreferenceSummaryToValue(findPreference("sync_frequency"));
 	}
 
 	/** {@inheritDoc} */

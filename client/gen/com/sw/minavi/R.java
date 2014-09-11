@@ -12,11 +12,13 @@ public final class R {
         public static final int start_logo_animation=0x7f040000;
     }
     public static final class array {
-        public static final int pref_country_list=0x7f080000;
-        public static final int pref_example_list_titles=0x7f080001;
-        public static final int pref_example_list_values=0x7f080002;
-        public static final int pref_sync_frequency_titles=0x7f080003;
-        public static final int pref_sync_frequency_values=0x7f080004;
+        public static final int pref_age_list=0x7f080001;
+        public static final int pref_country_list=0x7f080002;
+        public static final int pref_example_list_titles=0x7f080003;
+        public static final int pref_example_list_values=0x7f080004;
+        public static final int pref_sex_list=0x7f080000;
+        public static final int pref_sync_frequency_titles=0x7f080005;
+        public static final int pref_sync_frequency_values=0x7f080006;
     }
     public static final class attr {
         /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
@@ -183,27 +185,29 @@ containing a value of this type.
     public static final class string {
         public static final int action_settings=0x7f070001;
         public static final int app_name=0x7f070000;
-        public static final int pref_country_title=0x7f070008;
+        public static final int pref_age_title=0x7f070009;
+        public static final int pref_country_title=0x7f07000a;
         public static final int pref_enabled_location_abs=0x7f070005;
         public static final int pref_enabled_location_title=0x7f070004;
         /**  Example settings for Data & Sync 
          */
-        public static final int pref_header_data_sync=0x7f070009;
+        public static final int pref_header_data_sync=0x7f07000b;
         /**  Strings related to Settings 
  Example General settings 
          */
         public static final int pref_header_general=0x7f070003;
         /**  Example settings for Notifications 
          */
-        public static final int pref_header_notifications=0x7f07000c;
+        public static final int pref_header_notifications=0x7f07000e;
         public static final int pref_name=0x7f070007;
         public static final int pref_name_title=0x7f070006;
-        public static final int pref_ringtone_silent=0x7f07000f;
-        public static final int pref_title_new_message_notifications=0x7f07000d;
-        public static final int pref_title_ringtone=0x7f07000e;
-        public static final int pref_title_sync_frequency=0x7f07000a;
-        public static final int pref_title_system_sync_settings=0x7f07000b;
-        public static final int pref_title_vibrate=0x7f070010;
+        public static final int pref_ringtone_silent=0x7f070011;
+        public static final int pref_sex_title=0x7f070008;
+        public static final int pref_title_new_message_notifications=0x7f07000f;
+        public static final int pref_title_ringtone=0x7f070010;
+        public static final int pref_title_sync_frequency=0x7f07000c;
+        public static final int pref_title_system_sync_settings=0x7f07000d;
+        public static final int pref_title_vibrate=0x7f070012;
         public static final int title_activity_settings=0x7f070002;
     }
     public static final class style {

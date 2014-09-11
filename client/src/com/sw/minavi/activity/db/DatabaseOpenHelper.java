@@ -126,7 +126,15 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		/** テーブル項目:background_file_name */
 		background_file_name ("background_file_name", 3),
 		/** テーブル項目:select_flg */
-		select_flg ("select_flg", 4);
+		select_flg ("select_flg", 4),
+		/** テーブル項目:select_flg */
+		next_group_id ("next_group_id", 5),
+		/** テーブル項目:show_memory_flg */
+		show_memory_flg ("show_memory_flg", 6),
+		/** テーブル項目:enabled_flg */
+		is_enabled("is_enabled", 7),
+		/** テーブル項目:is_read */
+		is_read("is_read", 8);
 
 		/** 項目名称 */
 		private final String name;
@@ -379,7 +387,11 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.area_id.getName(), "integer", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.local_area_id.getName(), "integer", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { TalkGroupsTable.background_file_name.getName(), "text", })).append(",");
-			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.select_flg.getName(), "integer", }));
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.select_flg.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.next_group_id.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.is_enabled.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.show_memory_flg.getName(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkGroupsTable.is_read.getName(), "integer", }));
 			createSql.append(");");
 
 			// SQLの発行

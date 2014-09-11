@@ -1,7 +1,9 @@
 package com.sw.minavi.activity;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -14,7 +16,6 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -23,6 +24,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,9 +37,12 @@ import android.widget.Toast;
 import com.sw.minavi.R;
 import com.sw.minavi.activity.beans.TalkBeans;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
+import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.activity.db.TalkEventsTableManager;
 import com.sw.minavi.activity.db.TalkGroupsTableManager;
 import com.sw.minavi.activity.db.TalkSelectsTableManager;
+import com.sw.minavi.http.TransportLog;
+import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.TalkEvent;
 import com.sw.minavi.item.TalkGroup;
 import com.sw.minavi.item.TalkSelect;
@@ -64,7 +69,11 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 	private ArrayList<TalkBeans> talkTexts = new ArrayList<TalkBeans>();
 	private int textCount = 0;
+	private boolean toAr = false;
 
+	// 進行中のGroupId
+	int groupId = 0;
+	
 	// 選択中フラグ
 	private boolean selectingFlg = false;
 	// 選択肢数（分岐フラグを兼ねる）
@@ -96,14 +105,19 @@ public class TalkActivity extends Activity implements OnClickListener {
 	private Timer locationTimer;
 	private StringBuffer city;
 	long time;
+	
+	/** 座標アイテム */
+	private ArrayList<LocalItem> locationItems = new ArrayList<LocalItem>();
 
 	// 設定マネージャー
 	private SharedPreferences sPref;
-	
+
+	private Handler mHandler;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		// 設定値の呼び出し
 		sPref = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -145,6 +159,14 @@ public class TalkActivity extends Activity implements OnClickListener {
 		TalkEventsTableManager.getInstance(helper).InsertSample();
 		TalkSelectsTableManager.getInstance(helper).InsertSample();
 
+		// handler準備
+		mHandler = new Handler() {
+			public void handleMassage(Message msg) {
+				// メッセージ表示
+
+			};
+		};
+
 		// イベントセット
 		ArrayList<TalkGroup> talkGroup = getTalkGroupIds();
 		setTexts(talkGroup);
@@ -176,13 +198,29 @@ public class TalkActivity extends Activity implements OnClickListener {
 			startLocationService();
 
 			if (city != null) {
+				selectingFlg = false;
 				textCount = 1;
+				answerCount = 0;
 				talkTexts = new ArrayList<TalkBeans>();
-				talkTexts.add(new TalkBeans(null, null, 0, 0, 0));
+				talkTexts.add(new TalkBeans(0, null, null, 0, 0, 0));
 				nameTextView.setText("ミナ");
 				talkTextView.setText("現在地は「" +
 						city + "」です");
 				charaImageLeft.setImageResource(R.drawable.nomal_n);
+				
+				if(isExistItem() == true){
+					toAr = true;
+					// 一旦トーク内容リセット
+					talkTexts = null;
+
+					answerCount = 0;
+					textCount = 0;
+					
+					ArrayList<TalkGroup> talkGroup = getTalkGroupIds();
+					setTexts(talkGroup);
+					
+				}
+				
 			}
 
 		} else if (selectingFlg == true) {
@@ -194,24 +232,28 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 			if (v.getId() == R.id.answerTextFirstView) {
 				talkTexts = answerTextsFirst;
+				groupId = talkTexts.get(0).getTalkGroupId();
 				selectingFlg = false;
 				answersArea.setVisibility(View.GONE);
 				answerBackImage.setVisibility(View.GONE);
 				viewText();
 			} else if (v.getId() == R.id.answerTextSecondView) {
 				talkTexts = answerTextsSecond;
+				groupId = talkTexts.get(0).getTalkGroupId();
 				selectingFlg = false;
 				answersArea.setVisibility(View.GONE);
 				answerBackImage.setVisibility(View.GONE);
 				viewText();
 			} else if (v.getId() == R.id.answerTextThirdView) {
 				talkTexts = answerTextsThird;
+				groupId = talkTexts.get(0).getTalkGroupId();
 				selectingFlg = false;
 				answersArea.setVisibility(View.GONE);
 				answerBackImage.setVisibility(View.GONE);
 				viewText();
 			} else if (v.getId() == R.id.answerTextForthView) {
 				talkTexts = answerTextsForth;
+				groupId = talkTexts.get(0).getTalkGroupId();
 				selectingFlg = false;
 				answersArea.setVisibility(View.GONE);
 				answerBackImage.setVisibility(View.GONE);
@@ -228,25 +270,26 @@ public class TalkActivity extends Activity implements OnClickListener {
 			// 分岐に入る
 			selectingFlg = true;
 			answerTextFirstView.setText(answerTexts.get(0).getFirstTalkStr());
-			answerTextFirstView.setBackgroundColor(Color.WHITE);
+//			answerTextFirstView.setBackgroundColor(Color.WHITE);
 			answerTextSecondView.setText(answerTexts.get(1).getFirstTalkStr());
-			answerTextSecondView.setBackgroundColor(Color.WHITE);
+//			answerTextSecondView.setBackgroundColor(Color.WHITE);
 			answerTextThirdView.setText("");
 			answerTextForthView.setText("");
 
 			if (answerCount > 2) {
 				answerTextThirdView.setText(answerTexts.get(2).getFirstTalkStr());
-				answerTextThirdView.setBackgroundColor(Color.WHITE);
+//				answerTextThirdView.setBackgroundColor(Color.WHITE);
 			}
 			if (answerCount > 3) {
 				answerTextForthView.setText(answerTexts.get(3).getFirstTalkStr());
-				answerTextForthView.setBackgroundColor(Color.WHITE);
+//				answerTextForthView.setBackgroundColor(Color.WHITE);
 			}
 
 			answerBackImage.setVisibility(View.VISIBLE);
 			answersArea.setVisibility(View.VISIBLE);
 
 		} else if (textCount == talkTexts.size()) {
+			
 			textCount = 0;
 			nameTextView.setText("");
 			talkTextView.setText("");
@@ -257,8 +300,17 @@ public class TalkActivity extends Activity implements OnClickListener {
 				charaImageRight.setImageResource(talkTexts.get(textCount).getImageId());
 			}
 
-			// test
-			// setTestTexts();
+			// 既読処理
+			helper = new DatabaseOpenHelper(this);
+			TalkGroupsTableManager.getInstance(helper).updateIsRead(String.valueOf(groupId));
+			
+			// ARへ遷移
+			// TODO 固定値
+			if(groupId == 14){
+				Intent intent = new Intent(this, GLARActivity.class);
+				startActivity(intent);
+			}
+			
 			// 次の会話内容セット
 			// イベントセット
 			ArrayList<TalkGroup> talkGroup = getTalkGroupIds();
@@ -295,6 +347,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 		answerTextsThird = new ArrayList<TalkBeans>();
 		answerTextsForth = new ArrayList<TalkBeans>();
 		String str1 = "";
+		int selectTalkGroupId = 0;
 		int firstGroupId = 0;
 		int secondGroupId = 0;
 		int thirdGroupId = 0;
@@ -304,7 +357,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 		charaImageRight.setVisibility(View.GONE);
 
 		// ARからの遷移の場合、優先的に表示する。
-		int groupId = 0;
+		//groupId = 0;
 		TalkGroup group = null;
 		if (arTalkGroupId != 0) {
 			groupId = arTalkGroupId;
@@ -329,13 +382,38 @@ public class TalkActivity extends Activity implements OnClickListener {
 			areaId = group.getAreaId();
 			// 次回以降は通常通り
 			arTalkGroupId = 0;
-		} else {
+		} else if(toAr == true){
+			// TODO　固定値
+			groupId = 13;
+			// 取得されたグループから対象のグループを選択
+			for (int i = 0; i < groups.size(); i++) {
+				if (groups.get(i).getTalkGroupId() == groupId) {
+
+					group = groups.get(i);
+					break;
+
+				}
+			}
+
+			if (group.getBackGroundFileNmae() != null && group.getBackGroundFileNmae().length() > 0) {
+				// 背景を特殊背景に変える
+				backImage.setImageResource(getResources().getIdentifier(group.getBackGroundFileNmae(), "drawable",
+						getPackageName()));
+			}
+
+			// エリアが指定されている場合は、エリア情報のみ
+			areaId = group.getAreaId();
+			// 次回以降は通常通り
+			toAr = false;
+			arTalkGroupId = 0;
+		}else {
 			// 取得されたグループからランダムで表示
 			Random rnd = new Random();
 			int ran = rnd.nextInt(groups.size());
 			group = groups.get(ran);
 			groupId = group.getTalkGroupId();
 		}
+		
 		// 選択されたグループに紐づくイベント取得
 		ArrayList<TalkEvent> talkEvents = TalkEventsTableManager.getInstance(helper).GetRecords(groupId);
 
@@ -352,14 +430,16 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 			// 選択肢は最低二つ
 			str1 = select.getFirstTalkBody();
-			beans = new TalkBeans(str1, "", 0, 0, 0);
+			selectTalkGroupId = select.getFirstTalkGroupId();
+			beans = new TalkBeans(selectTalkGroupId, str1 , "", 0, 0, 0);
 			answerTexts.add(beans);
 			firstGroupId = select.getFirstTalkGroupId();
 			ArrayList<TalkEvent> firstSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(firstGroupId);
 			answerTextsFirst = getTalkBeans(firstSelectEve);
 
 			str1 = select.getSecondTalkBody();
-			beans = new TalkBeans(str1, "", 0, 0, 0);
+			selectTalkGroupId = select.getFirstTalkGroupId();
+			beans = new TalkBeans(selectTalkGroupId, str1 , "", 0, 0, 0);
 			answerTexts.add(beans);
 			secondGroupId = select.getSecondTalkGroupId();
 			ArrayList<TalkEvent> secondSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(secondGroupId);
@@ -367,7 +447,8 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 			if (select.getAnswerCount() > 2) {
 				str1 = select.getThirdTalkBody();
-				beans = new TalkBeans(str1, "", 0, 0, 0);
+				selectTalkGroupId = select.getFirstTalkGroupId();
+				beans = new TalkBeans(selectTalkGroupId, str1 , "", 0, 0, 0);
 				answerTexts.add(beans);
 				thirdGroupId = select.getThirdTalkGroupId();
 				ArrayList<TalkEvent> thirdSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(
@@ -376,7 +457,8 @@ public class TalkActivity extends Activity implements OnClickListener {
 			}
 			if (select.getAnswerCount() > 3) {
 				str1 = select.getForthTalkBody();
-				beans = new TalkBeans(str1, "", 0, 0, 0);
+				selectTalkGroupId = select.getFirstTalkGroupId();
+				beans = new TalkBeans(selectTalkGroupId, str1 , "", 0, 0, 0);
 				answerTexts.add(beans);
 				forthGroupId = select.getForthTalkGroupId();
 				ArrayList<TalkEvent> forthSelectEve = TalkEventsTableManager.getInstance(helper).GetRecords(
@@ -402,15 +484,15 @@ public class TalkActivity extends Activity implements OnClickListener {
 		// イベント情報をセット
 		for (int i = 0; i < talkEvents.size(); i++) {
 			str1 = talkEvents.get(i).getTalkBody();
-			
+
 			// 名前を挿入
-			str1 = MessageFormat.format(str1, sPref.getString("name", "ナヴィ"));
-			
+			str1 = MessageFormat.format(str1, sPref.getString("name", "unknown"));
+
 			talkName = talkEvents.get(i).getTalkName();
 			imageId = getResources().getIdentifier(talkEvents.get(i).getImageFileName(), "drawable", getPackageName());
 			animationType = talkEvents.get(i).getImageAnimationType();
 			pos = talkEvents.get(i).getImagePositionType();
-			beans = new TalkBeans(str1, talkName, imageId, animationType, pos);
+			beans = new TalkBeans(talkEvents.get(i).getTalkGroupId() ,str1, talkName, imageId, animationType, pos);
 			texts.add(beans);
 		}
 
@@ -533,9 +615,19 @@ public class TalkActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	void setLocation(final Location location) {
+	private void setLocation(final Location location) {
 		stopLocationService();
 		loadLocation = location;
+
+		// location情報をサーバーへ送信
+		TransportLog tl = new TransportLog(this, mHandler);
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd kk':'mm':'ss':'");
+
+		tl.execute(String.valueOf(location.getLongitude()), String.valueOf(location.getLatitude()),
+				String.valueOf(location.getAltitude())
+				, String.valueOf(location.getAccuracy()), String.valueOf(location.getSpeed()),
+				sdf.format(date), String.valueOf(0), sPref.getString("name", "unknown"));
 
 		// TODO: ここに位置情報が取得できた場合の処理を記述します。
 		Geocoder mGeocoder = new Geocoder(getApplicationContext(), Locale.JAPAN);
@@ -550,10 +642,21 @@ public class TalkActivity extends Activity implements OnClickListener {
 					city.append(addr.getAddressLine(i));
 				}
 			}
-			return;
 		} catch (Exception e) {
-			return;
+			
 		}
 
 	}
+	
+	private boolean isExistItem(){
+		locationItems = LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation);
+		
+		if(locationItems.size() > 0){
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
 }

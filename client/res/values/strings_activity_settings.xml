@@ -11,7 +11,27 @@
     <string name="pref_enabled_location_abs">収集された位置情報は、統計取得および品質向上に利用させていただきます。</string>
     <string name="pref_name_title">名前（ニックネーム）</string>
     <string name="pref_name">ナビ</string>
+    <string name="pref_sex_title">性別</string>
+    <string-array name="pref_sex_list">
+        <item>男</item>
+        <item>女</item>
+        <item>ひみつ</item>
+    </string-array>
+    <string name="pref_age_title">年齢</string>
+        <string-array name="pref_age_list">
+        <item>～10才</item>
+        <item>10代</item>
+        <item>20代</item>
+        <item>30代</item>
+        <item>40代</item>
+        <item>50代</item>
+        <item>60代</item>
+        <item>70才~</item>
+        <item>ひみつ</item>
+    </string-array>
+
     <string name="pref_country_title">お住まいの都道府県</string>
+
     <string-array name="pref_country_list">
         <item>北海道</item>
         <item>青森県</item>
@@ -60,6 +80,7 @@
         <item>宮崎県</item>
         <item>鹿児島県</item>
         <item>沖縄県</item>
+        <item>ひみつ</item>
     </string-array>
     <string-array name="pref_example_list_titles">
         <item>Always</item>

@@ -1,11 +1,14 @@
 package com.sw.minavi.activity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.vecmath.Vector3f;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,6 +17,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -24,6 +29,7 @@ import android.widget.FrameLayout.LayoutParams;
 import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.LocalItemTableManager;
+import com.sw.minavi.http.TransportLog;
 import com.sw.minavi.item.ARGLSurfaceView;
 import com.sw.minavi.item.DebugView;
 import com.sw.minavi.item.GLCameraView;
@@ -80,6 +86,11 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	private GLCameraView cameraView;
 	private DebugView debugView;
 	private MiniMap miniMap;
+	
+	// 設定マネージャー
+	private SharedPreferences sPref;
+	private Handler mHandler;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +107,14 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// SQLiteへのアクセス準備
 		initDataBaseManage();
+		
+		// handler準備
+		mHandler = new Handler() {
+			public void handleMassage(Message msg) {
+				// メッセージ表示
+
+			};
+		};
 	}
 
 	@Override
@@ -234,6 +253,15 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		if (loadLocation == null) {
 			// 1回目の座標取得
+			// location情報をサーバーへ送信
+			TransportLog tl = new TransportLog(this, mHandler);
+			Date date = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd kk':'mm':'ss':'");
+
+//			tl.execute(String.valueOf(location.getLongitude()), String.valueOf(location.getLatitude()),
+//					String.valueOf(location.getAltitude())
+//					, String.valueOf(location.getAccuracy()), String.valueOf(location.getSpeed()),
+//					sdf.format(date), String.valueOf(0), sPref.getString("name", "unknown"));
 
 			// ロード中の座標を更新
 			loadLocation = location;

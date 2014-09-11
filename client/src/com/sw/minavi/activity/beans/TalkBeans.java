@@ -2,6 +2,8 @@ package com.sw.minavi.activity.beans;
 
 
 
+
+
 public class TalkBeans {
 
 	String firstTalkStr = "";
@@ -9,7 +11,8 @@ public class TalkBeans {
 	int imageId = 0;
 	int animetionType = 0;
 	int position = 0;
-
+	int talkGroupId = 0;
+	
 	public String getFirstTalkStr() {
 		return firstTalkStr;
 	}
@@ -45,7 +48,16 @@ public class TalkBeans {
 		this.position = pos;
 	}
 	
-	public TalkBeans(String str1, String talkName, int id, int type, int pos) {
+
+	public int getTalkGroupId() {
+		return talkGroupId;
+	}
+	private void setTalkGroupId(int talkGroupId) {
+		this.talkGroupId = talkGroupId;
+	}
+	
+	public TalkBeans(int talkGroupId, String str1, String talkName, int id, int type, int pos) {
+		setTalkGroupId(talkGroupId);
 		setFirstTalkStr(str1);
 		setTalkName(talkName);
 		setImageId(id);
