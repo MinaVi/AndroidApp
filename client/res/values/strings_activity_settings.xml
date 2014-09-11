@@ -1,0 +1,105 @@
+<resources>
+
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">基本情報</string>
+    <string name="pref_enabled_location_title">位置情報の提供を許可する</string>
+    <string name="pref_enabled_location_abs">収集された位置情報は、統計取得および品質向上に利用させていただきます。</string>
+    <string name="pref_name_title">名前（ニックネーム）</string>
+    <string name="pref_name">ナビ</string>
+    <string name="pref_country_title">お住まいの都道府県</string>
+    <string-array name="pref_country_list">
+        <item>北海道</item>
+        <item>青森県</item>
+        <item>岩手県</item>
+        <item>宮城県</item>
+        <item>秋田県</item>
+        <item>山形県</item>
+        <item>福島県</item>
+        <item>茨城県</item>
+        <item>栃木県</item>
+        <item>群馬県</item>
+        <item>埼玉県</item>
+        <item>千葉県</item>
+        <item>東京都</item>
+        <item>神奈川県</item>
+        <item>新潟県</item>
+        <item>富山県</item>
+        <item>石川県</item>
+        <item>福井県</item>
+        <item>山梨県</item>
+        <item>長野県</item>
+        <item>岐阜県</item>
+        <item>静岡県</item>
+        <item>愛知県</item>
+        <item>三重県</item>
+        <item>滋賀県</item>
+        <item>京都府</item>
+        <item>大阪府</item>
+        <item>兵庫県</item>
+        <item>奈良県</item>
+        <item>和歌山県</item>
+        <item>鳥取県</item>
+        <item>島根県</item>
+        <item>岡山県</item>
+        <item>広島県</item>
+        <item>山口県</item>
+        <item>徳島県</item>
+        <item>香川県</item>
+        <item>愛媛県</item>
+        <item>高知県</item>
+        <item>福岡県</item>
+        <item>佐賀県</item>
+        <item>長崎県</item>
+        <item>熊本県</item>
+        <item>大分県</item>
+        <item>宮崎県</item>
+        <item>鹿児島県</item>
+        <item>沖縄県</item>
+    </string-array>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+    <string name="pref_title_vibrate">Vibrate</string>
+
+</resources>

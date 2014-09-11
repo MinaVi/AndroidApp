@@ -1,5 +1,6 @@
 package com.sw.minavi.activity;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -12,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
@@ -21,6 +23,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -94,9 +97,15 @@ public class TalkActivity extends Activity implements OnClickListener {
 	private StringBuffer city;
 	long time;
 
+	// 設定マネージャー
+	private SharedPreferences sPref;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// 設定値の呼び出し
+		sPref = PreferenceManager.getDefaultSharedPreferences(this);
 
 		setContentView(R.layout.activity_talk);
 		nameTextView = (TextView) findViewById(R.id.nameText);
@@ -393,6 +402,10 @@ public class TalkActivity extends Activity implements OnClickListener {
 		// イベント情報をセット
 		for (int i = 0; i < talkEvents.size(); i++) {
 			str1 = talkEvents.get(i).getTalkBody();
+			
+			// 名前を挿入
+			str1 = MessageFormat.format(str1, sPref.getString("name", "ナヴィ"));
+			
 			talkName = talkEvents.get(i).getTalkName();
 			imageId = getResources().getIdentifier(talkEvents.get(i).getImageFileName(), "drawable", getPackageName());
 			animationType = talkEvents.get(i).getImageAnimationType();

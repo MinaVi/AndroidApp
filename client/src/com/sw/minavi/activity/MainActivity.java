@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			Intent intent = new Intent(this, GLARActivity.class);
 			startActivity(intent);
 		} else if (v.getId() == R.id.setting_icon) {
-			Intent intent = new Intent(this, GLARActivity.class);
+			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 		}
 	}
