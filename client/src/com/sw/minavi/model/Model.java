@@ -143,6 +143,10 @@ public class Model {
 		return item;
 	}
 
+	public float distance(Vector3f vector) {
+		return distance(vector.x, vector.y, vector.z);
+	}
+
 	public float distance(float ex, float ey, float ez) {
 		double dx = this.x - ex;
 		double dy = this.y - ey;

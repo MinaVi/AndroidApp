@@ -12,7 +12,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -29,6 +29,7 @@ import android.os.Handler;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import com.sw.minavi.R;
 import com.sw.minavi.model.Grid;
@@ -55,28 +56,39 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private OpenGLRenderer renderer;
 	private List<LocalItem> locationItems;
 	private Location loadLocation;
-	private Context activityContext;
+	private Activity activityContext;
 	public ArrayList<Model> models = new ArrayList<Model>();
 	private ArrayList<TextModel> textModels = new ArrayList<TextModel>();
 	private Lockon lockOn;
 
 	private Handler handler;
-	private Runnable lookAtRunnable;
+	private Runnable viewunnable;
 	private DebugView debugView;
 	private double azimuthRad;
 	private float pitch;
 	private float roll;
 	private int azimuth;
 	private MiniMap miniMap;
+	private Model produceModel;
+	private TextView produceText;
 
 	public int centerObjectId = 0;
 
 	{
-		lookAtRunnable = new Runnable() {
+		viewunnable = new Runnable() {
 
 			@Override
 			public void run() {
 				debugView.updateStatus(camera);
+
+				if (produceModel != null) {
+					produceText.setVisibility(View.VISIBLE);
+					LocalItem item = produceModel.getItem();
+
+					produceText.setText(item.getMessage());
+				} else {
+					produceText.setText("モデルが見つかってないよ...(´；ω；｀)ｳｯ…");
+				}
 			}
 		};
 	}
@@ -134,7 +146,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			camera.gluLookAt(gl);
 			//			GLU.gluLookAt(gl, eyepos[0], eyepos[1], eyepos[2], centerPos[0],
 			//					centerPos[1], centerPos[2], upPos[0], upPos[1], upPos[2]);
-			handler.post(lookAtRunnable);
+			handler.post(viewunnable);
 
 			// デプステスト
 			// gl.glEnable(GL10.GL_DEPTH_TEST);
@@ -162,6 +174,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// ----------------------------------------------
 			// モデルの描画
 			// ----------------------------------------------
+			List<Model> highlightModels = new ArrayList<Model>();
 			List<Vector3f> arcSightList = getArcSight(45);
 			Collections.sort(models, new ModelComparator());
 			for (Model model : models) {
@@ -180,12 +193,32 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
+
+					highlightModels.add(model);
 				} else {
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, darkColor, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, darkColor, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, darkColor, 0);
 				}
 				model.draw(gl);
+			}
+
+			// ----------------------------------------------
+			// モデルのロックオン
+			// ----------------------------------------------
+			float maxDistance = 0;
+			Model lockonModel = null;
+			for (Model highlightModel : highlightModels) {
+				float distance = highlightModel.distance(camera.getLook());
+				if (maxDistance < distance) {
+					maxDistance = distance;
+					lockonModel = highlightModel;
+				}
+			}
+
+			produceModel = null;
+			if (lockonModel != null) {
+				produceModel = lockonModel;
 			}
 
 			// ----------------------------------------------
@@ -525,14 +558,15 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	}
 
 	// サーフェースビューのコンストラクタ
-	public ARGLSurfaceView(Context context, Location loadLocation,
-			List<LocalItem> locationItems, DebugView debugView, MiniMap miniMap) {
+	public ARGLSurfaceView(Activity context, Location loadLocation,
+			List<LocalItem> locationItems, DebugView debugView, MiniMap miniMap, TextView produceText) {
 		super(context);
 
 		this.activityContext = context;
 		this.loadLocation = loadLocation;
 		this.locationItems = locationItems;
 		this.debugView = debugView;
+		this.produceText = produceText;
 		this.miniMap = miniMap;
 		this.handler = new Handler();
 

@@ -25,6 +25,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.FrameLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
@@ -86,7 +87,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	private GLCameraView cameraView;
 	private DebugView debugView;
 	private MiniMap miniMap;
-	
+
 	// 設定マネージャー
 	private SharedPreferences sPref;
 	private Handler mHandler;
@@ -107,7 +108,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// SQLiteへのアクセス準備
 		initDataBaseManage();
-		
+
 		// handler準備
 		mHandler = new Handler() {
 			public void handleMassage(Message msg) {
@@ -354,12 +355,13 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		// this.gesDetector = new GestureDetector(this, myGLSurfaceView);
 
 		// OpenGL用のビューの生成
+		TextView produceText = new TextView(this);//;(TextView) findViewById(R.id.produceText);
 		this.debugView = new DebugView(this);
 		this.cameraView = new GLCameraView(this);
 		this.miniMap = new MiniMap(this);
 		this.myGLSurfaceView = new ARGLSurfaceView(this, loadLocation,
-				locationItems, debugView, miniMap);
-		
+				locationItems, debugView, miniMap, produceText);
+
 		// 生成したビューを画面に追加
 		setContentView(myGLSurfaceView);
 		addContentView(cameraView, new LayoutParams(LayoutParams.MATCH_PARENT,
@@ -368,15 +370,17 @@ public class GLARActivity extends Activity implements SensorEventListener,
 				LayoutParams.MATCH_PARENT));
 		addContentView(miniMap, new LayoutParams(300,
 				400));
+		addContentView(produceText, new LayoutParams(300,
+				400));
 		miniMap.setVisibility(View.GONE);
 
 		// デバッグ情報の更新
 		debugView.updateLocation(loadLocation.getLatitude(),
 				loadLocation.getLongitude());
 	}
-	
+
 	public void onClick(View v) {
-		
+
 		// 中心との最近隣を計算
 		float nearDist = 1000;
 		int id = 0;
@@ -388,10 +392,10 @@ public class GLARActivity extends Activity implements SensorEventListener,
 				id = m.getItem().getTalkGroupId();
 			}
 		}
-		
+
 		debugView.updateID(id);
-		
-		
+
+
 		if(id != 0){
 //			Intent intent = new Intent();
 //			intent.setClassName("com.sw.minavi",
@@ -402,5 +406,5 @@ public class GLARActivity extends Activity implements SensorEventListener,
 //			finish();
 		}
 	}
-	
+
 }
