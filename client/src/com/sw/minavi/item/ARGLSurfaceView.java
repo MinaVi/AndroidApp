@@ -188,13 +188,15 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 							break;
 						}
 					}
+					if (GLUtils.intersect(eye, camera.getLook(),
+							vertexList)) {
+						highlightModels.add(model);
+					}
 				}
 				if (isIntersect) {
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
-
-					highlightModels.add(model);
 				} else {
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, darkColor, 0);
 					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, darkColor, 0);
