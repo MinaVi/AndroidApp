@@ -364,10 +364,10 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// 生成したビューを画面に追加
 		setContentView(myGLSurfaceView);
-		addContentView(cameraView, new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT));
-		addContentView(debugView, new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT));
+		addContentView(cameraView, new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+				android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+		addContentView(debugView, new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+				android.view.ViewGroup.LayoutParams.MATCH_PARENT));
 		addContentView(miniMap, new LayoutParams(300,
 				400));
 		addContentView(produceText, new LayoutParams(300,
@@ -379,6 +379,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 				loadLocation.getLongitude());
 	}
 
+	@Override
 	public void onClick(View v) {
 
 		// 中心との最近隣を計算

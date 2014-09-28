@@ -105,7 +105,7 @@ public final class PhysicsUtil {
 			dVert.set(vertical.x, vertical.y, vertical.z);
 		}
 
-		dVert.scale(1.f / (float) height);
+		dVert.scale(1.f / height);
 
 		tmp1.scale(0.5f, hor);
 		tmp2.scale(0.5f, vertical);

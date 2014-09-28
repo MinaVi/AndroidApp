@@ -97,6 +97,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		bgmPlayingFlg = false;
 	}
 
+	@Override
 	protected void onStart() {
 		super.onStart();
 		BgmManager.newIntance(getApplicationContext()).playSound(

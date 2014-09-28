@@ -24,7 +24,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,10 +32,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.sw.minavi.R;
 import com.sw.minavi.activity.beans.TalkBeans;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
@@ -154,7 +150,11 @@ public class TalkActivity extends Activity implements OnClickListener {
 		answerBackImage.setVisibility(View.GONE);
 
 		backImage = (ImageView) findViewById(R.id.back_btn);
+		
+		// 左キャラクター初期設定
 		charaImageLeft = (ImageView) findViewById(R.id.chara_image_left);
+		
+		
 		charaImageRight = (ImageView) findViewById(R.id.chara_image_right);
 		arBtn = (ImageView) findViewById(R.id.ar_btn);
 		checkAreaBtn = (ImageView) findViewById(R.id.check_area_btn);
@@ -636,6 +636,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 						// ProgressDialog のキャンセルされた時に呼び出されるコールバックを登録
 						progLog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+							@Override
 							public void onCancel(DialogInterface dialog) {
 								// Thread を停止
 								// Toast.makeText(TalkActivity.this,
@@ -754,7 +755,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 				talkTexts.add(new TalkBeans(0, null, null, 0, 0, 0));
 				nameTextView.setText("ミナ");
 				talkTextView.setText("現在地は「" + city + "」です");
-				charaImageLeft.setImageResource(R.drawable.nomal_n);
+				charaImageLeft.setImageResource(R.drawable.mina1_nomal);
 				city = null;
 
 				if (isExistItem() == true) {
@@ -800,6 +801,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 		bgmPlayingFlg = false;
 	}
 
+	@Override
 	protected void onStart() {
 		super.onStart();
 		BgmManager.newIntance(getApplicationContext()).playSound(

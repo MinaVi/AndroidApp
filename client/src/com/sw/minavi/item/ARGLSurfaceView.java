@@ -546,6 +546,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	}
 
 	class ModelComparator implements Comparator<Model> {
+		@Override
 		public int compare(Model s, Model t) {
 			Vector3f eye = camera.getEye();
 			float ds = s.distance(eye.x, eye.y, eye.z);

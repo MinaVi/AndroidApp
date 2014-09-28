@@ -11,64 +11,107 @@
     tools:context=".MainActivity" >
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
         android:orientation="vertical" >
 
-        <ImageView
-            android:id="@+id/title_image"
+        <LinearLayout
+            android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:src="@drawable/minavi_parts_27" />
+            android:layout_height="0dp"
+            android:layout_weight="0.4"
+            android:orientation="vertical" >
 
+            <ImageView
+                android:id="@+id/title_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="50dp"
+                android:src="@drawable/minavi_parts_27" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.6" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:orientation="vertical" >
+
+                <ImageView
+                    android:id="@+id/chara_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/mina1_nomal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.25"
+                    android:orientation="vertical" >
+
+                    <ImageView
+                        android:id="@+id/talk_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:onClick="onClick"
+                        android:src="@drawable/minavi_parts_07" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.25"
+                    android:orientation="vertical" >
+
+                    <ImageView
+                        android:id="@+id/ar_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:onClick="onClick"
+                        android:src="@drawable/minavi_parts_13" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.25"
+                    android:orientation="vertical" >
+
+                    <ImageView
+                        android:id="@+id/map_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/minavi_parts_12" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.25"
+                    android:orientation="vertical" >
+
+                    <ImageView
+                        android:id="@+id/setting_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:onClick="onClick"
+                        android:src="@drawable/minavi_parts_29" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:orientation="vertical" >
-
-        <ImageView
-            android:id="@+id/talk_icon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:onClick="onClick"
-            android:src="@drawable/minavi_parts_07" />
-
-        <ImageView
-            android:id="@+id/ar_icon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:onClick="onClick"
-            android:src="@drawable/minavi_parts_13" />
-
-        <ImageView
-            android:id="@+id/map_icon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/minavi_parts_12" />
-
-        <ImageView
-            android:id="@+id/setting_icon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:onClick="onClick"
-            android:src="@drawable/minavi_parts_29" />
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/chara_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/linearLayout2"
-        android:layout_alignParentLeft="true"
-        android:src="@drawable/nomal_s" />
 
 </RelativeLayout>

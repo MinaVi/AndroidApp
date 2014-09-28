@@ -470,15 +470,15 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 
 			// 各回転角の表示.
 			// ラジアンから度に変換した後に表示
-			azimuthText.setText(Integer.toString((int) (LocationUtilities
+			azimuthText.setText(Integer.toString((LocationUtilities
 					.radianToDegreeForAzimuth(attitude[0]))));
-			pitchText.setText(Integer.toString((int) (LocationUtilities
+			pitchText.setText(Integer.toString((LocationUtilities
 					.radianToDegree(attitude[1]))));
-			rollText.setText(Integer.toString((int) (LocationUtilities
+			rollText.setText(Integer.toString((LocationUtilities
 					.radianToDegree(attitude[2]))));
 
 			// 方位角の設定
-			int tmpAzimuth = (int) (LocationUtilities
+			int tmpAzimuth = (LocationUtilities
 					.radianToDegreeForAzimuth(attitude[0]));
 
 			// 前回から方位差がN度ずれた場合のみ描画イベントを開始
