@@ -32,6 +32,7 @@ import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.http.TransportLog;
 import com.sw.minavi.item.ARGLSurfaceView;
+import com.sw.minavi.item.BgmManager;
 import com.sw.minavi.item.DebugView;
 import com.sw.minavi.item.GLCameraView;
 import com.sw.minavi.item.LocalItem;
@@ -122,6 +123,9 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	protected void onResume() {
 		super.onResume();
 
+		// BGM復帰
+		BgmManager.newIntance(getApplicationContext()).playSound(R.raw.spring_wind);
+		
 		// 加速度センサの登録
 		sensorManager.registerListener(this,
 				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
@@ -137,8 +141,12 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	protected void onPause() {
 		super.onPause();
 
+		// BGM停止
+		BgmManager.newIntance(getApplicationContext()).playSound(-1);
+		
 		// SensorManagerの解除
 		sensorManager.unregisterListener(this);
+		BgmManager.newIntance(getApplicationContext()).playSound(R.raw.spring_wind);
 	}
 
 	@Override
