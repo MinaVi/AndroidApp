@@ -96,7 +96,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		// レイアウトを設定
 		setContentView(R.layout.activity_gl);
 

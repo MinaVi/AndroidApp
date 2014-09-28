@@ -14,6 +14,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 import com.sw.minavi.R;
+import com.sw.minavi.item.BgmManager;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -51,6 +52,8 @@ public class SettingsActivity extends PreferenceActivity {
 		if (!isSimplePreferences(this)) {
 			return;
 		}
+		
+		BgmManager.newIntance(getApplicationContext()).playSound(R.raw.kibou_no_hikari);
 
 		// In the simplified UI, fragments are not used at all and we instead
 		// use the older PreferenceActivity APIs.
