@@ -490,7 +490,7 @@ containing a value of this type.
         public static final int talk_icon_s=0x7f02005e;
     }
     public static final class id {
-        public static final int action_settings=0x7f0a005c;
+        public static final int action_settings=0x7f0a005e;
         public static final int answerTextFirstView=0x7f0a003c;
         public static final int answerTextForthView=0x7f0a003f;
         public static final int answerTextSecondView=0x7f0a003d;
@@ -513,6 +513,7 @@ containing a value of this type.
         public static final int check_area_btn=0x7f0a0040;
         public static final int classic=0x7f0a0011;
         public static final int debug_area=0x7f0a0027;
+        public static final int detail_btn=0x7f0a005c;
         public static final int eyeXLabel=0x7f0a0042;
         public static final int eyeXValue=0x7f0a0043;
         public static final int eyeYLabel=0x7f0a0044;
@@ -567,6 +568,7 @@ containing a value of this type.
         public static final int roll=0x7f0a001a;
         public static final int rollLabel=0x7f0a0054;
         public static final int rollValue=0x7f0a0055;
+        public static final int route_btn=0x7f0a005d;
         public static final int sandbox=0x7f0a0008;
         public static final int satellite=0x7f0a0002;
         public static final int selectionDetails=0x7f0a000b;

@@ -163,7 +163,7 @@ int drawable stationsaruhutu 0x7f02005b
 int drawable summerwars 0x7f02005c
 int drawable talk_icon 0x7f02005d
 int drawable talk_icon_s 0x7f02005e
-int id action_settings 0x7f0a005c
+int id action_settings 0x7f0a005e
 int id answerTextFirstView 0x7f0a003c
 int id answerTextForthView 0x7f0a003f
 int id answerTextSecondView 0x7f0a003d
@@ -186,6 +186,7 @@ int id chara_img 0x7f0a002d
 int id check_area_btn 0x7f0a0040
 int id classic 0x7f0a0011
 int id debug_area 0x7f0a0027
+int id detail_btn 0x7f0a005c
 int id eyeXLabel 0x7f0a0042
 int id eyeXValue 0x7f0a0043
 int id eyeYLabel 0x7f0a0044
@@ -240,6 +241,7 @@ int id provider 0x7f0a0020
 int id roll 0x7f0a001a
 int id rollLabel 0x7f0a0054
 int id rollValue 0x7f0a0055
+int id route_btn 0x7f0a005d
 int id sandbox 0x7f0a0008
 int id satellite 0x7f0a0002
 int id selectionDetails 0x7f0a000b
