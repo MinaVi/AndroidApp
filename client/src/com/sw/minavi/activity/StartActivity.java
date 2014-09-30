@@ -72,4 +72,9 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 		// TODO Auto-generated method stub
 		
 	}
+	
+	protected void onPause(){
+		super.onPause();
+		finish();
+	}
 }

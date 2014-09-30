@@ -85,6 +85,10 @@ public class MainActivity extends Activity implements OnClickListener {
 			bgmPlayingFlg = true;
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
+		} else if (v.getId() == R.id.map_icon) {
+			bgmPlayingFlg = true;
+			Intent intent = new Intent(this, LocationActivity.class);
+			startActivity(intent);
 		}
 	}
 

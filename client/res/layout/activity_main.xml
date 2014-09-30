@@ -93,6 +93,7 @@
                         android:id="@+id/map_icon"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:onClick="onClick"
                         android:src="@drawable/minavi_parts_12" />
                 </LinearLayout>
 

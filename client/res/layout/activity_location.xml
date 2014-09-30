@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/lbl_geo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="lonlat" />
+
+    <TextView
+        android:id="@+id/lbl_log"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/lbl_geo"
+        android:text="log" />
+
+    <TextView
+        android:id="@+id/lbl_prov"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/lbl_log"
+        android:text="provider" />
+
+    <TextView
+        android:id="@+id/geo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/log"
+        android:layout_marginLeft="19dp"
+        android:layout_toRightOf="@+id/lbl_prov"
+        android:text="0" />
+
+    <TextView
+        android:id="@+id/log"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/provider"
+        android:layout_alignLeft="@+id/geo"
+        android:text="0" />
+
+    <TextView
+        android:id="@+id/provider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/lbl_prov"
+        android:layout_alignBottom="@+id/lbl_prov"
+        android:layout_alignLeft="@+id/log"
+        android:text="0" />
+
+    <TextView
+        android:id="@+id/lbl_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/timer"
+        android:text="Time" />
+
+    <Chronometer
+        android:id="@+id/timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/provider"
+        android:layout_below="@+id/provider"
+        android:layout_marginTop="32dp"
+        android:text="Chronometer" />
+
+</RelativeLayout>
