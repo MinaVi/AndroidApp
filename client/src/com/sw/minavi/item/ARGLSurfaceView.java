@@ -64,8 +64,9 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 	private Handler handler;
 	private Runnable viewunnable;
 	private DebugView debugView;
-	private int pitch;
-	private int roll;
+	private double azimuthRad;
+	private float pitch;
+	private float roll;
 	private int azimuth;
 	private MiniMap miniMap;
 	private Model produceModel;
@@ -86,8 +87,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 					produceText.setText(item.getMessage());
 				} else {
-					//					produceText.setText("モデルが見つかってないよ...(´；ω；｀)ｳｯ…");
-					produceText.setText(MessageFormat.format("azimuth:{0},roll:{1},pitch:{2}", azimuth, roll, pitch));
+					produceText.setText("モデルが見つかってないよ...(´；ω；｀)ｳｯ…");
 				}
 			}
 		};
@@ -276,7 +276,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
 			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
 			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
-			lockOn.draw(gl, camera, azimuth, pitch, roll, angle);
+			lockOn.draw(gl, camera, azimuth, roll, angle);
 
 			// ----------------------------------------------
 			// 視点-注視点間の線分の描画
@@ -591,17 +591,20 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	@Override
 	public boolean onDown(MotionEvent arg0) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent arg0) {
+		// TODO Auto-generated method stub
 
 	}
 
@@ -615,6 +618,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 
 	@Override
 	public void onShowPress(MotionEvent arg0) {
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -622,14 +626,13 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 		return false;
 	}
 
-	public void changeAzimuthEvent(double azimuthRad, float pitchRad, float rollRad) {
+	public void changeAzimuthEvent(double radian, float pitch, float roll) {
+		this.azimuthRad = radian;
 		this.azimuth = LocationUtilities
-				.radianToDegreeForAzimuth((float) azimuthRad);
-		this.pitch = LocationUtilities
-				.radianToDegreeForAzimuth((float) pitchRad);
-		this.roll = LocationUtilities
-				.radianToDegreeForAzimuth((float) rollRad);
-		camera.rotateLook((float) azimuthRad, rollRad);
+				.radianToDegreeForAzimuth((float) radian);
+		this.pitch = pitch;
+		this.roll = roll;
+		camera.rotateLook((float) azimuthRad, roll);
 	}
 
 	private List<Vector3f> getArcSight(int sight) {

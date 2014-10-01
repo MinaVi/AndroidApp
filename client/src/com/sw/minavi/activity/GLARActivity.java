@@ -93,10 +93,11 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	private SharedPreferences sPref;
 	private Handler mHandler;
 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		// レイアウトを設定
 		setContentView(R.layout.activity_gl);
 
@@ -124,7 +125,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// BGM復帰
 		BgmManager.newIntance(getApplicationContext()).playSound(R.raw.spring_wind);
-
+		
 		// 加速度センサの登録
 		sensorManager.registerListener(this,
 				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
@@ -142,7 +143,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// BGM停止
 		BgmManager.newIntance(getApplicationContext()).playSound(-1);
-
+		
 		// SensorManagerの解除
 		sensorManager.unregisterListener(this);
 		BgmManager.newIntance(getApplicationContext()).playSound(R.raw.spring_wind);
@@ -158,6 +159,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
+		// TODO Auto-generated method stub
 
 	}
 
@@ -265,10 +267,10 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			Date date = new Date();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd kk':'mm':'ss':'");
 
-			//			tl.execute(String.valueOf(location.getLongitude()), String.valueOf(location.getLatitude()),
-			//					String.valueOf(location.getAltitude())
-			//					, String.valueOf(location.getAccuracy()), String.valueOf(location.getSpeed()),
-			//					sdf.format(date), String.valueOf(0), sPref.getString("name", "unknown"));
+//			tl.execute(String.valueOf(location.getLongitude()), String.valueOf(location.getLatitude()),
+//					String.valueOf(location.getAltitude())
+//					, String.valueOf(location.getAccuracy()), String.valueOf(location.getSpeed()),
+//					sdf.format(date), String.valueOf(0), sPref.getString("name", "unknown"));
 
 			// ロード中の座標を更新
 			loadLocation = location;
@@ -310,16 +312,19 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 	@Override
 	public void onProviderDisabled(String arg0) {
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onProviderEnabled(String arg0) {
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+		// TODO Auto-generated method stub
 
 	}
 
@@ -350,8 +355,8 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// 周辺情報を取得
 		// TODO 範囲によって取得情報をフィルタリング
-		//		loadLocation.setLongitude(141.343739);
-		//		loadLocation.setLatitude(43.072665);
+//		loadLocation.setLongitude(141.343739);
+//		loadLocation.setLatitude(43.072665);
 		locationItems = LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation);
 
 		// ジェスチャーを検出する
@@ -391,7 +396,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		for (Model m : this.myGLSurfaceView.models) {
 			Vector3f eye = this.myGLSurfaceView.camera.getEye();
 			float ds = m.distance(eye.x, eye.y, eye.z);
-			if (ds < nearDist) {
+			if(ds < nearDist){
 				nearDist = ds;
 				id = m.getItem().getTalkGroupId();
 			}
@@ -399,14 +404,15 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		debugView.updateID(id);
 
-		if (id != 0) {
-			//			Intent intent = new Intent();
-			//			intent.setClassName("com.sw.minavi",
-			//					"com.sw.minavi.activity.TalkActivity");
-			//			intent.putExtra("pinId", 0);
-			//			intent.putExtra("talkGroupId", this.myGLSurfaceView.centerObjectId);
-			//			startActivity(intent);
-			//			finish();
+
+		if(id != 0){
+//			Intent intent = new Intent();
+//			intent.setClassName("com.sw.minavi",
+//					"com.sw.minavi.activity.TalkActivity");
+//			intent.putExtra("pinId", 0);
+//			intent.putExtra("talkGroupId", this.myGLSurfaceView.centerObjectId);
+//			startActivity(intent);
+//			finish();
 		}
 	}
 

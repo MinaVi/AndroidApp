@@ -82,17 +82,18 @@ public class Lockon {
 		textureBuffer.position(0);
 	}
 
-	public void draw(GL10 gl, Camera3D camera, int degree, int pitch, int roll, float angle) {
+	public void draw(GL10 gl, Camera3D camera, int degree, float roll, float angle) {
 		gl.glPushMatrix(); // マトリックス記憶
 
 		Vector3f eye = camera.getEye();
 		Vector3f look = camera.getLook();
 
-		Vector3f middle = camera.getMiddleEyeAndLook(10);
+		float x = eye.x + look.x / 2.0f;
+		float y = eye.y + look.y / 2.0f;
+		float z = eye.z + look.z / 2.0f;
 
-		gl.glTranslatef(middle.x, middle.y, middle.z);
+		gl.glTranslatef(look.x, look.y, look.z);
 		gl.glRotatef(degreeToAngle[degree], 0, 1, 0);
-		gl.glRotatef(degreeToAngle[roll], 1, 0, 0);
 		gl.glRotatef(angle, 0, 0, 1);
 
 		gl.glEnable(GL10.GL_TEXTURE_2D);
