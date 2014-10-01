@@ -55,4 +55,18 @@ public class Camera3D {
 		this.look.y = y;
 		this.look.z = z;
 	}
+
+	public Vector3f getMiddleEyeAndLook(double length) {
+
+		float dx = look.x - eye.x;
+		float dy = look.y - eye.y;
+		float dz = look.z - eye.z;
+
+		double l = Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
+
+		return new Vector3f(
+				(float) (dx * length / l + eye.x),
+				(float) (dy * length / l + eye.y),
+				(float) (dz * length / l + eye.z));
+	}
 }
