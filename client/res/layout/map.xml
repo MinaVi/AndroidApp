@@ -1,53 +1,99 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
-    
-    <fragment
-    android:id="@+id/map"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    class="com.google.android.gms.maps.SupportMapFragment" />
-</RelativeLayout>
+    android:orientation="vertical" >
 
-<!-- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" -->
-<!--     android:layout_width="fill_parent" -->
-<!--     android:layout_height="fill_parent" -->
-<!--     android:orientation="vertical" > -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="0.9"
+            android:orientation="vertical" >
 
-<!--     <Button -->
-<!--         android:id="@+id/button_start" -->
-<!--         android:layout_width="fill_parent" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:text="位置情報取得" /> -->
+            <fragment
+                android:id="@+id/map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                class="com.google.android.gms.maps.SupportMapFragment" />
 
-<!--     <com.google.android.maps.MapView -->
-<!--     android:id="@+id/map" -->
-<!--     android:layout_width="fill_parent" -->
-<!--     android:layout_height="320dip" -->
-<!--     android:apiKey="@string/maps_api_key" -->
-<!--     android:clickable="true" -->
-<!--     android:enabled="true" /> -->
+        </LinearLayout>
 
-<!--     <fragment -->
-<!--         android:id="@+id/map" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         class="com.google.android.gms.maps.SupportMapFragment" /> -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.1"
+            android:orientation="horizontal" >
 
-<!--     <TextView -->
-<!--         android:id="@+id/text_location_title" -->
-<!--         android:layout_width="fill_parent" -->
-<!--         android:layout_height="wrap_content" /> -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5" >
 
-<!--     <TextView -->
-<!--         android:id="@+id/text_location_snippet" -->
-<!--         android:layout_width="fill_parent" -->
-<!--         android:layout_height="wrap_content" /> -->
+                <Button
+                    android:id="@+id/detail_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                        android:onClick="onClick"
+                    android:text="詳細" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5" >
+
+                <Button
+                    android:id="@+id/route_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                        android:onClick="onClick"
+                    android:text="ルート" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+</LinearLayout> <!-- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" -->
+<!-- android:layout_width="fill_parent" -->
+<!-- android:layout_height="fill_parent" -->
+<!-- android:orientation="vertical" > -->
+
+
+<!-- <Button -->
+<!-- android:id="@+id/button_start" -->
+<!-- android:layout_width="fill_parent" -->
+<!-- android:layout_height="wrap_content" -->
+<!-- android:text="位置情報取得" /> -->
+
+
+<!-- <com.google.android.maps.MapView -->
+<!-- android:id="@+id/map" -->
+<!-- android:layout_width="fill_parent" -->
+<!-- android:layout_height="320dip" -->
+<!-- android:apiKey="@string/maps_api_key" -->
+<!-- android:clickable="true" -->
+<!-- android:enabled="true" /> -->
+
+
+<!-- <fragment -->
+<!-- android:id="@+id/map" -->
+<!-- android:layout_width="wrap_content" -->
+<!-- android:layout_height="wrap_content" -->
+<!-- class="com.google.android.gms.maps.SupportMapFragment" /> -->
+
+
+<!-- <TextView -->
+<!-- android:id="@+id/text_location_title" -->
+<!-- android:layout_width="fill_parent" -->
+<!-- android:layout_height="wrap_content" /> -->
+
+
+<!-- <TextView -->
+<!-- android:id="@+id/text_location_snippet" -->
+<!-- android:layout_width="fill_parent" -->
+<!-- android:layout_height="wrap_content" /> -->
+
 
 <!-- </LinearLayout> -->
