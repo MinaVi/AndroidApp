@@ -85,9 +85,6 @@ public class Lockon {
 	public void draw(GL10 gl, Camera3D camera, int degree, int pitch, int roll, float angle) {
 		gl.glPushMatrix(); // マトリックス記憶
 
-		Vector3f eye = camera.getEye();
-		Vector3f look = camera.getLook();
-
 		Vector3f middle = camera.getMiddleEyeAndLook(10);
 
 		gl.glTranslatef(middle.x, middle.y, middle.z);

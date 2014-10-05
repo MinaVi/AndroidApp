@@ -24,8 +24,6 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.FrameLayout.LayoutParams;
-import android.widget.TextView;
 
 import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
@@ -33,10 +31,8 @@ import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.http.TransportLog;
 import com.sw.minavi.item.ARGLSurfaceView;
 import com.sw.minavi.item.BgmManager;
-import com.sw.minavi.item.DebugView;
-import com.sw.minavi.item.GLCameraView;
+import com.sw.minavi.item.CustomView;
 import com.sw.minavi.item.LocalItem;
-import com.sw.minavi.item.MiniMap;
 import com.sw.minavi.item.SensorFilter;
 import com.sw.minavi.model.Model;
 import com.sw.minavi.util.LocationUtilities;
@@ -77,17 +73,15 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	/** 現在ロードしている座標 */
 	private Location loadLocation = null;
 
-	private float azimuthRad;
-	private float pitch;
-	private float roll;
-
+	/** 現在位置取得フラグ */
 	private boolean isGetLocation = false;
+	/** 方位取得フラグ */
 	private boolean isGetAzimuth = false;
 
-	private ARGLSurfaceView myGLSurfaceView;
-	private GLCameraView cameraView;
-	private DebugView debugView;
-	private MiniMap miniMap;
+	/** GLSurfaceView */
+	private ARGLSurfaceView glSurfaceView;
+	/** GLSurfaceViewに重ねる付加情報ビュー */
+	private CustomView customView;
 
 	// 設定マネージャー
 	private SharedPreferences sPref;
@@ -108,6 +102,9 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// SQLiteへのアクセス準備
 		initDataBaseManage();
+
+		// レイアウト上の各ビューを取得
+		findViews();
 
 		// handler準備
 		mHandler = new Handler() {
@@ -234,29 +231,20 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			}
 
 			// 方位(ラジアン)、ピッチ、ロールを取得
-			azimuthRad = attitude[0];
-			pitch = attitude[1];
-			roll = attitude[2];
+			float azimuth = attitude[0];
+			float pitch = attitude[1];
+			float roll = attitude[2];
+
+			// ジャイロセンサー情報が取得済みであることを通知
 			isGetAzimuth = true;
 
-			if (myGLSurfaceView != null) {
-				myGLSurfaceView.changeAzimuthEvent(azimuthRad, pitch, roll);
-			}
-
-			if (debugView != null) {
-				debugView.updateSensor(
-						LocationUtilities.radianToDegreeForAzimuth(azimuthRad),
-						roll, pitch);
-			}
+			// GLSurfaceViewの方位更新イベントを実行
+			glSurfaceView.changeAzimuthEvent(azimuth, pitch, roll);
 		}
 	}
 
 	@Override
 	public void onLocationChanged(Location location) {
-
-		if (isGetAzimuth == false) {
-			return;
-		}
 
 		if (loadLocation == null) {
 			// 1回目の座標取得
@@ -273,14 +261,19 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			// ロード中の座標を更新
 			loadLocation = location;
 
+			// 現在位置が取得済みであることを通知
 			isGetLocation = true;
 
-			// Toast.makeText(this,
-			// location.getLatitude() + "," + location.getLongitude(),
-			// Toast.LENGTH_SHORT).show();
-			addViews();
+			// デバッグ用。現在位置の通知
+			//			Toast.makeText(this,
+			//					location.getLatitude() + "," + location.getLongitude(),
+			//					Toast.LENGTH_SHORT).show();
+
+			// 位置情報更新イベントの実行
+			updateLocationEvent();
 
 		} else {
+
 			// 2回目の座標取得
 			double lengthInMeter = LocationUtilities
 					.getDistance(location.getLatitude(),
@@ -288,23 +281,16 @@ public class GLARActivity extends Activity implements SensorEventListener,
 							loadLocation.getLatitude(),
 							loadLocation.getLongitude(), 10) * 1000;
 
+			// 前回のロード座標から50m以内であれば位置情報を更新しない
 			if (lengthInMeter < 50) {
-				// Toast.makeText(
-				// this,
-				// location.getLatitude() + "," + location.getLongitude()
-				// + "," + lengthInMeter + "m", Toast.LENGTH_SHORT)
-				// .show();
 				return;
 			}
 
 			// ロード中の座標を更新
 			loadLocation = location;
 
-			if (debugView != null) {
-				debugView.updateLocation(loadLocation.getLatitude(),
-						loadLocation.getLongitude());
-			}
-			// TODO 再レンダリング
+			// 位置情報更新イベントの実行
+			updateLocationEvent();
 		}
 	}
 
@@ -342,44 +328,24 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		LocalItemTableManager.getInstance(helper).InsertSample();
 	}
 
-	private void addViews() {
+	private void findViews() {
+		glSurfaceView = (ARGLSurfaceView) findViewById(R.id.arGLSurfaceView);
+		customView = (CustomView) findViewById(R.id.customView);
+		glSurfaceView.setCustomView(customView);
+	}
 
+	private void updateLocationEvent() {
+
+		// 方位と位置の両方が取得出来ていることを確認
 		if (isGetAzimuth == false || isGetLocation == false) {
 			return;
 		}
 
 		// 周辺情報を取得
-		// TODO 範囲によって取得情報をフィルタリング
-		//		loadLocation.setLongitude(141.343739);
-		//		loadLocation.setLatitude(43.072665);
 		locationItems = LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation);
 
-		// ジェスチャーを検出する
-		// this.gesDetector = new GestureDetector(this, myGLSurfaceView);
-
-		// OpenGL用のビューの生成
-		TextView produceText = new TextView(this);//;(TextView) findViewById(R.id.produceText);
-		this.debugView = new DebugView(this);
-		this.cameraView = new GLCameraView(this);
-		this.miniMap = new MiniMap(this);
-		this.myGLSurfaceView = new ARGLSurfaceView(this, loadLocation,
-				locationItems, debugView, miniMap, produceText);
-
-		// 生成したビューを画面に追加
-		setContentView(myGLSurfaceView);
-		addContentView(cameraView, new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-				android.view.ViewGroup.LayoutParams.MATCH_PARENT));
-		addContentView(debugView, new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-				android.view.ViewGroup.LayoutParams.MATCH_PARENT));
-		addContentView(miniMap, new LayoutParams(300,
-				400));
-		addContentView(produceText, new LayoutParams(300,
-				400));
-		miniMap.setVisibility(View.GONE);
-
-		// デバッグ情報の更新
-		debugView.updateLocation(loadLocation.getLatitude(),
-				loadLocation.getLongitude());
+		// GLSurfaceViewに登録されている位置情報、ロケーション情報を更新
+		glSurfaceView.updateLocation(loadLocation, locationItems);
 	}
 
 	@Override
@@ -388,16 +354,14 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		// 中心との最近隣を計算
 		float nearDist = 1000;
 		int id = 0;
-		for (Model m : this.myGLSurfaceView.models) {
-			Vector3f eye = this.myGLSurfaceView.camera.getEye();
+		for (Model m : this.glSurfaceView.models) {
+			Vector3f eye = this.glSurfaceView.camera.getEye();
 			float ds = m.distance(eye.x, eye.y, eye.z);
 			if (ds < nearDist) {
 				nearDist = ds;
 				id = m.getItem().getTalkGroupId();
 			}
 		}
-
-		debugView.updateID(id);
 
 		if (id != 0) {
 			//			Intent intent = new Intent();

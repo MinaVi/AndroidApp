@@ -3,24 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <RelativeLayout
-        android:id="@+id/debug_area"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+    <com.sw.minavi.item.ARGLSurfaceView
+        android:id="@+id/arGLSurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:background="#FF000000"
-        android:layout_marginLeft="367dp"
-        android:layout_marginTop="204dp" >
-    </RelativeLayout>
+        android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:id="@+id/produceText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="35dp"
-        android:text="" />
+    <com.sw.minavi.item.GLCameraView
+        android:id="@+id/glCamera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <com.sw.minavi.item.CustomView
+        android:id="@+id/customView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" >
+    </com.sw.minavi.item.CustomView>
 
 </RelativeLayout>

@@ -12,7 +12,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import javax.vecmath.Vector3f;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -26,15 +26,11 @@ import android.location.Location;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.os.Handler;
-import android.view.GestureDetector.OnGestureListener;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 
 import com.sw.minavi.R;
-import com.sw.minavi.model.Grid;
-import com.sw.minavi.model.Ground;
-import com.sw.minavi.model.LineOfSight;
 import com.sw.minavi.model.Lockon;
 import com.sw.minavi.model.Model;
 import com.sw.minavi.model.TextModel;
@@ -42,123 +38,147 @@ import com.sw.minavi.util.GLUtils;
 import com.sw.minavi.util.LocationUtilities;
 import com.sw.minavi.util.PhysicsUtil;
 
-public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener {
+public class ARGLSurfaceView extends GLSurfaceView {
 
-	private float viewWidth;
-	private float viewHeight;
-
-	private Ground ground = new Ground();
-	private Grid grid = new Grid();
-	private LineOfSight lineOfSight = new LineOfSight();
-
-	public Camera3D camera;
-
-	private OpenGLRenderer renderer;
-	private List<LocalItem> locationItems;
 	private Location loadLocation;
-	private Activity activityContext;
+	private List<LocalItem> locationItems = new ArrayList<LocalItem>();
+	private OpenGLRenderer renderer;
+
 	public ArrayList<Model> models = new ArrayList<Model>();
 	private ArrayList<TextModel> textModels = new ArrayList<TextModel>();
-	private Lockon lockOn;
+	private Lockon lockon;
 
-	private Handler handler;
-	private Runnable viewunnable;
-	private DebugView debugView;
+	private CustomView customView;
+
 	private int pitch;
 	private int roll;
 	private int azimuth;
-	private MiniMap miniMap;
-	private Model produceModel;
-	private TextView produceText;
 
-	public int centerObjectId = 0;
+	private boolean isUpdateLocation = false;
 
+	public Camera3D camera;
+
+	private Model lockonModel;
+
+	private Handler handler;
+	private Runnable extraRunnable;
 	{
-		viewunnable = new Runnable() {
-
+		extraRunnable = new Runnable() {
 			@Override
 			public void run() {
-				debugView.updateStatus(camera);
 
-				if (produceModel != null) {
-					produceText.setVisibility(View.VISIBLE);
-					LocalItem item = produceModel.getItem();
-
-					produceText.setText(item.getMessage());
+				ProduceView produce = customView.getProduce();
+				if (lockonModel == null) {
+					produce.setVisibility(View.INVISIBLE);
 				} else {
-					//					produceText.setText("モデルが見つかってないよ...(´；ω；｀)ｳｯ…");
-					produceText.setText(MessageFormat.format("azimuth:{0},roll:{1},pitch:{2}", azimuth, roll, pitch));
+					LocalItem item = lockonModel.getItem();
+					produce.updateProduce(
+							getResources().getIdentifier(
+									item.getArImageName(), "drawable",
+									getContext().getPackageName()),
+							item.getMessage(),
+							item.getLat() + "," + item.getLon());
+
+					produce.setVisibility(View.VISIBLE);
 				}
 			}
 		};
 	}
 
-	private class MiniMapHandler extends Handler implements Runnable {
-		private void startSyncMap() {
-			this.postDelayed(this, 1000);
-		}
-
-		@Override
-		public void run() {
-			miniMap.syncMap(camera, models);
-			this.postDelayed(this, 10);
-		}
-
+	public ARGLSurfaceView(Context context) {
+		super(context);
+		init(); // 初期化
 	}
 
-	// レンダラークラス
-	public class OpenGLRenderer implements Renderer, OnTouchListener {
+	public ARGLSurfaceView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init(); // 初期化
+	}
 
-		float lightpos[] = { 0.0f, 0.0f, 4.0f, 0.0f };
-		float red[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-		float green[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-		float blue[] = { 0.0f, 0.0f, 1.0f, 1.0f };
-		float white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		float gray[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-		float yellow[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-		float darkColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-		float brightColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		Vector3f rayTo;
-		float angle = 0.0f;
+	public void setCustomView(CustomView customView) {
+		this.customView = customView;
+	}
+
+	public void updateLocation(Location loadLocation, List<LocalItem> locationItems) {
+		this.loadLocation = loadLocation;
+		this.locationItems = locationItems;
+
+		// 位置情報の更新を通知
+		this.isUpdateLocation = true;
+	}
+
+	public void changeAzimuthEvent(double azimuthRad, float pitchRad, float rollRad) {
+
+		// 方位・ロール・ピッチをdegreeに変換
+		this.azimuth = LocationUtilities
+				.radianToDegreeForAzimuth((float) azimuthRad);
+		this.pitch = LocationUtilities
+				.radianToDegreeForAzimuth((float) pitchRad);
+		this.roll = LocationUtilities
+				.radianToDegreeForAzimuth((float) rollRad);
+
+		// カメラの回転
+		camera.rotateLook((float) azimuthRad, rollRad);
+
+		// デバッグ情報の更新
+		customView.setGyroSensorValues(azimuth, roll, pitch);
+		customView.setCameraValues(camera);
+	}
+
+	private void init() {
+
+		// 背景を透過
+		setZOrderOnTop(true);
+		getHolder().setFormat(PixelFormat.TRANSLUCENT);
+		setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+
+		// カメラの作成
+		camera = new Camera3D(
+				new float[] { 0.0f, 0.5f, 5.0f },
+				new float[] { 0.0f, 0.0f, 0.0f },
+				new float[] { 0.0f, 1.0f, 0.0f });
+
+		// レンダラーの指定
+		renderer = new OpenGLRenderer();
+		this.setRenderer(renderer);
+		this.setOnTouchListener(renderer);
+
+		// ハンドラの作成
+		this.handler = new Handler();
+	}
+
+	class OpenGLRenderer implements Renderer, OnTouchListener {
+
+		private float lockonAngle = 0.0f;
 
 		@Override
 		public void onDrawFrame(GL10 gl) {
 
+			// ----------------------------------------------
+			// モデル描画前
+			// ----------------------------------------------
+			// クリア処理
 			gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-
-			Vector3f eye = camera.getEye();
-			Vector3f look = camera.getLook();
-			Vector3f middlePoint = getMiddlePoint(eye, look);
 
 			// ライティングをON
 			gl.glEnable(GL10.GL_LIGHTING);
+
+			// 光源の位置を取得
+			Vector3f middle = GLUtils.getMiddlePoint(camera.getEye(), camera.getLook());
+			float[] lightPos = new float[] { middle.x, middle.y, middle.x, 0.0f };
+
 			// 光源を有効にして位置を設定
 			gl.glEnable(GL10.GL_LIGHT0);
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, new float[] {
-					middlePoint.x, middlePoint.y, middlePoint.x, 0.0f }, 0);
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, lightPos, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, GLUtils.WHITE, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, GLUtils.WHITE, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, GLUtils.WHITE, 0);
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
-
-			// カメラ位置を設定
-			camera.gluLookAt(gl);
-			//			GLU.gluLookAt(gl, eyepos[0], eyepos[1], eyepos[2], centerPos[0],
-			//					centerPos[1], centerPos[2], upPos[0], upPos[1], upPos[2]);
-			handler.post(viewunnable);
-
-			// デプステスト
-			// gl.glEnable(GL10.GL_DEPTH_TEST);
-			// gl.glDepthFunc(GL10.GL_LEQUAL); gl.glDepthMask(true);
 
 			// アルファブレンド
 			gl.glEnable(GL10.GL_BLEND);
 			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-
-			// アルファテスト
-			// gl.glEnable(GL10.GL_ALPHA_TEST);
-			// gl.glAlphaFunc(GL10.GL_GEQUAL, 0.1f);
 
 			// 陰面消去
 			gl.glEnable(GL10.GL_CULL_FACE);
@@ -166,179 +186,123 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			// スムースシェーディング
 			gl.glShadeModel(GL10.GL_SMOOTH);
 			// マテリアル
-			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, gray, 0);
-			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, gray, 0);
-			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, gray, 0);
+			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, GLUtils.GRAY, 0);
+			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, GLUtils.GRAY, 0);
+			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, GLUtils.GRAY, 0);
 			gl.glMaterialf(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, 80f);
+
+			// カメラ位置を設定
+			camera.gluLookAt(gl);
+
+			// モデルの更新
+			updateModels(gl);
 
 			// ----------------------------------------------
 			// モデルの描画
 			// ----------------------------------------------
-			List<Model> highlightModels = new ArrayList<Model>();
-			List<Vector3f> arcSightList = getArcSight(45);
-			Collections.sort(models, new ModelComparator());
-			for (Model model : models) {
+			if (isExistModels()) {
 
-				boolean isIntersect = false;
-				for (Vector3f[] vertexList : model.getVector3f()) {
-					for (Vector3f arcSightTo : arcSightList) {
-						if (GLUtils.intersect(eye, arcSightTo,
+				List<Model> highlightModels = new ArrayList<Model>();
+				List<Vector3f> arcSightList = getArcSight(45);
+				Vector3f eye = camera.getEye();
+
+				Collections.sort(models, new ModelComparator());
+
+				for (Model model : models) {
+
+					boolean isIntersect = false;
+					for (Vector3f[] vertexList : model.getVector3f()) {
+						for (Vector3f arcSightTo : arcSightList) {
+							if (GLUtils.intersect(eye, arcSightTo,
+									vertexList)) {
+								isIntersect = true;
+								break;
+							}
+						}
+						if (GLUtils.intersect(eye, camera.getLook(),
 								vertexList)) {
-							isIntersect = true;
-							break;
+							highlightModels.add(model);
 						}
 					}
-					if (GLUtils.intersect(eye, camera.getLook(),
-							vertexList)) {
-						highlightModels.add(model);
+					if (isIntersect) {
+						gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, GLUtils.WHITE, 0);
+						gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, GLUtils.WHITE, 0);
+						gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, GLUtils.WHITE, 0);
+					} else {
+						gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, GLUtils.DARK, 0);
+						gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, GLUtils.DARK, 0);
+						gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, GLUtils.DARK, 0);
+					}
+					model.draw(gl);
+				}
+
+				// ----------------------------------------------
+				// モデルのロックオン
+				// ----------------------------------------------
+				float maxDistance = 0;
+				Model tmpLockonModel = null;
+				for (Model highlightModel : highlightModels) {
+					float distance = highlightModel.distance(camera.getLook());
+					if (maxDistance < distance) {
+						maxDistance = distance;
+						tmpLockonModel = highlightModel;
 					}
 				}
-				if (isIntersect) {
-					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
-					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
-					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
-				} else {
-					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, darkColor, 0);
-					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, darkColor, 0);
-					gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, darkColor, 0);
-				}
-				model.draw(gl);
+				lockonModel = tmpLockonModel;
 			}
-
-			// ----------------------------------------------
-			// モデルのロックオン
-			// ----------------------------------------------
-			float maxDistance = 0;
-			Model lockonModel = null;
-			for (Model highlightModel : highlightModels) {
-				float distance = highlightModel.distance(camera.getLook());
-				if (maxDistance < distance) {
-					maxDistance = distance;
-					lockonModel = highlightModel;
-				}
-			}
-
-			produceModel = null;
-			if (lockonModel != null) {
-				produceModel = lockonModel;
-			}
+			handler.post(extraRunnable);
 
 			// ----------------------------------------------
 			// テキストの描画
 			// ----------------------------------------------
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, GLUtils.WHITE, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, GLUtils.WHITE, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, GLUtils.WHITE, 0);
 			for (TextModel textModel : textModels) {
 				textModel.draw(gl);
 			}
 
-			// ------------------------------------------------
-			// 軸の描画
-			// ------------------------------------------------
-			// gl.glPushMatrix(); // マトリックス記憶
-			// gl.glEnable(GL10.GL_DEPTH_TEST);
-			// gl.glDepthFunc(GL10.GL_LEQUAL);
-			// gl.glDepthMask(true);
-			// gl.glLineWidth(5.0f);
-			// gl.glMaterialfv(GL10.GL_FRONT_AND_BACK,
-			// GL10.GL_AMBIENT_AND_DIFFUSE, white, 0);
-			// ground.draw(gl);
-			// gl.glPopMatrix(); // マトリックスを戻す
-
-			// ------------------------------------------------
-			// グリッドの描画
-			// ------------------------------------------------
-			// // マトリックス記憶
-			// gl.glPushMatrix();
-			//
-			// gl.glLineWidth(1.0f);
-			// grid.drawGrid(gl, 50, 50, 1.0f, 1.0f);
-			// // マトリックスを戻す
-			// gl.glPopMatrix();
-
-			// ----------------------------------------------
-			// 視点-モデル間の線分の描画
-			// ----------------------------------------------
-			// for (Model model : models) {
-			// // マトリックス記憶
-			// gl.glPushMatrix();
-			// gl.glLineWidth(10.0f);
-			// lineOfSight.drawLine(gl, eyepos[0], eyepos[1] - 1, eyepos[2],
-			// model.getX(), model.getY(), model.getZ());
-			// // マトリックスを戻す
-			// gl.glPopMatrix();
-			// }
-
 			// ----------------------------------------------
 			// ロックオンサイトの描画
 			// ----------------------------------------------
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, white, 0);
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, white, 0);
-			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, white, 0);
-			lockOn.draw(gl, camera, azimuth, pitch, roll, angle);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, GLUtils.WHITE, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, GLUtils.WHITE, 0);
+			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, GLUtils.WHITE, 0);
+			lockon.draw(gl, camera, azimuth, pitch, roll, lockonAngle);
 
 			// ----------------------------------------------
-			// 視点-注視点間の線分の描画
+			// モデル描画後処理
 			// ----------------------------------------------
-			// マトリックス記憶
-			gl.glPushMatrix();
-
-			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, red, 0);
-			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, red, 0);
-			gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, red, 0);
-			gl.glLineWidth(10.0f);
-
-			//			lineOfSight.drawLine(gl, eye.x, eye.y - 1, eye.z, look.x, look.y, look.z);
-
-			// マトリックスを戻す
-			gl.glPopMatrix();
-
-			// ----------------------------------------------
-			// 視点-RayTo間の線分の描画
-			// ----------------------------------------------
-			if (rayTo != null) {
-				gl.glPushMatrix(); // マトリックス記憶
-
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, green,
-						0);
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, green,
-						0);
-				gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR,
-						green, 0);
-				gl.glLineWidth(10.0f);
-
-				//				lineOfSight.drawLine(gl, eye.x, eye.y - 1, eye.z,
-				//						rayTo.x, rayTo.y, rayTo.z);
-				gl.glPopMatrix(); // マトリックスを戻す
-			}
-
-			angle += 1.0f;
+			// ロックオンサイトのアングルを更新
+			lockonAngle += 1.0f;
 		}
 
 		@Override
 		public void onSurfaceChanged(GL10 gl, int width, int height) {
+
 			gl.glViewport(0, 0, width, height);
 			gl.glMatrixMode(GL10.GL_PROJECTION);
 			gl.glLoadIdentity();
-			GLU.gluPerspective(gl, 50f, (float) width / height, 0.01f, 100f);
-
-			viewWidth = width;
-			viewHeight = height;
+			GLU.gluPerspective(gl, 45f, (float) width / height, 1f, 50f);
 		}
 
 		@Override
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
 			gl.glClearColor(0.0f, 0.0f, 0.0f, 0);
 			gl.glClearDepthf(1.0f);
 
+			// ロックオンサイトの作成
+			createLockonSight(gl);
+		}
+
+		private void createLocationModels(GL10 gl) {
 			HashSet<String> arImgNameSet = new HashSet<String>();
 			for (LocalItem locationItem : locationItems) {
 				arImgNameSet.add(locationItem.getArImageName());
 			}
 			int[] arImgTextures = new int[arImgNameSet.size()];
 			int[] textImgTextures = new int[locationItems.size()];
-			int[] etcImgTextures = new int[1];
 			arImgNameSet.clear();
 
 			gl.glGenTextures(arImgTextures.length, arImgTextures, 0);
@@ -356,7 +320,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 							getResources(),
 							getResources().getIdentifier(
 									locationItem.getArImageName(), "drawable",
-									activityContext.getPackageName()));
+									getContext().getPackageName()));
 
 					if (arImgNameToTextIdMap.containsKey(locationItem
 							.getArImageName())) {
@@ -387,10 +351,6 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 					paint.setColor(Color.WHITE);
 					paint.setStyle(Style.FILL);
 					canvas.drawColor(0);
-					//					canvas.drawText(MessageFormat.format(
-					//							"ID[{0}]:Msg[{1}]:Img[{2}]", locationItem.getId(),
-					//							locationItem.getMessage(),
-					//							locationItem.getArImageName()), 0, 15, paint);
 
 					float[] results = new float[1];
 					Location.distanceBetween(loadLocation.getLatitude(),
@@ -398,8 +358,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 							locationItem.getLat(), locationItem.getLon(), results);
 
 					canvas.drawText(MessageFormat.format(
-							"場所[{0}]:距離[{1}m]", locationItem.getMessage(), results[0]
-							), 0, 20, paint);
+							"場所[{0}]:距離[{1}m]", locationItem.getMessage(), results[0]), 0, 20, paint);
 
 					textImgTextureId = textImgTextures[textImgTextureIndex++];
 
@@ -430,11 +389,7 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 						itemLatitude, itemLongitude, loadLatitude,
 						loadLongitude);
 
-				float scaleLength;
-
-				// TODO 元に戻す
-				//scaleLength = 5;
-				scaleLength = results[0];
+				float scaleLength = results[0];
 
 				Vector3f eye = camera.getEye();
 				float xPos = (float) (Math.cos(azimuthRad) * scaleLength + eye.x);
@@ -448,40 +403,77 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 						textImgTextureId));
 
 			}
+		}
 
-			// 中心との最近隣を計算
-			float nearDist = 1000;
-			for (Model m : models) {
-				//Vector3f eye = camera.getEye();
-				Vector3f look = camera.getLook();
-				float ds = m.distance(look.x, look.y, look.z);
-				if (ds < nearDist) {
-					nearDist = ds;
-					centerObjectId = m.getItem().getTalkGroupId();
-				}
+		private void createLockonSight(GL10 gl) {
+
+			// ロックオンサイトイメージの取得
+			Bitmap imgBitmap = BitmapFactory.decodeResource(
+					getResources(),
+					R.drawable.sight_large);
+
+			// テクスチャIDの取得
+			int[] imgTextures = new int[1];
+			gl.glGenTextures(imgTextures.length, imgTextures, 0);
+			int imgTextureId = imgTextures[0];
+
+			// テクスチャのバインド
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, imgTextureId);
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+			android.opengl.GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, imgBitmap, 0);
+
+			// bitmapの破棄
+			imgBitmap.recycle();
+
+			// ロックオンサイトの作成
+			lockon = new Lockon(imgTextureId);
+		}
+
+		private void updateModels(GL10 gl) {
+			// 位置情報が更新されているか判定
+			if (isUpdateLocation) {
+
+				// 現在表示しているモデルをクリア
+				models.clear();
+				textModels.clear();
+
+				// ロケーションモデルの作成
+				createLocationModels(gl);
+
+				// 位置情報の更新フラグをOFFに設定
+				isUpdateLocation = false;
 			}
+		}
 
-			debugView.updateID(centerObjectId);
+		private boolean isExistModels() {
+			return models.size() > 0;
+		}
 
-			{
+		private List<Vector3f> getArcSight(int sight) {
 
-				Bitmap etcImgBitmap = BitmapFactory.decodeResource(
-						getResources(),
-						R.drawable.sight_large);
+			List<Vector3f> arcSightPointList = new ArrayList<Vector3f>();
 
-				int etcImgTextureId = etcImgTextures[0];
+			int centerAngle = sight / 2;
 
-				gl.glBindTexture(GL10.GL_TEXTURE_2D, etcImgTextureId);
-				gl.glTexParameterf(GL10.GL_TEXTURE_2D,
-						GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-				gl.glTexParameterf(GL10.GL_TEXTURE_2D,
-						GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
-				android.opengl.GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0,
-						etcImgBitmap, 0);
-				etcImgBitmap.recycle();
+			Vector3f eye = camera.getEye();
+			Vector3f look = camera.getLook();
 
-				lockOn = new Lockon(etcImgTextureId);
+			for (int i = 1; i <= centerAngle; i++) {
+				double radian = LocationUtilities.degreesToRads(i + azimuth);
+				float x = (float) (Math.cos(radian) * eye.z + eye.x);
+				float y = look.y;
+				float z = (float) (Math.sin(radian) * eye.z + eye.z);
+				arcSightPointList.add(new Vector3f(x, y, z));
 			}
+			for (int i = -centerAngle; i <= -1; i++) {
+				double radian = LocationUtilities.degreesToRads(i + azimuth);
+				float x = (float) (Math.cos(radian) * eye.z + eye.x);
+				float y = look.y;
+				float z = (float) (Math.sin(radian) * eye.z + eye.z);
+				arcSightPointList.add(new Vector3f(x, y, z));
+			}
+			return arcSightPointList;
 		}
 
 		@Override
@@ -505,17 +497,11 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 				int width = getWidth();
 				int height = getHeight();
 
-				rayTo = PhysicsUtil
-						.getRayTo(x, y, eye, look, up, width, height);
+				Vector3f rayTo = PhysicsUtil.getRayTo(x, y, eye, look, up, width, height);
 
 				Model model = getRayIntersectModel(eye, rayTo);
 				if (model != null) {
 					LocalItem item = model.getItem();
-					//					String message = MessageFormat.format("{0},{1}",
-					//							item.getId(), item.getArImageName());
-
-					//					Toast.makeText(activityContext, message, Toast.LENGTH_SHORT)
-					//							.show();
 
 					if (item.getTalkGroupId() != 0) {
 						Intent intent = new Intent();
@@ -558,111 +544,5 @@ public class ARGLSurfaceView extends GLSurfaceView implements OnGestureListener 
 			else
 				return -1;
 		}
-	}
-
-	// サーフェースビューのコンストラクタ
-	public ARGLSurfaceView(Activity context, Location loadLocation,
-			List<LocalItem> locationItems, DebugView debugView, MiniMap miniMap, TextView produceText) {
-		super(context);
-
-		this.activityContext = context;
-		this.loadLocation = loadLocation;
-		this.locationItems = locationItems;
-		this.debugView = debugView;
-		this.produceText = produceText;
-		this.miniMap = miniMap;
-		this.handler = new Handler();
-
-		setZOrderOnTop(true);
-		getHolder().setFormat(PixelFormat.TRANSLUCENT);
-		setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-
-		camera = new Camera3D(activityContext,
-				new float[] { 0.0f, 0.5f, 5.0f },
-				new float[] { 0.0f, 0.0f, 0.0f },
-				new float[] { 0.0f, 1.0f, 0.0f });
-
-		renderer = new OpenGLRenderer();
-		setRenderer(renderer);
-		setOnTouchListener(renderer);
-
-		new MiniMapHandler().startSyncMap();
-	}
-
-	@Override
-	public boolean onDown(MotionEvent arg0) {
-		return false;
-	}
-
-	@Override
-	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
-			float arg3) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent arg0) {
-
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent event1, MotionEvent event2,
-			float distx, float disty) {
-		// eyepos[0] += distx * 0.01;
-		// eyepos[1] += disty * 0.01;
-		return true;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent arg0) {
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent event) {
-		return false;
-	}
-
-	public void changeAzimuthEvent(double azimuthRad, float pitchRad, float rollRad) {
-		this.azimuth = LocationUtilities
-				.radianToDegreeForAzimuth((float) azimuthRad);
-		this.pitch = LocationUtilities
-				.radianToDegreeForAzimuth((float) pitchRad);
-		this.roll = LocationUtilities
-				.radianToDegreeForAzimuth((float) rollRad);
-		camera.rotateLook((float) azimuthRad, rollRad);
-	}
-
-	private List<Vector3f> getArcSight(int sight) {
-
-		List<Vector3f> arcSightPointList = new ArrayList<Vector3f>();
-
-		int centerAngle = sight / 2;
-
-		Vector3f eye = camera.getEye();
-		Vector3f look = camera.getLook();
-
-		for (int i = 1; i <= centerAngle; i++) {
-			double radian = LocationUtilities.degreesToRads(i + azimuth);
-			float x = (float) (Math.cos(radian) * eye.z + eye.x);
-			float y = look.y;
-			float z = (float) (Math.sin(radian) * eye.z + eye.z);
-			arcSightPointList.add(new Vector3f(x, y, z));
-		}
-		for (int i = -centerAngle; i <= -1; i++) {
-			double radian = LocationUtilities.degreesToRads(i + azimuth);
-			float x = (float) (Math.cos(radian) * eye.z + eye.x);
-			float y = look.y;
-			float z = (float) (Math.sin(radian) * eye.z + eye.z);
-			arcSightPointList.add(new Vector3f(x, y, z));
-		}
-		return arcSightPointList;
-	}
-
-	public Vector3f getMiddlePoint(Vector3f v0, Vector3f v1) {
-		float x = (v1.x + v0.x) / 2.0f;
-		float y = (v1.y + v0.y) / 2.0f;
-		float z = (v1.z + v0.z) / 2.0f;
-
-		return new Vector3f(x, y, z);
 	}
 }

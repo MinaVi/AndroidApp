@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:weightSum="100" >
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="30" >
+
+            <TableLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:background="#88000000" >
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/azimuthLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="azimuth"
+                        android:textColor="#00FF00" />
+
+                    <TextView
+                        android:id="@+id/currentAzimuth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="24dp"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="0.0"
+                        android:textColor="#00FF00" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/rollLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="roll"
+                        android:textColor="#00FF00" />
+
+                    <TextView
+                        android:id="@+id/currentRoll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="24dp"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="0.0"
+                        android:textColor="#00FF00" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/pitchLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="pitch"
+                        android:textColor="#00FF00" />
+
+                    <TextView
+                        android:id="@+id/currentPitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="24dp"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="0.0"
+                        android:textColor="#00FF00" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/eyeLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="eye"
+                        android:textColor="#00FF00" />
+
+                    <TextView
+                        android:id="@+id/currentEye"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="24dp"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="0.0"
+                        android:textColor="#00FF00" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/lookLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="look"
+                        android:textColor="#00FF00" />
+
+                    <TextView
+                        android:id="@+id/currentLook"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="24dp"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="0.0"
+                        android:textColor="#00FF00" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/upLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="up"
+                        android:textColor="#00FF00" />
+
+                    <TextView
+                        android:id="@+id/currentUp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="24dp"
+                        android:gravity="left"
+                        android:singleLine="true"
+                        android:text="0.0"
+                        android:textColor="#00FF00" />
+                </TableRow>
+            </TableLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="30" >
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="40" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="right" >
+
+                <com.sw.minavi.item.ProduceView
+                    android:id="@+id/produce"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="bottom" >
+                </com.sw.minavi.item.ProduceView>
+            </LinearLayout>
+        </TableRow>
+    </TableLayout>
+
+</RelativeLayout>

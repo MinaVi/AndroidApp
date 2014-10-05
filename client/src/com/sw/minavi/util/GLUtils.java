@@ -4,6 +4,15 @@ import javax.vecmath.Vector3f;
 
 public class GLUtils {
 
+	public static final float RED[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	public static final float GREEN[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+	public static final float BLUE[] = { 0.0f, 0.0f, 1.0f, 1.0f };
+	public static final float WHITE[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	public static final float GRAY[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	public static final float YERLLOW[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+	public static final float DARK[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	public static final float BRIGHT[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
 	public static float[] getRotatePos(float[] org, float[] midPoint, int degree) {
 		return rotateY(org, midPoint, LocationUtilities.degreesToRads(degree));
 	}
@@ -65,5 +74,13 @@ public class GLUtils {
 			}
 		}
 		return false;
+	}
+
+	public static Vector3f getMiddlePoint(Vector3f v0, Vector3f v1) {
+		float x = (v1.x + v0.x) / 2.0f;
+		float y = (v1.y + v0.y) / 2.0f;
+		float z = (v1.z + v0.z) / 2.0f;
+
+		return new Vector3f(x, y, z);
 	}
 }

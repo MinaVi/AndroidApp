@@ -15,11 +15,9 @@ import android.view.WindowManager;
 public class GLCameraView extends SurfaceView implements SurfaceHolder.Callback {
 	private SurfaceHolder holder;
 	private Camera camera;
-	private Context activityContext;
 
 	public GLCameraView(Context context) {
 		super(context);
-		this.activityContext = context;
 
 		// サーフェイスホルダーの生成
 		holder = getHolder();
@@ -50,7 +48,7 @@ public class GLCameraView extends SurfaceView implements SurfaceHolder.Callback 
 				.getSupportedPreviewSizes();
 
 		Camera.Parameters parameters = camera.getParameters();
-		WindowManager windowManager = (WindowManager) activityContext
+		WindowManager windowManager = (WindowManager) getContext()
 				.getSystemService(Context.WINDOW_SERVICE);
 		Display display = windowManager.getDefaultDisplay();
 		int rotation = display.getRotation();
@@ -93,7 +91,6 @@ public class GLCameraView extends SurfaceView implements SurfaceHolder.Callback 
 		}
 		camera.setDisplayOrientation(direction);
 		parameters.setRotation(direction);
-		// camera.setPreviewDisplay(getHolder());
 
 		camera.setParameters(parameters);
 		camera.startPreview();
@@ -105,7 +102,6 @@ public class GLCameraView extends SurfaceView implements SurfaceHolder.Callback 
 		// カメラの初期化
 		try {
 			camera = Camera.open();
-			// _camera.setDisplayOrientation(90);
 			camera.setPreviewDisplay(holder);
 		} catch (Exception e) {
 			e.printStackTrace();
