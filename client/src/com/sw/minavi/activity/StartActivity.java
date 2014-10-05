@@ -73,6 +73,7 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 		
 	}
 	
+	@Override
 	protected void onPause(){
 		super.onPause();
 		finish();

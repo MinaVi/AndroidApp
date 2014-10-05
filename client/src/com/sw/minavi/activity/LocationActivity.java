@@ -389,6 +389,7 @@ public class LocationActivity extends FragmentActivity implements
 		return true;
 	}
 
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case MENU_A:

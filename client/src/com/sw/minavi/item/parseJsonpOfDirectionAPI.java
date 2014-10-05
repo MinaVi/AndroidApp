@@ -31,21 +31,21 @@ public class parseJsonpOfDirectionAPI {
 				jsonLegs = ((JSONObject) jsonRoutes.get(i)).getJSONArray("legs");
 
 				//スタート地点・住所
-				String s_address = (String) ((JSONObject) (JSONObject) jsonLegs.get(i)).getString("start_address");
+				String s_address = ((JSONObject) jsonLegs.get(i)).getString("start_address");
 
-				li.info_A = s_address;
+				LocationActivity.info_A = s_address;
 
 				//到着地点・住所
-				String e_address = (String) ((JSONObject) (JSONObject) jsonLegs.get(i)).getString("end_address");
+				String e_address = ((JSONObject) jsonLegs.get(i)).getString("end_address");
 
-				li.info_B = e_address;
+				LocationActivity.info_B = e_address;
 
-				String distance_txt = (String) ((JSONObject) ((JSONObject) jsonLegs.get(i)).get("distance"))
+				String distance_txt = ((JSONObject) ((JSONObject) jsonLegs.get(i)).get("distance"))
 						.getString("text");
 
 				temp += distance_txt + "<br><br>";
 
-				String distance_val = (String) ((JSONObject) ((JSONObject) jsonLegs.get(i)).get("distance"))
+				String distance_val = ((JSONObject) ((JSONObject) jsonLegs.get(i)).get("distance"))
 						.getString("value");
 
 				temp += distance_val + "<br><br>";
@@ -60,11 +60,11 @@ public class parseJsonpOfDirectionAPI {
 						polyline = (String) ((JSONObject) ((JSONObject) jsonSteps.get(k)).get("polyline"))
 								.get("points");
 
-						String instructions = (String) ((JSONObject) (JSONObject) jsonSteps.get(k))
+						String instructions = ((JSONObject) jsonSteps.get(k))
 								.getString("html_instructions");
-						String duration_value = (String) ((JSONObject) ((JSONObject) jsonSteps.get(k)).get("duration"))
+						String duration_value = ((JSONObject) ((JSONObject) jsonSteps.get(k)).get("duration"))
 								.getString("value");
-						String duration_txt = (String) ((JSONObject) ((JSONObject) jsonSteps.get(k)).get("duration"))
+						String duration_txt = ((JSONObject) ((JSONObject) jsonSteps.get(k)).get("duration"))
 								.getString("text");
 
 						temp += instructions + "/" + duration_value + " m /" + duration_txt + "<br><br>";
@@ -73,8 +73,8 @@ public class parseJsonpOfDirectionAPI {
 
 						for (int l = 0; l < list.size(); l++) {
 							HashMap<String, String> hm = new HashMap<String, String>();
-							hm.put("lat", Double.toString(((LatLng) list.get(l)).latitude));
-							hm.put("lng", Double.toString(((LatLng) list.get(l)).longitude));
+							hm.put("lat", Double.toString(list.get(l).latitude));
+							hm.put("lng", Double.toString(list.get(l).longitude));
 							path.add(hm);
 						}
 					}
@@ -83,7 +83,7 @@ public class parseJsonpOfDirectionAPI {
 				}
 
 				//ルート情報
-				li.posinfo = temp;
+				LocationActivity.posinfo = temp;
 			}
 
 		} catch (JSONException e) {
@@ -121,8 +121,8 @@ public class parseJsonpOfDirectionAPI {
 			int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
 			lng += dlng;
 
-			LatLng p = new LatLng((((double) lat / 1E5)),
-					(((double) lng / 1E5)));
+			LatLng p = new LatLng(((lat / 1E5)),
+					((lng / 1E5)));
 			poly.add(p);
 		}
 

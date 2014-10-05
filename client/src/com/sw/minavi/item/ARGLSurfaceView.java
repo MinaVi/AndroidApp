@@ -113,9 +113,9 @@ public class ARGLSurfaceView extends GLSurfaceView {
 		this.azimuth = LocationUtilities
 				.radianToDegreeForAzimuth((float) azimuthRad);
 		this.pitch = LocationUtilities
-				.radianToDegreeForAzimuth((float) pitchRad);
+				.radianToDegreeForAzimuth(pitchRad);
 		this.roll = LocationUtilities
-				.radianToDegreeForAzimuth((float) rollRad);
+				.radianToDegreeForAzimuth(rollRad);
 
 		// カメラの回転
 		camera.rotateLook((float) azimuthRad, rollRad);
