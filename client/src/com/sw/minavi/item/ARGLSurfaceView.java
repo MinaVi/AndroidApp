@@ -71,13 +71,21 @@ public class ARGLSurfaceView extends GLSurfaceView {
 				if (lockonModel == null) {
 					produce.setVisibility(View.INVISIBLE);
 				} else {
+
 					LocalItem item = lockonModel.getItem();
+					double lengthInMeter = LocationUtilities.getDistance(item.getLat(), item.getLon(), loadLocation.getLatitude(),
+							loadLocation.getLongitude(), 10) * 1000;
+
+					String message = MessageFormat.format("緯度:{0} 経度:{1}\r\nX:{2}, Y{3}, Z{3}\r\n距離:{4}",
+							new Object[] { item.getLat(), item.getLon(),
+									lockonModel.getX(), lockonModel.getY(), lockonModel.getZ(),
+									lengthInMeter });
 					produce.updateProduce(
 							getResources().getIdentifier(
 									item.getArImageName(), "drawable",
 									getContext().getPackageName()),
 							item.getMessage(),
-							item.getLat() + "," + item.getLon());
+							message);
 
 					produce.setVisibility(View.VISIBLE);
 				}
@@ -389,7 +397,12 @@ public class ARGLSurfaceView extends GLSurfaceView {
 						itemLatitude, itemLongitude, loadLatitude,
 						loadLongitude);
 
-				float scaleLength = results[0];
+				float scaleLength = results[0] / 10;
+				if (scaleLength < 5) {
+					scaleLength = 5;
+				} else if (scaleLength > 300) {
+					scaleLength = 10;
+				}
 
 				Vector3f eye = camera.getEye();
 				float xPos = (float) (Math.cos(azimuthRad) * scaleLength + eye.x);

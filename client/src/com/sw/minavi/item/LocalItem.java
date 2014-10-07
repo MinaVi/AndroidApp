@@ -1,6 +1,5 @@
 package com.sw.minavi.item;
 
-
 public class LocalItem {
 	private int id;
 	private int talk_group_id;
@@ -9,6 +8,10 @@ public class LocalItem {
 	private double lat;
 	private String arImageName;
 	private String auther;
+	private double specialLonMin;
+	private double specialLatMin;
+	private double specialLonMax;
+	private double specialLatMax;
 	private String createTime;
 
 	public int getId() {
@@ -18,7 +21,7 @@ public class LocalItem {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	public int getTalkGroupId() {
 		return this.talk_group_id;
 	}
@@ -58,13 +61,45 @@ public class LocalItem {
 	public void setArImageName(String arImageName) {
 		this.arImageName = arImageName;
 	}
-	
+
 	public String getAuther() {
 		return this.auther;
 	}
 
 	public void setAuther(String auther) {
 		this.auther = auther;
+	}
+
+	public double getSpecialLonMin() {
+		return specialLonMin;
+	}
+
+	public void setSpecialLonMin(double specialLonMin) {
+		this.specialLonMin = specialLonMin;
+	}
+
+	public double getSpecialLatMin() {
+		return specialLatMin;
+	}
+
+	public void setSpecialLatMin(double specialLatMin) {
+		this.specialLatMin = specialLatMin;
+	}
+
+	public double getSpecialLonMax() {
+		return specialLonMax;
+	}
+
+	public void setSpecialLonMax(double specialLonMax) {
+		this.specialLonMax = specialLonMax;
+	}
+
+	public double getSpecialLatMax() {
+		return specialLatMax;
+	}
+
+	public void setSpecialLatMax(double specialLatMax) {
+		this.specialLatMax = specialLatMax;
 	}
 
 	public String getCreateTime() {

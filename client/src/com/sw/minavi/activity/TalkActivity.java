@@ -33,6 +33,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.sw.minavi.R;
 import com.sw.minavi.activity.beans.TalkBeans;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
@@ -150,11 +151,11 @@ public class TalkActivity extends Activity implements OnClickListener {
 		answerBackImage.setVisibility(View.GONE);
 
 		backImage = (ImageView) findViewById(R.id.back_btn);
-		
+
 		// 左キャラクター初期設定
 		charaImageLeft = (ImageView) findViewById(R.id.chara_image_left);
-		
-		
+
+
 		charaImageRight = (ImageView) findViewById(R.id.chara_image_right);
 		arBtn = (ImageView) findViewById(R.id.ar_btn);
 		checkAreaBtn = (ImageView) findViewById(R.id.check_area_btn);

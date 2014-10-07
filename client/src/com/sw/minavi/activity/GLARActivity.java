@@ -342,7 +342,8 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		}
 
 		// 周辺情報を取得
-		locationItems = LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation);
+		locationItems.clear();
+		locationItems.addAll(LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation));
 
 		// GLSurfaceViewに登録されている位置情報、ロケーション情報を更新
 		glSurfaceView.updateLocation(loadLocation, locationItems);
