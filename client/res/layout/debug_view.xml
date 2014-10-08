@@ -2,285 +2,139 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:visibility="gone" >
+    android:background="#88000000"
+    android:orientation="vertical" >
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/eyeXLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="eyeX"
-            android:textColor="#ff0000" />
-
-        <TextView
-            android:id="@+id/eyeXValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
-    </TableRow>
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/eyeYLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="eyeY"
-            android:textColor="#ff0000" />
-
-        <TextView
-            android:id="@+id/eyeYValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
-    </TableRow>
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/eyeZLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="eyeZ"
-            android:textColor="#ff0000" />
-
-        <TextView
-            android:id="@+id/eyeZValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
-    </TableRow>
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/lookXLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="lookX"
-            android:textColor="#ff0000" />
-
-        <TextView
-            android:id="@+id/lookXValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
-    </TableRow>
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/lookYLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="lookY"
-            android:textColor="#ff0000" />
-
-        <TextView
-            android:id="@+id/lookYValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
-    </TableRow>
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/lookZLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="lookZ"
-            android:textColor="#ff0000" />
-
-        <TextView
-            android:id="@+id/lookZValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
-    </TableRow>
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/latitudeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="latitude"
-            android:textColor="#ff0000" />
-
-        <TextView
-            android:id="@+id/latitudeValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
-    </TableRow>
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/longitudeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="longitude"
-            android:textColor="#ff0000" />
-
-        <TextView
-            android:id="@+id/longitudeValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
-    </TableRow>
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+    <TableRow>
 
         <TextView
             android:id="@+id/azimuthLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
+            android:gravity="left"
+            android:singleLine="true"
             android:text="azimuth"
-            android:textColor="#ff0000" />
+            android:textColor="#00FF00" />
 
         <TextView
-            android:id="@+id/azimuthValue"
+            android:id="@+id/currentAzimuth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
+            android:layout_marginLeft="24dp"
+            android:gravity="left"
+            android:singleLine="true"
             android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
+            android:textColor="#00FF00" />
     </TableRow>
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+    <TableRow>
 
         <TextView
             android:id="@+id/rollLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
+            android:gravity="left"
+            android:singleLine="true"
             android:text="roll"
-            android:textColor="#ff0000" />
+            android:textColor="#00FF00" />
 
         <TextView
-            android:id="@+id/rollValue"
+            android:id="@+id/currentRoll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
+            android:layout_marginLeft="24dp"
+            android:gravity="left"
+            android:singleLine="true"
             android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
+            android:textColor="#00FF00" />
     </TableRow>
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+    <TableRow>
 
         <TextView
             android:id="@+id/pitchLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
+            android:gravity="left"
+            android:singleLine="true"
             android:text="pitch"
-            android:textColor="#ff0000" />
+            android:textColor="#00FF00" />
 
         <TextView
-            android:id="@+id/pitchValue"
+            android:id="@+id/currentPitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
+            android:layout_marginLeft="24dp"
+            android:gravity="left"
+            android:singleLine="true"
             android:text="0.0"
-            android:textColor="#ff0000" >
-        </TextView>
-
+            android:textColor="#00FF00" />
     </TableRow>
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+    <TableRow>
 
         <TextView
-            android:id="@+id/talkGroupIdLabel"
+            android:id="@+id/eyeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="talkGroupId"
-            android:textColor="#ff0000" />
+            android:gravity="left"
+            android:singleLine="true"
+            android:text="eye"
+            android:textColor="#00FF00" />
 
         <TextView
-            android:id="@+id/talkGroupIdValue"
+            android:id="@+id/currentEye"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:text="0"
-            android:textColor="#ff0000" />
+            android:layout_marginLeft="24dp"
+            android:gravity="left"
+            android:singleLine="true"
+            android:text="0.0"
+            android:textColor="#00FF00" />
     </TableRow>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+    <TableRow>
 
-        <Button
-            android:id="@+id/serBtn"
+        <TextView
+            android:id="@+id/lookLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:onClick="onClick"
-            android:text="サーチ" />
-    </RelativeLayout>
+            android:gravity="left"
+            android:singleLine="true"
+            android:text="look"
+            android:textColor="#00FF00" />
+
+        <TextView
+            android:id="@+id/currentLook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:gravity="left"
+            android:singleLine="true"
+            android:text="0.0"
+            android:textColor="#00FF00" />
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:id="@+id/upLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:singleLine="true"
+            android:text="up"
+            android:textColor="#00FF00" />
+
+        <TextView
+            android:id="@+id/currentUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:gravity="left"
+            android:singleLine="true"
+            android:text="0.0"
+            android:textColor="#00FF00" />
+    </TableRow>
 
 </TableLayout>

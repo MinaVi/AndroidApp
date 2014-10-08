@@ -129,8 +129,8 @@ public class ARGLSurfaceView extends GLSurfaceView {
 		camera.rotateLook((float) azimuthRad, rollRad);
 
 		// デバッグ情報の更新
-		customView.setGyroSensorValues(azimuth, roll, pitch);
-		customView.setCameraValues(camera);
+		customView.getDebug().setGyroSensorValues(azimuth, roll, pitch);
+		customView.getDebug().setCameraValues(camera);
 	}
 
 	private void init() {

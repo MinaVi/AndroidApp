@@ -16,143 +16,35 @@
             android:layout_height="0dp"
             android:layout_weight="70" >
 
-            <TableLayout
+            <com.sw.minavi.item.DebugView
+                android:id="@+id/debug"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#88000000" >
+                android:layout_height="wrap_content" >
+            </com.sw.minavi.item.DebugView>
+        </TableRow>
 
-                <TableRow>
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
 
-                    <TextView
-                        android:id="@+id/azimuthLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="azimuth"
-                        android:textColor="#00FF00" />
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
 
-                    <TextView
-                        android:id="@+id/currentAzimuth"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="24dp"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="0.0"
-                        android:textColor="#00FF00" />
-                </TableRow>
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
 
-                <TableRow>
-
-                    <TextView
-                        android:id="@+id/rollLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="roll"
-                        android:textColor="#00FF00" />
-
-                    <TextView
-                        android:id="@+id/currentRoll"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="24dp"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="0.0"
-                        android:textColor="#00FF00" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:id="@+id/pitchLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="pitch"
-                        android:textColor="#00FF00" />
-
-                    <TextView
-                        android:id="@+id/currentPitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="24dp"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="0.0"
-                        android:textColor="#00FF00" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:id="@+id/eyeLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="eye"
-                        android:textColor="#00FF00" />
-
-                    <TextView
-                        android:id="@+id/currentEye"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="24dp"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="0.0"
-                        android:textColor="#00FF00" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:id="@+id/lookLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="look"
-                        android:textColor="#00FF00" />
-
-                    <TextView
-                        android:id="@+id/currentLook"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="24dp"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="0.0"
-                        android:textColor="#00FF00" />
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView
-                        android:id="@+id/upLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="up"
-                        android:textColor="#00FF00" />
-
-                    <TextView
-                        android:id="@+id/currentUp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="24dp"
-                        android:gravity="left"
-                        android:singleLine="true"
-                        android:text="0.0"
-                        android:textColor="#00FF00" />
-                </TableRow>
-            </TableLayout>
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
         </TableRow>
 
         <LinearLayout
