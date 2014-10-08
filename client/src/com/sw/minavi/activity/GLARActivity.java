@@ -131,6 +131,9 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		sensorManager.registerListener(this,
 				sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
 				SensorManager.SENSOR_DELAY_GAME);
+
+		// 位置情報センサの登録
+		initLocationService();
 	}
 
 	@Override
@@ -143,6 +146,9 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		// SensorManagerの解除
 		sensorManager.unregisterListener(this);
 		BgmManager.newIntance(getApplicationContext()).playSound(R.raw.spring_wind);
+
+		// LocationManagerの解除
+		locationManager.removeUpdates(this);
 	}
 
 	@Override
