@@ -10,25 +10,23 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Rect;
-import android.os.Handler;
+import android.graphics.Paint.Align;
+import android.util.AttributeSet;
 import android.view.View;
 
 import com.sw.minavi.model.Model;
+import com.sw.minavi.util.LocationUtilities;
 
-public class MiniMap extends View implements Runnable {
+public class MiniMap extends View {
 	public static final int CUBE_COLOR = Color.rgb(10, 10, 10);
 	public static final int DOMINO_COLOR = Color.GRAY;
 
 	private Canvas canvas;
 	private Paint paint;
-	private Rect rect;
-	private Path vectorPath;
 
 	private List<MapPoint> points = new ArrayList<MiniMap.MapPoint>();
 
-	private float arrowAngle;
+	private int azimuth;
 
 	private class MapPoint {
 		private float x, y;
@@ -44,96 +42,97 @@ public class MiniMap extends View implements Runnable {
 		}
 	}
 
-	public MiniMap(Context context) {
-		super(context);
+	public MiniMap(Context context, AttributeSet attrs) {
+		super(context, attrs);
 		this.paint = new Paint();
-		this.rect = new Rect();
-		this.vectorPath = new Path();
-
-		new Handler().postDelayed(this, 500);
 	}
 
 	@SuppressLint("DrawAllocation")
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (this.canvas == null)
+		if (this.canvas == null) {
 			this.canvas = canvas;
-
-		this.paint.setColor(Color.rgb(10, 10, 10));
-		this.paint.setAlpha(255);
+		}
 
 		final float centerX = canvas.getWidth() / 2;
 		final float centerY = canvas.getHeight() / 2;
+		final float outCircleRadius = centerX;
+		final float inCircleRadius = outCircleRadius - 20;
 
-		final int width = canvas.getWidth();
-		final int height = canvas.getHeight();
+		// ミニマップの縁を描画
+		this.paint.setColor(Color.rgb(50, 50, 50));
+		this.paint.setAlpha(255);
+		canvas.drawCircle(centerX, centerY, outCircleRadius, this.paint);
 
-		// 背景を描画
-		this.rect.set(0, 0, width, height);
-		canvas.drawRect(this.rect, this.paint);
+		// ミニマップの背景を描画
+		this.paint.setColor(Color.rgb(10, 10, 10));
+		this.paint.setAlpha(255);
+		canvas.drawCircle(centerX, centerY, inCircleRadius, this.paint);
 
-		// eyeのベクトルを描画
-		this.paint.setColor(Color.WHITE);
+		// 方位：北の描画
+		this.paint.setAntiAlias(true);
+		this.paint.setStrokeWidth(5.0f);
+		this.paint.setColor(Color.rgb(255, 255, 255));
+		this.paint.setAlpha(0x77);
+		this.paint.setTextSize(35);
+		this.paint.setTextAlign(Align.CENTER);
+		this.paint.setStyle(Paint.Style.STROKE);
+		canvas.drawText("N", centerX, centerY - inCircleRadius + 10, this.paint);
+
+		this.paint.setAntiAlias(true);
+		this.paint.setStrokeWidth(0);
+		this.paint.setColor(Color.rgb(255, 70, 70));
+		this.paint.setAlpha(255);
+		this.paint.setTextSize(35);
+		this.paint.setTextAlign(Align.CENTER);
+		this.paint.setStyle(Paint.Style.FILL);
+		canvas.drawText("N", centerX, centerY - inCircleRadius + 10, this.paint);
+
+		// カメラ位置の描画
+		this.paint.setColor(Color.rgb(255, 0, 0));
+		this.paint.setAlpha(255);
+		canvas.drawCircle(centerX, centerY, 5, this.paint);
+
+		// 画角線の描画
+		double azimuthRightRad = LocationUtilities.degreesToRads(LocationUtilities.correctAzimuth(azimuth) + 270 + 30);
+		float rightX = (float) (Math.cos(azimuthRightRad) * inCircleRadius + centerX);
+		float rightY = (float) (Math.sin(azimuthRightRad) * inCircleRadius + centerY);
+
+		double azimuthLeftRad = LocationUtilities.degreesToRads(LocationUtilities.correctAzimuth(azimuth) + 270 - 30);
+		float leftX = (float) (Math.cos(azimuthLeftRad) * inCircleRadius + centerX);
+		float leftY = (float) (Math.sin(azimuthLeftRad) * inCircleRadius + centerY);
+
+		this.paint.setColor(Color.rgb(255, 255, 255));
+		this.paint.setAlpha(255);
+		canvas.drawLine(centerX, centerY, rightX, rightY, this.paint);
+		canvas.drawLine(centerX, centerY, leftX, leftY, this.paint);
+
 		canvas.save();
-		canvas.rotate(this.arrowAngle, centerX, centerY);
-		canvas.drawPath(this.vectorPath, this.paint);
-		canvas.drawText(centerX + "," + centerY, 30, 30, this.paint);
-		canvas.restore();
-
-		// オブジェクトの描画
-		final float objLeft = canvas.getWidth() * 0.035f;
-		final float objTop = canvas.getHeight() * 0.035f;
-		int y = 60;
+		canvas.rotate(70, centerX, centerY);
 		for (MapPoint mp : points) {
-
-			//			this.rect.left = (int) (mp.x - objLeft);
-			//			this.rect.right = (int) (mp.x + objLeft);
-			//			this.rect.top = (int) (mp.y - objTop);
-			//			this.rect.bottom = (int) (mp.y + objTop);
-
-			this.rect.left = (int) (mp.x + centerX);
-			this.rect.right = (int) (mp.x + centerX + 1);
-			this.rect.top = (int) (mp.y + centerY);
-			this.rect.bottom = (int) (mp.y + centerY + 1);
-
-			this.paint.setColor(Color.WHITE);
-			canvas.drawRect(this.rect, this.paint);
-			canvas.drawText(rect.toString(), 30, y += 30, this.paint);
+			this.paint.setColor(mp.color);
+			canvas.drawCircle(mp.x, mp.y, 5, paint);
 		}
+		canvas.restore();
 	}
 
-	public void syncMap(Camera3D camera, List<Model> models) {
+	public void syncMap(Camera3D camera, List<Model> models, int azimuth) {
+
+		this.azimuth = azimuth;
 
 		points.clear();
-		Vector3f eye = camera.getEye();
+		if (canvas != null) {
+			for (Model model : models) {
+				float x = model.getX();
+				float z = model.getZ();
 
-		for (Model model : models) {
-
-			Vector3f vec3 = model.getVector3f()[0][0];
-			float x = vec3.x;
-			float y = vec3.y;
-			float z = vec3.z;
-
-			MapPoint point = new MapPoint();
-			point.x = x;
-			point.y = z;
-			//this.convertPoint3Dto2D(point, eye, x, y, Color.RED);
-
-			points.add(point);
+				MapPoint point = new MapPoint();
+				convertPoint3Dto2D(point, camera.getEye(), x, z, Color.WHITE);
+				points.add(point);
+			}
 		}
 
 		this.invalidate();
-	}
-
-	private MiniMap addArrow() {
-		final float center = this.canvas.getWidth() / 2;
-		this.vectorPath.moveTo(center, center * 0.875f);
-		this.vectorPath.lineTo(center * 1.125f, center * 1.125f);
-		this.vectorPath.lineTo(center, center * 1.05f);
-		this.vectorPath.lineTo(center * 0.875f, center * 1.125f);
-		this.vectorPath.close();
-
-		return this;
 	}
 
 	private MapPoint convertPoint3Dto2D(MapPoint mp, Vector3f eye, float convX, float convY, int color) {
@@ -151,10 +150,5 @@ public class MiniMap extends View implements Runnable {
 		mp.color = color;
 
 		return mp;
-	}
-
-	@Override
-	public void run() {
-		//this.addArrow().invalidate();
 	}
 }

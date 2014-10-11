@@ -67,6 +67,8 @@ public class ARGLSurfaceView extends GLSurfaceView {
 			@Override
 			public void run() {
 
+				customView.getMiniMap().syncMap(camera, models, azimuth);
+
 				ProduceView produce = customView.getProduce();
 				if (lockonModel == null) {
 					produce.setVisibility(View.INVISIBLE);
@@ -183,6 +185,7 @@ public class ARGLSurfaceView extends GLSurfaceView {
 			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, GLUtils.WHITE, 0);
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
+			GLU.gluPerspective(gl, (float)160.0, (float)0.75, (float)0.0, (float)30.0);
 
 			// アルファブレンド
 			gl.glEnable(GL10.GL_BLEND);

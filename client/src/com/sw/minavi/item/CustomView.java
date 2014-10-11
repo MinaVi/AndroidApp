@@ -12,6 +12,7 @@ public class CustomView extends LinearLayout {
 
 	private DebugView debug;
 	private ProduceView produce;
+	private MiniMap miniMap;
 
 	public CustomView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -19,6 +20,7 @@ public class CustomView extends LinearLayout {
 		View layout = LayoutInflater.from(context).inflate(R.layout.custom_ar_info, this);
 		debug = (DebugView) layout.findViewById(R.id.debug);
 		produce = (ProduceView) layout.findViewById(R.id.produce);
+		miniMap = (MiniMap) layout.findViewById(R.id.miniMap);
 	}
 
 	public DebugView getDebug() {
@@ -28,4 +30,9 @@ public class CustomView extends LinearLayout {
 	public ProduceView getProduce() {
 		return produce;
 	}
+
+	public MiniMap getMiniMap() {
+		return miniMap;
+	}
+
 }

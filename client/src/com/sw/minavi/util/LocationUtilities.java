@@ -2,6 +2,18 @@ package com.sw.minavi.util;
 
 public class LocationUtilities {
 
+	private static final int[] CORRECT_AZIMUTH = new int[720];
+	static {
+		for (int i = 0; i < 360; i++) {
+			CORRECT_AZIMUTH[i] = i;
+		}
+		int azimuth = 0;
+		for (int i = 360; i < CORRECT_AZIMUTH.length; i++) {
+			CORRECT_AZIMUTH[i] = azimuth;
+			azimuth++;
+		}
+	}
+
 	/**
 	 * 2点間の距離を求める取得する
 	 *
@@ -102,5 +114,9 @@ public class LocationUtilities {
 	 */
 	public static double degreesToRads(double degrees) {
 		return degrees * (Math.PI / 180f);
+	}
+
+	public static double correctAzimuth(int azimuth) {
+		return CORRECT_AZIMUTH[azimuth];
 	}
 }
