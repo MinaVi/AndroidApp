@@ -87,7 +87,8 @@ public class ARGLSurfaceView extends GLSurfaceView {
 									item.getArImageName(), "drawable",
 									getContext().getPackageName()),
 							item.getMessage(),
-							message);
+							message,
+							item.getTalkGroupId());
 
 					produce.setVisibility(View.VISIBLE);
 				}
@@ -185,7 +186,7 @@ public class ARGLSurfaceView extends GLSurfaceView {
 			gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, GLUtils.WHITE, 0);
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
-			GLU.gluPerspective(gl, (float)160.0, (float)0.75, (float)0.0, (float)30.0);
+			GLU.gluPerspective(gl, (float) 160.0, (float) 0.75, (float) 0.0, (float) 30.0);
 
 			// アルファブレンド
 			gl.glEnable(GL10.GL_BLEND);

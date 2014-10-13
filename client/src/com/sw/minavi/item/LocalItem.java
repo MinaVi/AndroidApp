@@ -2,7 +2,7 @@ package com.sw.minavi.item;
 
 public class LocalItem {
 	private int id;
-	private int talk_group_id;
+	private int talkGroupId;
 	private String message;
 	private double lon;
 	private double lat;
@@ -23,11 +23,11 @@ public class LocalItem {
 	}
 
 	public int getTalkGroupId() {
-		return this.talk_group_id;
+		return this.talkGroupId;
 	}
 
-	public void setTalkGroupId(int talk_group_id) {
-		this.talk_group_id = talk_group_id;
+	public void setTalkGroupId(int talkGroupId) {
+		this.talkGroupId = talkGroupId;
 	}
 
 	public String getMessage() {
