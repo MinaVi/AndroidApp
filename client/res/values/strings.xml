@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">MinaViApp</string>
     <string name="action_settings">Settings</string>
-    <string name="maps_api_key">AIzaSyBu3y-j9-HB_F4YH-6LC1w-h6-CCYPXUqg</string>
+    <string name="maps_api_key">AIzaSyA44AWUfmZBCbIueVNUNdDbLKZnSxlyjhk</string>
 
 </resources>

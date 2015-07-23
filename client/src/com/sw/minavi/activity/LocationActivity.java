@@ -28,13 +28,15 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+//import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+//import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.location.LocationClient;
+//import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
@@ -50,9 +52,13 @@ import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.parseJsonpOfDirectionAPI;
+//import android.support.v4.app.Fragment;
 
-public class LocationActivity extends FragmentActivity implements
-		OnConnectionFailedListener, LocationListener, ConnectionCallbacks,
+import com.google.android.gms.maps.*;
+import android.app.Activity;
+
+public class LocationActivity extends FragmentActivity implements 
+GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleApiClient.ConnectionCallbacks,
 		OnClickListener {
 
 	GoogleMap gMap;
@@ -80,7 +86,7 @@ public class LocationActivity extends FragmentActivity implements
 
 	public int mode = 1;// デフォルトは詳細
 	private Location myLocation;
-	private LocationClient mLocationClient = null;
+	private GoogleApiClient mLocationClient = null;
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
@@ -115,8 +121,13 @@ public class LocationActivity extends FragmentActivity implements
 		if (gMap != null) {
 			gMap.setMyLocationEnabled(true);
 		}
-		mLocationClient = new LocationClient(getApplicationContext(), this,
-				this); // ConnectionCallbacks, OnConnectionFailedListener
+//		mLocationClient = new LocationClient(getApplicationContext(), this,
+//				this); // ConnectionCallbacks, OnConnectionFailedListener
+		mLocationClient = new GoogleApiClient.Builder(this)
+	      .addApi(LocationServices.API)
+	      .addConnectionCallbacks(this)
+	      .addOnConnectionFailedListener(this)
+	      .build();
 		if (mLocationClient != null) {
 			// Google Play Servicesに接続
 			mLocationClient.connect();
@@ -439,11 +450,10 @@ public class LocationActivity extends FragmentActivity implements
 	public void onConnected(Bundle connectionHint) {
 		// TODO Auto-generated method stub
 		// TODO Auto-generated method stub
-		mLocationClient.requestLocationUpdates(REQUEST, this); // LocationListener
+//		mLocationClient.requestLocationUpdates(REQUEST, this); // LocationListener
 
 	}
 
-	@Override
 	public void onDisconnected() {
 		// TODO Auto-generated method stub
 
@@ -493,6 +503,13 @@ public class LocationActivity extends FragmentActivity implements
 		LocalItemTableManager.getInstance(helper).InsertSample();
 	}
 
+	@Override
+	public void onConnectionSuspended(int cause) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 	// //リ･ルート検索
 	// private void re_routeSearch() {
 	// progressDialog.show();
