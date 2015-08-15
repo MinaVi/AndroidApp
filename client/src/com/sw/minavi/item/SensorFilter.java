@@ -8,8 +8,8 @@ public class SensorFilter {
 	private ArrayList<Float> mSecond = new ArrayList<Float>();
 	private ArrayList<Float> mThrad = new ArrayList<Float>();
 
-	public int sampleCount = 12;// サンプリング数
-	public int sampleNum = 6;// サンプリングした値の使用値のインデックス
+	public int sampleCount = 24;// サンプリング数
+	public int sampleNum = 12;// サンプリングした値の使用値のインデックス
 
 	private float[] mParam = new float[3];// フィルタをかけた後の値
 

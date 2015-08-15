@@ -463,6 +463,20 @@ public class TalkActivity extends Activity implements OnClickListener {
 			Random rnd = new Random();
 			int ran = rnd.nextInt(groups.size());
 			group = groups.get(ran);
+			
+			// TODO debaug
+			if (group.getBackGroundFileNmae() != null
+					&& group.getBackGroundFileNmae().length() > 2) {
+				// 背景を特殊背景に変える
+				backImage.setImageResource(getResources().getIdentifier(
+						group.getBackGroundFileNmae(), "drawable",
+						getPackageName()));
+			}else{
+				backImage.setImageResource(getResources().getIdentifier(
+						"aoiike", "drawable",
+						getPackageName()));
+			}
+			
 			groupId = group.getTalkGroupId();
 		}
 

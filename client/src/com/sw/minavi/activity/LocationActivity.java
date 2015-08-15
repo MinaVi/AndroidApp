@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,15 +29,12 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-//import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-//import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
-//import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
@@ -47,21 +45,26 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.android.gms.maps.model.UrlTileProvider;
 import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.parseJsonpOfDirectionAPI;
+//import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+//import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+//import com.google.android.gms.location.LocationClient;
 //import android.support.v4.app.Fragment;
 
-import com.google.android.gms.maps.*;
-import android.app.Activity;
-
-public class LocationActivity extends FragmentActivity implements 
-GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleApiClient.ConnectionCallbacks,
-		OnClickListener {
+public class LocationActivity extends FragmentActivity implements
+		GoogleApiClient.OnConnectionFailedListener, LocationListener,
+		GoogleApiClient.ConnectionCallbacks, OnClickListener {
 
 	GoogleMap gMap;
+	TileOverlay tileOverlay;
+
 	private static final int MENU_A = 0;
 	private static final int MENU_B = 1;
 	private static final int MENU_c = 2;
@@ -92,6 +95,47 @@ GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleApiClient.Co
 			.setFastestInterval(16) // 16ms = 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
+	UrlTileProvider tileProvider = new UrlTileProvider(256, 256) {
+		@Override
+		public URL getTileUrl(int x, int y, int zoom) {
+
+			/* Define the URL pattern for the tile images */
+			// String s =
+			// String.format("http://my.image.server/images/%d/%d/%d.png",
+			// zoom, x, y);
+			String s = String
+					.format("http://cyberjapandata.gsi.go.jp/xyz/bousai_app/h27/tsunami2_r/%d/%d/%d.png",
+							zoom, x, y);
+
+			if (!checkTileExists(x, y, zoom)) {
+				return null;
+			}
+
+			try {
+				return new URL(s);
+			} catch (MalformedURLException e) {
+				throw new AssertionError(e);
+			}
+		}
+
+		/*
+		 * Check that the tile server supports the requested x, y and zoom.
+		 * Complete this stub according to the tile range you support. If you
+		 * support a limited range of tiles at different zoom levels, then you
+		 * need to define the supported x, y range at each zoom level.
+		 */
+		private boolean checkTileExists(int x, int y, int zoom) {
+			int minZoom = 10;
+			int maxZoom = 18;
+
+			if ((zoom < minZoom || zoom > maxZoom)) {
+				return false;
+			}
+
+			return true;
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -121,13 +165,11 @@ GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleApiClient.Co
 		if (gMap != null) {
 			gMap.setMyLocationEnabled(true);
 		}
-//		mLocationClient = new LocationClient(getApplicationContext(), this,
-//				this); // ConnectionCallbacks, OnConnectionFailedListener
+		// mLocationClient = new LocationClient(getApplicationContext(), this,
+		// this); // ConnectionCallbacks, OnConnectionFailedListener
 		mLocationClient = new GoogleApiClient.Builder(this)
-	      .addApi(LocationServices.API)
-	      .addConnectionCallbacks(this)
-	      .addOnConnectionFailedListener(this)
-	      .build();
+				.addApi(LocationServices.API).addConnectionCallbacks(this)
+				.addOnConnectionFailedListener(this).build();
 		if (mLocationClient != null) {
 			// Google Play Servicesに接続
 			mLocationClient.connect();
@@ -220,6 +262,10 @@ GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleApiClient.Co
 					}
 				}
 			});
+
+			tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+					.tileProvider(tileProvider));
+			
 		}
 	}
 
@@ -450,7 +496,8 @@ GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleApiClient.Co
 	public void onConnected(Bundle connectionHint) {
 		// TODO Auto-generated method stub
 		// TODO Auto-generated method stub
-//		mLocationClient.requestLocationUpdates(REQUEST, this); // LocationListener
+		// mLocationClient.requestLocationUpdates(REQUEST, this); //
+		// LocationListener
 
 	}
 
@@ -463,7 +510,13 @@ GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleApiClient.Co
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
 		myLocation = location;
+		
 		// 現在地に移動
+		if(gMap != null) {
+			LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+			gMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+		}
+		
 		// CameraPosition cameraPos = new CameraPosition.Builder()
 		// .target(new LatLng(location.getLatitude(), location
 		// .getLongitude())).zoom(17.0f).bearing(0).build();
@@ -480,13 +533,13 @@ GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleApiClient.Co
 						.getIdentifier(locationItem.getArImageName(),
 								"drawable", getPackageName())));
 				items.title("A");
-				items.position(new LatLng(locationItem.getLat(), locationItem.getLon()));
+				items.position(new LatLng(locationItem.getLat(), locationItem
+						.getLon()));
 				gMap.addMarker(items);
 
 			}
 		}
-		
-		
+
 		markerPoints.clear();
 		markerPoints.add(new LatLng(location.getLatitude(), location
 				.getLongitude()));
@@ -506,10 +559,9 @@ GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleApiClient.Co
 	@Override
 	public void onConnectionSuspended(int cause) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	
 	// //リ･ルート検索
 	// private void re_routeSearch() {
 	// progressDialog.show();
