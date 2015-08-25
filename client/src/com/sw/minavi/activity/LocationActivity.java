@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
@@ -79,7 +80,9 @@ public class LocationActivity extends FragmentActivity implements
 
 	public ProgressDialog progressDialog;
 
-	public String travelMode = "driving";// default
+	public String travelMode =  "walking";// default
+//    public final static String MODE_DRIVING = "driving";
+//    public final static String MODE_WALKING = "walking";
 
 	/** DB操作オブジェクト */
 	private DatabaseOpenHelper helper;
@@ -146,7 +149,9 @@ public class LocationActivity extends FragmentActivity implements
 		LocationManager locationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
 		// GPSから現在地の情報を取得
-		Location myLocate = locationManager.getLastKnownLocation("gps");
+		final Criteria criteria = new Criteria();
+		final String provider = locationManager.getBestProvider(criteria, true);
+		myLocation = locationManager.getLastKnownLocation(provider);
 
 		// プログレス
 		progressDialog = new ProgressDialog(this);
@@ -178,12 +183,12 @@ public class LocationActivity extends FragmentActivity implements
 		// 初期位置
 		// LatLng location = new LatLng(34.802556297454004, 135.53884506225586);
 
-		if (gMap != null) {
+		if (gMap != null && myLocation != null) {
 
 			// gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 17));
 			// 現在地に移動
 			CameraPosition cameraPos = new CameraPosition.Builder()
-					.target(new LatLng(myLocate.getLatitude(), myLocate
+					.target(new LatLng(myLocation.getLatitude(), myLocation
 							.getLongitude())).zoom(17.0f).bearing(0).build();
 			gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
 
@@ -198,24 +203,24 @@ public class LocationActivity extends FragmentActivity implements
 						// ルート検索モード
 
 						// ３度目クリックでスタート地点を再設定
-						if (markerPoints.size() > 1) {
+//						if (markerPoints.size() > 1) {
 							markerPoints.clear();
 							gMap.clear();
 							markerPoints.add(new LatLng(myLocation
 									.getLatitude(), myLocation.getLongitude()));
-						}
+//						}
 
 						markerPoints.add(point);
 
 						options = new MarkerOptions();
 						options.position(point);
 
-						if (markerPoints.size() == 1) {
-							// options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-							options.icon(BitmapDescriptorFactory
-									.fromResource(R.drawable.question));
-							options.title("A");
-						}
+//						if (markerPoints.size() == 1) {
+//							// options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//							options.icon(BitmapDescriptorFactory
+//									.fromResource(R.drawable.question));
+//							options.title("A");
+//						}
 						// } else if (markerPoints.size() == 2) {
 						// //
 						// options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
@@ -244,19 +249,22 @@ public class LocationActivity extends FragmentActivity implements
 							}
 						});
 
-						if (markerPoints.size() >= 2) {
-							// 現在地に移動
-							CameraPosition cameraPos = new CameraPosition.Builder()
-									.target(new LatLng(
-											myLocation.getLatitude(),
-											myLocation.getLongitude()))
-									.zoom(17.0f).bearing(0).build();
-							gMap.animateCamera(CameraUpdateFactory
-									.newCameraPosition(cameraPos));
-							// ルート検索
-							gMap.clear();
-							routeSearch();
-						}
+//						if (markerPoints.size() >= 2) {
+//							// 現在地に移動
+//							CameraPosition cameraPos = new CameraPosition.Builder()
+//									.target(new LatLng(
+//											myLocation.getLatitude(),
+//											myLocation.getLongitude()))
+//									.zoom(17.0f).bearing(0).build();
+//							gMap.animateCamera(CameraUpdateFactory
+//									.newCameraPosition(cameraPos));
+//							// ルート検索
+//							gMap.clear();
+//							routeSearch();
+//						}
+						// ルート検索
+						gMap.clear();
+						routeSearch();
 					} else {
 						// 詳細モード
 					}

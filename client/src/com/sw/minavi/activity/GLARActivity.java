@@ -13,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -289,6 +290,13 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 			// 前回のロード座標から50m以内であれば位置情報を更新しない
 			if (lengthInMeter < 50) {
+				
+				// アイテム表示がない場合、念のためチェック
+				if(locationItems.size() == 0){
+					// 位置情報更新イベントの実行
+					updateLocationEvent();
+				}
+				
 				return;
 			}
 
@@ -327,6 +335,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		for (String provider : providers) {
 			locationManager.requestLocationUpdates(provider, 0, 1, this);
 		}
+		
 	}
 
 	private void initDataBaseManage() {

@@ -1,6 +1,7 @@
 package com.sw.minavi.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +11,10 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import com.growthpush.GrowthPush;
+import com.growthpush.handler.DefaultReceiveHandler;
+import com.growthpush.model.Environment;
+import com.sw.minavi.BuildConfig;
 import com.sw.minavi.R;
 
 public class StartActivity extends Activity implements OnClickListener, AnimationListener {
@@ -23,7 +28,7 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 		
 		ImageView img = (ImageView) findViewById(R.id.logoImage);
 		Animation anim = AnimationUtils.loadAnimation(this, R.anim.start_logo_animation);
-
+		
 		anim.setAnimationListener(new AnimationListener() {
 			
 			@Override

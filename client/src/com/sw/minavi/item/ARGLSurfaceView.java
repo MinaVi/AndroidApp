@@ -31,6 +31,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.sw.minavi.R;
+import com.sw.minavi.activity.GLARActivity;
 import com.sw.minavi.model.Lockon;
 import com.sw.minavi.model.Model;
 import com.sw.minavi.model.TextModel;

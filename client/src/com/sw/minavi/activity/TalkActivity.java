@@ -332,6 +332,14 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 		} else if (textCount == talkTexts.size()) {
 
+			// ARからの遷移だった場合、ARに戻す
+			if (arTalkGroupId != 0) {
+				bgmPlayingFlg = true;
+				Intent intent = new Intent(this, GLARActivity.class);
+				startActivity(intent);
+//				finish();
+			}
+			
 			textCount = 0;
 			nameTextView.setText("");
 			talkTextView.setText("");
@@ -351,11 +359,11 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 			// ARへ遷移
 			// TODO 固定値
-			if (groupId == 14) {
-				bgmPlayingFlg = true;
-				Intent intent = new Intent(this, GLARActivity.class);
-				startActivity(intent);
-			}
+//			if (groupId == 14) {
+//				bgmPlayingFlg = true;
+//				Intent intent = new Intent(this, GLARActivity.class);
+//				startActivity(intent);
+//			}
 
 			// 次の会話内容セット
 			// イベントセット
@@ -431,7 +439,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 			// エリアが指定されている場合は、エリア情報のみ
 			areaId = group.getAreaId();
 			// 次回以降は通常通り
-			arTalkGroupId = 0;
+//			arTalkGroupId = 0;
 		} else if (toAr == true) {
 			// TODO　固定値
 			groupId = 13;
