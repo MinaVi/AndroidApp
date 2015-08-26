@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 
 import com.sw.minavi.activity.db.DatabaseOpenHelper.EmergencyItemTable;
+import com.sw.minavi.activity.db.DatabaseOpenHelper.LocalItemTable;
 import com.sw.minavi.activity.db.DatabaseOpenHelper.Tables;
 import com.sw.minavi.item.EmergencyItem;
 
@@ -22,6 +23,8 @@ public class EmergencyItemTableManager {
 	private DatabaseOpenHelper helper = null;
 	/** 当該クラスが提供する唯一のインスタンス */
 	private static EmergencyItemTableManager me = null;
+	/** 言語設定マネージャー */
+	public static String lang = "Japanese";
 
 	/**
 	 * プライベートコンストラクタ
@@ -56,11 +59,11 @@ public class EmergencyItemTableManager {
 
 		// サンプルデータの準備
 		String[][] datas = new String[][] {
-				{ "7", "1", "避難所１", "141.343930", "43.072635", "refuge01", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
-				{ "8", "2", "避難所２", "141.344041", "43.072680", "refuge01", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
-				{ "9", "3", "避難所３", "141.343842", "43.072588", "refuge01", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
-				{ "10", "4", "避難所４", "139.701340", "35.658522", "refuge01", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
-				{ "14", "5", "避難所イベント", "141.338632", "43.106693", "refuge01", "pin", "141.331322", "43.070880", "141.347216",
+				{ "7", "1", "避難所１", "emergency１", "141.343930", "43.072635", "refuge01", "refuge01", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
+				{ "8", "2", "避難所２", "emergency１", "141.344041", "43.072680", "refuge01", "refuge01", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
+				{ "9", "3", "避難所３", "emergency１", "141.343842", "43.072588", "refuge01", "refuge01", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
+				{ "10", "4", "避難所４", "emergency１", "139.701340", "35.658522", "refuge01", "refuge01", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
+				{ "14", "5", "避難所イベント", "emergency１", "141.338632", "43.106693", "refuge01", "refuge01", "141.331322", "43.070880", "141.347216",
 						"43.090761", "20130701000000" },
 
 		};
@@ -119,11 +122,18 @@ public class EmergencyItemTableManager {
 				EmergencyItem val = new EmergencyItem();
 				val.setId(cursor.getInt(EmergencyItemTable.ID.ordinal()));
 				val.setTalkGroupId(cursor.getInt(EmergencyItemTable.TALK_GROUP_ID.ordinal()));
-				val.setMessage(cursor.getString(EmergencyItemTable.MESSAGE.ordinal()));
+				
+				// メッセージは言語によって変える
+				if(lang.equals("English")){
+					val.setMessage(cursor.getString(EmergencyItemTable.MESSAGE_EN.ordinal()));
+				}else{
+					val.setMessage(cursor.getString(EmergencyItemTable.MESSAGE.ordinal()));
+				}
+				
 				val.setLon(Double.valueOf(cursor.getString(EmergencyItemTable.LON.ordinal())).doubleValue());
 				val.setLat(Double.valueOf(cursor.getString(EmergencyItemTable.LAT.ordinal())).doubleValue());
 				val.setArImageName(cursor.getString(EmergencyItemTable.AR_IMAGE_NAME.ordinal()));
-				val.seticonImageName(cursor.getString(EmergencyItemTable.ICON_IMAGE_NAME.ordinal()));
+				val.setIconImageName(cursor.getString(EmergencyItemTable.ICON_IMAGE_NAME.ordinal()));
 				val.setSpecialLonMin(Double.valueOf(cursor.getString(EmergencyItemTable.SPECIAL_LON_MIN.ordinal())).doubleValue());
 				val.setSpecialLatMin(Double.valueOf(cursor.getString(EmergencyItemTable.SPECIAL_LAT_MIN.ordinal())).doubleValue());
 				val.setSpecialLonMax(Double.valueOf(cursor.getString(EmergencyItemTable.SPECIAL_LON_MAX.ordinal())).doubleValue());
@@ -164,12 +174,18 @@ public class EmergencyItemTableManager {
 				// EmergencyItemの生成・編集
 				EmergencyItem val = new EmergencyItem();
 				val.setId(cursor.getInt(EmergencyItemTable.ID.ordinal()));
-				val.setTalkGroupId(cursor.getInt(EmergencyItemTable.TALK_GROUP_ID.ordinal()));
-				val.setMessage(cursor.getString(EmergencyItemTable.MESSAGE.ordinal()));
+				
+				// メッセージは言語によって変える
+				if(lang.equals("English")){
+					val.setMessage(cursor.getString(EmergencyItemTable.MESSAGE_EN.ordinal()));
+				}else{
+					val.setMessage(cursor.getString(EmergencyItemTable.MESSAGE.ordinal()));
+				}
+				
 				val.setLon(Double.valueOf(cursor.getString(EmergencyItemTable.LON.ordinal())).doubleValue());
 				val.setLat(Double.valueOf(cursor.getString(EmergencyItemTable.LAT.ordinal())).doubleValue());
 				val.setArImageName(cursor.getString(EmergencyItemTable.AR_IMAGE_NAME.ordinal()));
-				val.seticonImageName(cursor.getString(EmergencyItemTable.ICON_IMAGE_NAME.ordinal()));
+				val.setIconImageName(cursor.getString(EmergencyItemTable.ICON_IMAGE_NAME.ordinal()));
 				val.setSpecialLonMin(Double.valueOf(cursor.getString(EmergencyItemTable.SPECIAL_LON_MIN.ordinal())).doubleValue());
 				val.setSpecialLatMin(Double.valueOf(cursor.getString(EmergencyItemTable.SPECIAL_LAT_MIN.ordinal())).doubleValue());
 				val.setSpecialLonMax(Double.valueOf(cursor.getString(EmergencyItemTable.SPECIAL_LON_MAX.ordinal())).doubleValue());
@@ -226,7 +242,7 @@ public class EmergencyItemTableManager {
 			val.setLon(Double.valueOf(record[3]).doubleValue());
 			val.setLat(Double.valueOf(record[4]).doubleValue());
 			val.setArImageName(record[5]);
-			val.seticonImageName(record[6]);
+			val.setIconImageName(record[6]);
 			val.setCreateTime(record[7]);
 
 			values.add(val);

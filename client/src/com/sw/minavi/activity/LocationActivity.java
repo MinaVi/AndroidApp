@@ -53,7 +53,6 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.UrlTileProvider;
 import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
-import com.sw.minavi.activity.db.DatabaseOpenHelper.EmergencyItemTable;
 import com.sw.minavi.activity.db.EmergencyItemTableManager;
 import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.item.EmergencyItem;
@@ -254,6 +253,8 @@ public class LocationActivity extends FragmentActivity implements
 						// オブジェクト取得
 						if (emeFlg == true) {
 							setEmeItemOnGmap();
+							tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+							.tileProvider(tileProvider));
 						} else {
 							setItemOnGmap();
 						}
@@ -263,12 +264,11 @@ public class LocationActivity extends FragmentActivity implements
 				}
 			});
 
-			tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
-					.tileProvider(tileProvider));
-
 			// アイコン情報
 			if (emeFlg == true) {
 				setEmeItemOnGmap();
+				tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+				.tileProvider(tileProvider));
 			} else {
 				setItemOnGmap();
 			}
@@ -500,6 +500,8 @@ public class LocationActivity extends FragmentActivity implements
 			// オブジェクト取得
 			if (emeFlg == true) {
 				setEmeItemOnGmap();
+				tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+				.tileProvider(tileProvider));
 			} else {
 				setItemOnGmap();
 			}
@@ -538,6 +540,8 @@ public class LocationActivity extends FragmentActivity implements
 		// オブジェクト取得
 		if (emeFlg == true) {
 			setEmeItemOnGmap();
+			tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+			.tileProvider(tileProvider));
 		} else {
 			setItemOnGmap();
 		}
@@ -592,6 +596,9 @@ public class LocationActivity extends FragmentActivity implements
 		this.helper = new DatabaseOpenHelper(this);
 		LocalItemTableManager.getInstance(helper).InsertSample();
 		EmergencyItemTableManager.getInstance(helper).InsertSample();
+		String lang = sPref.getString("lang", "Japanese");
+		LocalItemTableManager.lang = lang;
+		EmergencyItemTableManager.lang = lang;
 	}
 
 	@Override

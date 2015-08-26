@@ -20,6 +20,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -28,11 +29,13 @@ import android.view.View.OnClickListener;
 
 import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
+import com.sw.minavi.activity.db.EmergencyItemTableManager;
 import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.http.TransportLog;
 import com.sw.minavi.item.ARGLSurfaceView;
 import com.sw.minavi.item.BgmManager;
 import com.sw.minavi.item.CustomView;
+import com.sw.minavi.item.EmergencyItem;
 import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.SensorFilter;
 import com.sw.minavi.model.Model;
@@ -70,6 +73,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 	/** 座標アイテム */
 	private ArrayList<LocalItem> locationItems = new ArrayList<LocalItem>();
+	private ArrayList<LocalItem> EmergencyItems = new ArrayList<LocalItem>();
 
 	/** 現在ロードしている座標 */
 	private Location loadLocation = null;
@@ -86,6 +90,8 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 	// 設定マネージャー
 	private SharedPreferences sPref;
+	boolean emeFlg = false;
+	
 	private Handler mHandler;
 
 	@Override
@@ -94,6 +100,10 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// レイアウトを設定
 		setContentView(R.layout.activity_gl);
+		
+		// モード判定
+		sPref = PreferenceManager.getDefaultSharedPreferences(this);
+		emeFlg = sPref.getBoolean("pref_emergency_flag", false);
 
 		// センサーサービスの起動
 		initSensorService();
@@ -341,6 +351,10 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	private void initDataBaseManage() {
 		this.helper = new DatabaseOpenHelper(this);
 		LocalItemTableManager.getInstance(helper).InsertSample();
+		EmergencyItemTableManager.getInstance(helper).InsertSample();
+		String lang = sPref.getString("lang", "Japanese");
+		LocalItemTableManager.lang = lang;
+		EmergencyItemTableManager.lang = lang;
 	}
 
 	private void findViews() {
@@ -357,11 +371,18 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		}
 
 		// 周辺情報を取得
-		locationItems.clear();
-		locationItems.addAll(LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation));
-
 		// GLSurfaceViewに登録されている位置情報、ロケーション情報を更新
-		glSurfaceView.updateLocation(loadLocation, locationItems);
+		if(emeFlg == true){
+			EmergencyItems.clear();
+			locationItems.clear();
+			EmergencyItems.addAll(EmergencyItemTableManager.getInstance(helper).GetAroundRecords(loadLocation));
+			glSurfaceView.updateLocation(loadLocation, EmergencyItems);
+		}else{
+			EmergencyItems.clear();
+			locationItems.clear();
+			locationItems.addAll(LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation));
+			glSurfaceView.updateLocation(loadLocation, locationItems);
+		}
 	}
 
 	@Override

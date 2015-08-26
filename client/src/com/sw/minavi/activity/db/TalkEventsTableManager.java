@@ -21,6 +21,8 @@ public class TalkEventsTableManager {
 	private DatabaseOpenHelper helper = null;
 	/** 当該クラスが提供する唯一のインスタンス */
 	private static TalkEventsTableManager me = null;
+	/** 言語設定マネージャー */
+	public static String lang = "Japanese";
 
 	/**
 	 * プライベートコンストラクタ
@@ -102,37 +104,37 @@ public class TalkEventsTableManager {
 				{ "41", "14", "ミナ","ARカメラを起動します。" , "mina2_nomal", "0" , "0"},
 				{ "42", "15", "ミナ","わかりました。" , "mina2_nomal", "0" , "0"},
 				*/
-				{ "1", "1", "リセ","ここは茶房ヌプリという喫茶店よ。" , "rise_sammar_nomal_up", "0" , "0"},
-				{ "2", "1", "リセ", "ニセコの喫茶店はいろいろあるけどここは駅の中にあるから、" , "rise_sammar_nomal_up", "0" , "0"},
-				{ "3", "1", "リセ", "電車で来た時に、すぐ一息つけるわ。" , "rise_sammar_nomal_up", "0" , "0"},
-				{ "4", "1", "リセ", "もちろん珈琲やケーキとかあるけど、私のおすすめは「ヌプリカレー」ね。" , "rise2_sammar_smile_up", "0" , "0"},
-				{ "5", "1", "リセ", "すごくコクが合って、それでいてまろやか…って言ってたら食べたくなっちゃった。" , "rise_sammar_smile_up", "0" , "0"},
-				{ "6", "1", "リセ", "あと、店内にはたくさんの時計があるけど、どれも同じ時間で止まっているのよ。" , "rise_sammar_nomal_up", "0" , "0"},
-				{ "7", "1", "リセ", "・・・" , "rise_sammar_sad_up", "0" , "0"},
-				{ "8", "1", "リセ", "あの時間が何を指しているのか、興味があるならお店の人にたずねてみるといいよ。" , "rise_sammar_nomal_up", "0" , "0"},
+				{ "1", "1", "リセ", "RISE","ここは茶房ヌプリという喫茶店よ。", "This cafe called Sabo Nupuri.", "rise_sammar_nomal_up", "0" , "0"},
+				{ "2", "1", "リセ", "RISE", "ニセコの喫茶店はいろいろあるけどここは駅の中にあるから、", "Cafe in Niseko are various, this cafe is because there in the station," , "rise_sammar_nomal_up", "0" , "0"},
+				{ "3", "1", "リセ", "RISE", "電車で来た時に、すぐ一息つけるわ。", "When you came by train, I'll put immediately breath." , "rise_sammar_nomal_up", "0" , "0"},
+				{ "4", "1", "リセ", "RISE", "もちろん珈琲やケーキとかあるけど、私のおすすめは「ヌプリカレー」ね。", "Though there Toka coffee and cakes, I recommend I Nupuri curry." , "rise2_sammar_smile_up", "0" , "0"},
+				{ "5", "1", "リセ", "RISE", "すごくコクが合って、それでいてまろやか…って言ってたら食べたくなっちゃった。", "There is a very full-bodied, yet it's mellow." , "rise_sammar_smile_up", "0" , "0"},
+				{ "6", "1", "リセ", "RISE", "あと、店内にはたくさんの時計があるけど、どれも同じ時間で止まっているのよ。", "But the store there is a lot of clock, none No has stopped at the same time." , "rise_sammar_nomal_up", "0" , "0"},
+				{ "7", "1", "リセ", "RISE", "・・・", "・・・" , "rise_sammar_sad_up", "0" , "0"},
+				{ "8", "1", "リセ", "RISE", "あの時間が何を指しているのか、興味があるならお店の人にたずねてみるといいよ。", "Whether that time is what the points, it is good to try to ask the shop of people if you are interested." , "rise_sammar_nomal_up", "0" , "0"},
 				
-				{ "9", "2", "ミナ", "ここは？もしかして民家に迷い込んで・・・" , "mina_nomal_up", "0" , "0"},
-				{ "10", "2", "リセ", "いいえ、ここはそば処「楽一」よ。まぁ、入り口に小さい旗が立っているだけだから、間違えるのも無理はないけどね。" 
+				{ "9", "2", "ミナ", "MINA", "ここは？もしかして民家に迷い込んで・・・", "here? ... Do you mean wandered into a house" , "mina_nomal_up", "0" , "0"},
+				{ "10", "2", "リセ", "RISE", "いいえ、ここはそば処「楽一」よ。まぁ、入り口に小さい旗が立っているだけだから、間違えるのも無理はないけどね。", "No, This is Rakuichi, japanese moodle 'SOBA' restrant 'SOBA'." 
 					, "rise_winter_nomal_up", "1" , "0"},
-				{ "11", "2", "リセ", "ここのそばは注文されてから打ち始めるから、実際に食べられるまで時間があるの。" , "rise_winter_nomal_up", "1" , "0"},
-				{ "12", "2", "リセ", "その間、家族や仲間と話したり、お酒を飲んだりして時間の流れを楽しむのよ。" , "rise2_winter_smile_up", "1" , "0"},
-				{ "13", "2", "リセ", "そばはニセコの清水を利用していて、のどごしがすごくいいの。" , "rise_winter_smile_up", "1" , "0"},
-				{ "14", "2", "ミナ", "それは是非食べてみたいですね！" , "mina_smile_up", "0" , "0"},
-				{ "15", "2", "リセ", "夜は懐石料理がでるけど、私にはとても高くてまだ食べたことがないの。でもいつか食べに来ようと思ってるわ！" 
+				{ "11", "2", "リセ", "RISE", "ここのそばは注文されてから打ち始めるから、実際に食べられるまで時間があるの。", "'SOBA' can be started out from being order" , "rise_winter_nomal_up", "1" , "0"},
+				{ "12", "2", "リセ", "RISE", "その間、家族や仲間と話したり、お酒を飲んだりして時間の流れを楽しむのよ。", "In the meantime, you can talk with family and friends, and No enjoy the flow of the time by drinking sake." , "rise2_winter_smile_up", "1" , "0"},
+				{ "13", "2", "リセ", "RISE", "そばはニセコの清水を利用していて、のどごしがすごくいいの。", "'SOBA' If you are using the Shimizu of Niseko, the is very good Nodogoshi." , "rise_winter_smile_up", "1" , "0"},
+				{ "14", "2", "ミナ", "MINA", "それは是非食べてみたいですね！", "It It is by all means eat like!" , "mina_smile_up", "0" , "0"},
+				{ "15", "2", "リセ", "RISE", "RISE", "夜は懐石料理がでるけど、私にはとても高くてまだ食べたことがないの。でもいつか食べに来ようと思ってるわ！", "I evening out is kaiseki cuisine, is the never ate still to me is very high." 
 					, "rise_winter_nigawarai_up", "1" , "0"},
-				{ "16", "2", "ミナ", "それは楽しみですね♪" , "mina_smile_up", "0" , "0"},
+				{ "16", "2", "ミナ", "MINA", "それは楽しみですね♪", "That's fun ♪" , "mina_smile_up", "0" , "0"},
 				
-				{ "17", "3", "ナミ", "ここで問題です！" , "nami_glass_smile_up", "0" , "0"},
-				{ "18", "3", "ナミ", "現在ではニセコバスの本社や、レジャー関連会社の倉庫になっていますが、" , "nami_glass_nomal_up", "0" , "0"},
-				{ "19", "3", "ナミ", "元々は何を貯蔵するための倉庫だったでしょうか？" , "nami_glass_nomal_up", "0" , "0"},
+				{ "17", "3", "ナミ", "NAMI", "ここで問題です！", "Question!" , "nami_glass_smile_up", "0" , "0"},
+				{ "18", "3", "ナミ", "NAMI", "現在ではニセコバスの本社や、レジャー関連会社の倉庫になっていますが、", "Headquarters and of Nisekobasu in the current, but has become a warehouse of leisure-related company," , "nami_glass_nomal_up", "0" , "0"},
+				{ "19", "3", "ナミ", "NAMI", "元々は何を貯蔵するための倉庫だったでしょうか？", "Either would have been a warehouse for the storage of what originally?" , "nami_glass_nomal_up", "0" , "0"},
 				
-				{ "20", "4", "ナミ", "正解です！" , "nami_glass_smile_up", "0" , "0"},
-				{ "21", "4", "ナミ", "もともと秋に収穫した米を貯蔵していたこの倉庫ですが、米倉庫自体は郊外に移転しました。" , "nami_glass_nomal_up", "0" , "0"},
-				{ "22", "4", "ナミ", "でも歴史的価値も高いので保存し、現在では観光資源として再利用する動きが出ています。" , "nami_glass_nomal_up", "0" , "0"},
+				{ "20", "4", "ナミ", "NAMI", "正解です！", "the correct answer!" , "nami_glass_smile_up", "0" , "0"},
+				{ "21", "4", "ナミ", "NAMI", "もともと秋に収穫した米を貯蔵していたこの倉庫ですが、米倉庫自体は郊外に移転しました。", "It is originally this warehouse that had been stored rice were harvested in the fall, but the US warehouse itself has moved to the suburbs." , "nami_glass_nomal_up", "0" , "0"},
+				{ "22", "4", "ナミ", "NAMI", "でも歴史的価値も高いので保存し、現在では観光資源として再利用する動きが出ています。", "But to save because the historical value is also high, and he has movement is now to be re-used as tourism resources." , "nami_glass_nomal_up", "0" , "0"},
 				
-				{ "23", "5", "ナミ", "残念、不正解です。" , "nami_glass_gakkari_up", "0" , "0"},
-				{ "24", "5", "ナミ", "もともと秋に収穫した米を貯蔵していたこの倉庫ですが、米倉庫自体は郊外に移転しました。" , "nami_glass_nomal_up", "0" , "0"},
-				{ "25", "5", "ナミ", "でも歴史的価値も高いので保存し、現在では観光資源として再利用する動きが出ています。" , "nami_glass_nomal_up", "0" , "0"},
+				{ "23", "5", "ナミ", "NAMI", "残念、不正解です。", "Unfortunately, it is incorrect" , "nami_glass_gakkari_up", "0" , "0"},
+				{ "24", "5", "ナミ", "NAMI", "もともと秋に収穫した米を貯蔵していたこの倉庫ですが、米倉庫自体は郊外に移転しました。", "It is originally this warehouse that had been stored rice were harvested in the fall, but the US warehouse itself has moved to the suburbs." , "nami_glass_nomal_up", "0" , "0"},
+				{ "25", "5", "ナミ", "NAMI", "でも歴史的価値も高いので保存し、現在では観光資源として再利用する動きが出ています。", "But to save because the historical value is also high, and he has movement is now to be re-used as tourism resources." , "nami_glass_nomal_up", "0" , "0"},
 				
 		};
 
@@ -152,7 +154,9 @@ public class TalkEventsTableManager {
 				values.put(TalkEventsTable.talk_event_id.getName(), data[TalkEventsTable.talk_event_id.getColNo()]);
 				values.put(TalkEventsTable.talk_group_id.getName(), data[TalkEventsTable.talk_group_id.getColNo()]);
 				values.put(TalkEventsTable.talk_name.getName(), data[TalkEventsTable.talk_name.getColNo()]);
+				values.put(TalkEventsTable.talk_name_en.getName(), data[TalkEventsTable.talk_name_en.getColNo()]);
 				values.put(TalkEventsTable.talk_body.getName(), data[TalkEventsTable.talk_body.getColNo()]);
+				values.put(TalkEventsTable.talk_body_en.getName(), data[TalkEventsTable.talk_body_en.getColNo()]);
 				values.put(TalkEventsTable.image_file_name.getName(), data[TalkEventsTable.image_file_name.getColNo()]);
 				values.put(TalkEventsTable.image_position_type.getName(), data[TalkEventsTable.image_position_type.getColNo()]);
 				values.put(TalkEventsTable.image_animation_type.getName(), data[TalkEventsTable.image_animation_type.getColNo()]);
@@ -194,8 +198,20 @@ public class TalkEventsTableManager {
 				TalkEvent val = new TalkEvent();
 				val.setTalkEventId(cursor.getInt(TalkEventsTable.talk_event_id.getColNo()));
 				val.setTalkGroupId(cursor.getInt(TalkEventsTable.talk_group_id.getColNo()));
-				val.setTalkName(cursor.getString(TalkEventsTable.talk_name.getColNo()));
-				val.setTalkBody(cursor.getString(TalkEventsTable.talk_body.getColNo()));
+				
+				// メッセージは言語によって変える
+				if (lang.equals("English")) {
+					val.setTalkName(cursor.getString(TalkEventsTable.talk_name_en
+							.getColNo()));
+					val.setTalkBody(cursor.getString(TalkEventsTable.talk_body_en
+							.getColNo()));
+				}else{
+					val.setTalkName(cursor.getString(TalkEventsTable.talk_name
+							.getColNo()));
+					val.setTalkBody(cursor.getString(TalkEventsTable.talk_body
+							.getColNo()));
+				}
+
 				val.setImageFileName(cursor.getString(TalkEventsTable.image_file_name.getColNo()));
 				val.setImagePositionType(cursor.getInt(TalkEventsTable.image_position_type.getColNo()));
 				val.setImageAnimationType(cursor.getInt(TalkEventsTable.image_animation_type.getColNo()));

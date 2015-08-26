@@ -77,6 +77,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		TALK_GROUP_ID,
 		/** テーブル項目:message */
 		MESSAGE,
+		/** テーブル項目:message_en */
+		MESSAGE_EN,
 		/** テーブル項目:lon */
 		LON,
 		/** テーブル項目:lat */
@@ -159,14 +161,18 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		talk_group_id("talk_group_id", 1),
 		/** テーブル項目:talk_name */
 		talk_name("talk_name", 2),
+		/** テーブル項目:talk_name */
+		talk_name_en("talk_name_en", 3),
 		/** テーブル項目:talk_body */
-		talk_body("talk_body", 3),
+		talk_body("talk_body", 4),
+		/** テーブル項目:talk_body */
+		talk_body_en("talk_body_en", 5),
 		/** テーブル項目:image_file_name */
-		image_file_name("image_file_name", 4),
+		image_file_name("image_file_name", 6),
 		/** テーブル項目:image_position_type */
-		image_position_type("image_position_type", 5),
+		image_position_type("image_position_type", 7),
 		/** テーブル項目:image_animation_type */
-		image_animation_type("image_animation_type", 6);
+		image_animation_type("image_animation_type", 8);
 
 		/** 項目名称 */
 		private final String name;
@@ -306,6 +312,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		TALK_GROUP_ID,
 		/** テーブル項目:message */
 		MESSAGE,
+		/** テーブル項目:message_en */
+		MESSAGE_EN,
 		/** テーブル項目:lon */
 		LON,
 		/** テーブル項目:lat */
@@ -386,6 +394,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.TALK_GROUP_ID.toString(), "integer", })).append(
 					",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.MESSAGE.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.MESSAGE_EN.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.LON.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.LAT.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { LocalItemTable.AR_IMAGE_NAME.toString(), "text", })).append(",");
@@ -432,7 +441,9 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkEventsTable.talk_group_id.getName(), "integer", })).append(
 					",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { TalkEventsTable.talk_name.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { TalkEventsTable.talk_name_en.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { TalkEventsTable.talk_body.getName(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { TalkEventsTable.talk_body_en.getName(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { TalkEventsTable.image_file_name.getName(), "text", }))
 					.append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { TalkEventsTable.image_position_type.getName(), "text", }))
@@ -468,6 +479,9 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 					",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkSelectsTable.forth_talk_group_id.getName(), "integer", }));
 			createSql.append(");");
+
+			// SQLの発行
+			db.execSQL(createSql.toString());
 			
 			// emergency_item_tblを作成
 			createSql = new StringBuilder();
@@ -476,6 +490,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.TALK_GROUP_ID.toString(), "integer", })).append(
 					",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.MESSAGE.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.MESSAGE_EN.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.LON.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.LAT.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { EmergencyItemTable.AR_IMAGE_NAME.toString(), "text", })).append(",");

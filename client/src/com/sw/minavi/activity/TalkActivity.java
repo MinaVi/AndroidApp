@@ -197,6 +197,9 @@ public class TalkActivity extends Activity implements OnClickListener {
 		TalkEventsTableManager.getInstance(helper).InsertSample();
 		TalkSelectsTableManager.getInstance(helper).InsertSample();
 
+		String lang = sPref.getString("lang", "Japanese");
+		TalkEventsTableManager.lang = lang;
+
 		// handler準備
 		mHandler = new Handler() {
 			public void handleMassage(Message msg) {

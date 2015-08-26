@@ -13,14 +13,24 @@
     <string name="pref_emergency_flag_abs">地震発生時には自動でONになります。</string>
     <string name="pref_name_title">名前（ニックネーム）</string>
     <string name="pref_name">ナビ</string>
+    <string name="pref_lang_title">言語</string>
+
+    <string-array name="pref_lang_list">
+        <item>Japanese</item>
+        <item>English</item>
+    </string-array>
+
     <string name="pref_sex_title">性別</string>
+
     <string-array name="pref_sex_list">
         <item>男</item>
         <item>女</item>
         <item>ひみつ</item>
     </string-array>
+
     <string name="pref_age_title">年齢</string>
-        <string-array name="pref_age_list">
+
+    <string-array name="pref_age_list">
         <item>～10才</item>
         <item>10代</item>
         <item>20代</item>

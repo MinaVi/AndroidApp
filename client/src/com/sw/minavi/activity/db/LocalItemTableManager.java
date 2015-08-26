@@ -3,9 +3,11 @@ package com.sw.minavi.activity.db;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.preference.PreferenceManager;
 
 import com.sw.minavi.activity.db.DatabaseOpenHelper.LocalItemTable;
 import com.sw.minavi.activity.db.DatabaseOpenHelper.Tables;
@@ -22,7 +24,9 @@ public class LocalItemTableManager {
 	private DatabaseOpenHelper helper = null;
 	/** 当該クラスが提供する唯一のインスタンス */
 	private static LocalItemTableManager me = null;
-
+	/** 言語設定マネージャー */
+	public static String lang = "Japanese";
+	
 	/**
 	 * プライベートコンストラクタ
 	 */
@@ -56,11 +60,11 @@ public class LocalItemTableManager {
 
 		// サンプルデータの準備
 		String[][] datas = new String[][] {
-				{ "7", "1", "北大１", "141.343930", "43.072635", "mina1_nomal", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
-				{ "8", "2", "北大２", "141.344041", "43.072680", "question", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
-				{ "9", "3", "北大３", "141.343842", "43.072588", "mina2_nomal", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
-				{ "10", "4", "北大４", "139.701340", "35.658522", "question", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
-				{ "14", "5", "特殊イベント", "141.338632", "43.106693", "question", "pin", "141.331322", "43.070880", "141.347216",
+				{ "7", "1", "北大１", "hokudai１", "141.343930", "43.072635", "mina1_nomal", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
+				{ "8", "2", "北大２", "hokudai2", "141.344041", "43.072680", "question", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
+				{ "9", "3", "北大３", "hokudai3", "141.343842", "43.072588", "mina2_nomal", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
+				{ "10", "4", "北大４", "hokudai4", "139.701340", "35.658522", "question", "pin", "-1.0", "-1.0", "-1.0", "-1.0", "20130701000000" },
+				{ "14", "5", "特殊イベント", "special5", "141.338632", "43.106693", "question", "pin", "141.331322", "43.070880", "141.347216",
 						"43.090761", "20130701000000" },
 
 		};
@@ -119,7 +123,14 @@ public class LocalItemTableManager {
 				LocalItem val = new LocalItem();
 				val.setId(cursor.getInt(LocalItemTable.ID.ordinal()));
 				val.setTalkGroupId(cursor.getInt(LocalItemTable.TALK_GROUP_ID.ordinal()));
-				val.setMessage(cursor.getString(LocalItemTable.MESSAGE.ordinal()));
+				
+				// メッセージは言語によって変える
+				if(lang.equals("English")){
+					val.setMessage(cursor.getString(LocalItemTable.MESSAGE_EN.ordinal()));
+				}else{
+					val.setMessage(cursor.getString(LocalItemTable.MESSAGE.ordinal()));
+				}
+				
 				val.setLon(Double.valueOf(cursor.getString(LocalItemTable.LON.ordinal())).doubleValue());
 				val.setLat(Double.valueOf(cursor.getString(LocalItemTable.LAT.ordinal())).doubleValue());
 				val.setArImageName(cursor.getString(LocalItemTable.AR_IMAGE_NAME.ordinal()));
@@ -165,7 +176,14 @@ public class LocalItemTableManager {
 				LocalItem val = new LocalItem();
 				val.setId(cursor.getInt(LocalItemTable.ID.ordinal()));
 				val.setTalkGroupId(cursor.getInt(LocalItemTable.TALK_GROUP_ID.ordinal()));
-				val.setMessage(cursor.getString(LocalItemTable.MESSAGE.ordinal()));
+				
+				// メッセージは言語によって変える
+				if(lang.equals("English")){
+					val.setMessage(cursor.getString(LocalItemTable.MESSAGE_EN.ordinal()));
+				}else{
+					val.setMessage(cursor.getString(LocalItemTable.MESSAGE.ordinal()));
+				}
+				
 				val.setLon(Double.valueOf(cursor.getString(LocalItemTable.LON.ordinal())).doubleValue());
 				val.setLat(Double.valueOf(cursor.getString(LocalItemTable.LAT.ordinal())).doubleValue());
 				val.setArImageName(cursor.getString(LocalItemTable.AR_IMAGE_NAME.ordinal()));
