@@ -1,6 +1,6 @@
 package com.sw.minavi.item;
 
-public class LocalItem {
+public class EmergencyItem {
 	private int id;
 	private int talkGroupId;
 	private String message;
@@ -66,7 +66,7 @@ public class LocalItem {
 		return this.iconImageName;
 	}
 
-	public void setIconImageName(String iconImageName) {
+	public void seticonImageName(String iconImageName) {
 		this.iconImageName = iconImageName;
 	}
 

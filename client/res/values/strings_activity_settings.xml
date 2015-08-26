@@ -9,7 +9,8 @@
     <string name="pref_header_general">基本情報</string>
     <string name="pref_enabled_location_title">位置情報の提供を許可する</string>
     <string name="pref_enabled_location_abs">収集された位置情報は、統計取得および品質向上に利用させていただきます。</string>
-    <string name="pref_emergency_flag">災害モード</string>
+    <string name="pref_emergency_flag_title">地震災害モード</string>
+    <string name="pref_emergency_flag_abs">地震発生時には自動でONになります。</string>
     <string name="pref_name_title">名前（ニックネーム）</string>
     <string name="pref_name">ナビ</string>
     <string name="pref_sex_title">性別</string>

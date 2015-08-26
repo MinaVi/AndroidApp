@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
-            android:src="@drawable/summerwars" />
+            android:src="@drawable/resize" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,6 +25,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.3" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="災害モードに変更します"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textSize="50sp" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -37,7 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
-                    android:src="@drawable/mina2_nomal" />
+                    android:src="@drawable/mina2_emergency" />
 
             </LinearLayout>
 

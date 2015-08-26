@@ -1,0 +1,4 @@
+resize:http://cg.foto.ne.jp/
+refuge01.gif:http://polar-stars.com/
+refuge02.gif:http://polar-stars.com/
+refuge03.gif:http://polar-stars.com/

@@ -77,7 +77,6 @@ public class SettingsActivity extends PreferenceActivity {
 		bindPreferenceSummaryToValue(findPreference("country"));
 		bindPreferenceSummaryToValue(findPreference("sex"));
 		bindPreferenceSummaryToValue(findPreference("age"));
-//		bindPreferenceSummaryToValue(findPreference("sync_frequency"));
 	}
 
 	/** {@inheritDoc} */

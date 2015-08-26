@@ -16,11 +16,13 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -51,7 +53,10 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.UrlTileProvider;
 import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
+import com.sw.minavi.activity.db.DatabaseOpenHelper.EmergencyItemTable;
+import com.sw.minavi.activity.db.EmergencyItemTableManager;
 import com.sw.minavi.activity.db.LocalItemTableManager;
+import com.sw.minavi.item.EmergencyItem;
 import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.parseJsonpOfDirectionAPI;
 //import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -76,19 +81,24 @@ public class LocationActivity extends FragmentActivity implements
 	ArrayList<LatLng> markerPoints;
 
 	public static MarkerOptions options;
+	public static MarkerOptions emeitems = null;
 	public static MarkerOptions items = null;
-
 	public ProgressDialog progressDialog;
 
-	public String travelMode =  "walking";// default
-//    public final static String MODE_DRIVING = "driving";
-//    public final static String MODE_WALKING = "walking";
+	public String travelMode = "walking";// default
+	// public final static String MODE_DRIVING = "driving";
+	// public final static String MODE_WALKING = "walking";
 
 	/** DB操作オブジェクト */
 	private DatabaseOpenHelper helper;
 
+	/** 設定マネージャー */
+	private SharedPreferences sPref;
+	boolean emeFlg = false;
+
 	/** 座標アイテム */
-	private ArrayList<LocalItem> locationItems = new ArrayList<LocalItem>();
+	private ArrayList<LocalItem> LocalItems = new ArrayList<LocalItem>(); // 通常モード用
+	private ArrayList<EmergencyItem> EmergencyItems = new ArrayList<EmergencyItem>(); // 災害モード用
 
 	public int mode = 1;// デフォルトは詳細
 	private Location myLocation;
@@ -144,6 +154,10 @@ public class LocationActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map);
 
+		// モード判定
+		sPref = PreferenceManager.getDefaultSharedPreferences(this);
+		emeFlg = sPref.getBoolean("pref_emergency_flag", false);
+
 		// 現在地取得
 		// LocationManagerの取得
 		LocationManager locationManager = (LocationManager) this
@@ -180,7 +194,7 @@ public class LocationActivity extends FragmentActivity implements
 			mLocationClient.connect();
 		}
 
-		// 初期位置
+		// 初期位置（テスト用）
 		// LatLng location = new LatLng(34.802556297454004, 135.53884506225586);
 
 		if (gMap != null && myLocation != null) {
@@ -203,32 +217,17 @@ public class LocationActivity extends FragmentActivity implements
 						// ルート検索モード
 
 						// ３度目クリックでスタート地点を再設定
-//						if (markerPoints.size() > 1) {
-							markerPoints.clear();
-							gMap.clear();
-							markerPoints.add(new LatLng(myLocation
-									.getLatitude(), myLocation.getLongitude()));
-//						}
+						// if (markerPoints.size() > 1) {
+						markerPoints.clear();
+						gMap.clear();
+						markerPoints.add(new LatLng(myLocation.getLatitude(),
+								myLocation.getLongitude()));
+						// }
 
 						markerPoints.add(point);
 
 						options = new MarkerOptions();
 						options.position(point);
-
-//						if (markerPoints.size() == 1) {
-//							// options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-//							options.icon(BitmapDescriptorFactory
-//									.fromResource(R.drawable.question));
-//							options.title("A");
-//						}
-						// } else if (markerPoints.size() == 2) {
-						// //
-						// options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-						// options.icon(BitmapDescriptorFactory
-						// .fromResource(R.drawable.question));
-						// options.title("B");
-						//
-						// }
 
 						gMap.addMarker(options);
 
@@ -249,22 +248,15 @@ public class LocationActivity extends FragmentActivity implements
 							}
 						});
 
-//						if (markerPoints.size() >= 2) {
-//							// 現在地に移動
-//							CameraPosition cameraPos = new CameraPosition.Builder()
-//									.target(new LatLng(
-//											myLocation.getLatitude(),
-//											myLocation.getLongitude()))
-//									.zoom(17.0f).bearing(0).build();
-//							gMap.animateCamera(CameraUpdateFactory
-//									.newCameraPosition(cameraPos));
-//							// ルート検索
-//							gMap.clear();
-//							routeSearch();
-//						}
 						// ルート検索
 						gMap.clear();
 						routeSearch();
+						// オブジェクト取得
+						if (emeFlg == true) {
+							setEmeItemOnGmap();
+						} else {
+							setItemOnGmap();
+						}
 					} else {
 						// 詳細モード
 					}
@@ -273,7 +265,18 @@ public class LocationActivity extends FragmentActivity implements
 
 			tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
 					.tileProvider(tileProvider));
-			
+
+			// アイコン情報
+			if (emeFlg == true) {
+				setEmeItemOnGmap();
+			} else {
+				setItemOnGmap();
+			}
+
+			markerPoints.clear();
+			markerPoints.add(new LatLng(myLocation.getLatitude(), myLocation
+					.getLongitude()));
+
 		}
 	}
 
@@ -494,6 +497,12 @@ public class LocationActivity extends FragmentActivity implements
 			gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
 			// ルート検索
 			gMap.clear();
+			// オブジェクト取得
+			if (emeFlg == true) {
+				setEmeItemOnGmap();
+			} else {
+				setItemOnGmap();
+			}
 		} else if (v.getId() == R.id.route_btn) {
 			mode = 2;
 		}
@@ -518,39 +527,59 @@ public class LocationActivity extends FragmentActivity implements
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
 		myLocation = location;
-		
+
 		// 現在地に移動
-		if(gMap != null) {
-			LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+		if (gMap != null) {
+			LatLng latLng = new LatLng(location.getLatitude(),
+					location.getLongitude());
 			gMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
 		}
-		
-		// CameraPosition cameraPos = new CameraPosition.Builder()
-		// .target(new LatLng(location.getLatitude(), location
-		// .getLongitude())).zoom(17.0f).bearing(0).build();
-		// gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
-		if (items == null) {
-			// オブジェクト取得
-			locationItems = LocalItemTableManager.getInstance(helper)
-					.GetAroundRecords(myLocation);
-			// オブジェクト配置
-			for (LocalItem locationItem : locationItems) {
 
-				items = new MarkerOptions();
-				items.icon(BitmapDescriptorFactory.fromResource(getResources()
-						.getIdentifier(locationItem.getArImageName(),
-								"drawable", getPackageName())));
-				items.title("A");
-				items.position(new LatLng(locationItem.getLat(), locationItem
-						.getLon()));
-				gMap.addMarker(items);
-
-			}
+		// オブジェクト取得
+		if (emeFlg == true) {
+			setEmeItemOnGmap();
+		} else {
+			setItemOnGmap();
 		}
 
 		markerPoints.clear();
 		markerPoints.add(new LatLng(location.getLatitude(), location
 				.getLongitude()));
+	}
+
+	private void setItemOnGmap() {
+		// オブジェクト取得
+		LocalItems = LocalItemTableManager.getInstance(helper)
+				.GetAroundRecords(myLocation);
+		// オブジェクト配置
+		for (LocalItem LocalItem : LocalItems) {
+
+			items = new MarkerOptions();
+			items.icon(BitmapDescriptorFactory.fromResource(getResources()
+					.getIdentifier(LocalItem.getIconImageName(), "drawable",
+							getPackageName())));
+			items.title(LocalItem.getMessage());
+			items.position(new LatLng(LocalItem.getLat(), LocalItem.getLon()));
+			gMap.addMarker(items);
+		}
+	}
+
+	private void setEmeItemOnGmap() {
+		// オブジェクト取得
+		EmergencyItems = EmergencyItemTableManager.getInstance(helper)
+				.GetAroundRecords(myLocation);
+		// オブジェクト配置
+		for (EmergencyItem EmergencyItem : EmergencyItems) {
+
+			emeitems = new MarkerOptions();
+			emeitems.icon(BitmapDescriptorFactory.fromResource(getResources()
+					.getIdentifier(EmergencyItem.getIconImageName(), "drawable",
+							getPackageName())));
+			emeitems.title(EmergencyItem.getMessage());
+			emeitems.position(new LatLng(EmergencyItem.getLat(), EmergencyItem
+					.getLon()));
+			gMap.addMarker(emeitems);
+		}
 	}
 
 	@Override
@@ -562,6 +591,7 @@ public class LocationActivity extends FragmentActivity implements
 	private void initDataBaseManage() {
 		this.helper = new DatabaseOpenHelper(this);
 		LocalItemTableManager.getInstance(helper).InsertSample();
+		EmergencyItemTableManager.getInstance(helper).InsertSample();
 	}
 
 	@Override
@@ -569,38 +599,4 @@ public class LocationActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 
 	}
-
-	// //リ･ルート検索
-	// private void re_routeSearch() {
-	// progressDialog.show();
-	//
-	// LatLng origin = markerPoints.get(0);
-	// LatLng dest = markerPoints.get(1);
-	//
-	// //
-	// gMap.clear();
-	//
-	// //マーカー
-	// //A
-	// options = new MarkerOptions();
-	// options.position(origin);
-	// options.icon(BitmapDescriptorFactory.fromResource(R.drawable.question));
-	// options.title("A");
-	// options.draggable(true);
-	// gMap.addMarker(options);
-	// //B
-	// options = new MarkerOptions();
-	// options.position(dest);
-	// options.icon(BitmapDescriptorFactory.fromResource(R.drawable.question));
-	// options.title("B");
-	// options.draggable(true);
-	// gMap.addMarker(options);
-	//
-	// String url = getDirectionsUrl(origin, dest);
-	//
-	// DownloadTask downloadTask = new DownloadTask();
-	//
-	// downloadTask.execute(url);
-	//
-	// }
 }

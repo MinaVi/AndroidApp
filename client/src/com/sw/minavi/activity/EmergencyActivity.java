@@ -2,9 +2,12 @@ package com.sw.minavi.activity;
 
 import com.sw.minavi.R;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
@@ -13,6 +16,9 @@ public class EmergencyActivity extends Activity implements OnClickListener {
 
 	private TextView talkTextView;
 	private int ClickCount = 0;
+	
+	// 設定マネージャー
+	private SharedPreferences sPref;
 
 	final String message1 = "地震が発生しました";
 	final String message2 = "揺れを感じた方は、災害情報を確認し、";
@@ -26,10 +32,14 @@ public class EmergencyActivity extends Activity implements OnClickListener {
 		talkTextView = (TextView) findViewById(R.id.talkText);
 	}
 	
-	@Override
+	@SuppressLint("CommitPrefEdits") @Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-
+		sPref = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences.Editor editor = sPref.edit();
+		editor.putBoolean("pref_emergency_flag", true);
+		editor.apply();
+		
 		switch (ClickCount) {
 		case 0:
 			talkTextView.setText(message1);

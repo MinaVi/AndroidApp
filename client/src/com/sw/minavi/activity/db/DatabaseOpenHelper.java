@@ -1,5 +1,7 @@
 package com.sw.minavi.activity.db;
 
+import com.sw.minavi.item.EmergencyItem;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
@@ -30,7 +32,10 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		talkSelectsTable("talk_selects_tbl", 3),
 
 		/** settings_tblの定義情報 */
-		settingsTable("settings_tbl", 4);
+		settingsTable("settings_tbl", 4),
+		
+		/** local_item_tblの定義情報 */
+		emergencyItemTable("emergency_item_tbl", 5);
 
 		/** テーブル名称 */
 		private final String name;
@@ -79,7 +84,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		/** テーブル項目:ar_image_name */
 		AR_IMAGE_NAME,
 		/** テーブル項目:auther */
-		AUTHER,
+		ICON_IMAGE_NAME,
 		/** テーブル項目:lon */
 		SPECIAL_LON_MIN,
 		/** テーブル項目:lat */
@@ -292,6 +297,35 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			return colNo;
 		}
 	}
+	
+	/** emergency_item_tblの定義情報 */
+	public enum EmergencyItemTable {
+		/** テーブル項目:id */
+		ID,
+		/** テーブル項目:talk_group_id */
+		TALK_GROUP_ID,
+		/** テーブル項目:message */
+		MESSAGE,
+		/** テーブル項目:lon */
+		LON,
+		/** テーブル項目:lat */
+		LAT,
+		/** テーブル項目:ar_image_name */
+		AR_IMAGE_NAME,
+		/** テーブル項目:auther */
+		ICON_IMAGE_NAME,
+		/** テーブル項目:lon */
+		SPECIAL_LON_MIN,
+		/** テーブル項目:lat */
+		SPECIAL_LAT_MIN,
+		/** テーブル項目:lon */
+		SPECIAL_LON_MAX,
+		/** テーブル項目:lat */
+		SPECIAL_LAT_MAX,
+		/** テーブル項目:createTime */
+		CREATE_TIME;
+
+	}
 
 	/**
 	 * コンストラクタ
@@ -355,7 +389,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.LON.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.LAT.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { LocalItemTable.AR_IMAGE_NAME.toString(), "text", })).append(",");
-			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { LocalItemTable.AUTHER.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { LocalItemTable.ICON_IMAGE_NAME.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.SPECIAL_LON_MIN.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.SPECIAL_LAT_MIN.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.SPECIAL_LON_MAX.toString(), "text", })).append(",");
@@ -433,6 +467,24 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { TalkSelectsTable.forth_answer_body.getName(), "text", })).append(
 					",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { TalkSelectsTable.forth_talk_group_id.getName(), "integer", }));
+			createSql.append(");");
+			
+			// emergency_item_tblを作成
+			createSql = new StringBuilder();
+			createSql.append(String.format(SQL_CREATE_TBL, new Object[] { Tables.emergencyItemTable.getName() }));
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PRIMARYS, new Object[] { EmergencyItemTable.ID.toString(), "integer", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.TALK_GROUP_ID.toString(), "integer", })).append(
+					",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.MESSAGE.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.LON.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.LAT.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { EmergencyItemTable.AR_IMAGE_NAME.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { EmergencyItemTable.ICON_IMAGE_NAME.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.SPECIAL_LON_MIN.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.SPECIAL_LAT_MIN.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.SPECIAL_LON_MAX.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.SPECIAL_LAT_MAX.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { EmergencyItemTable.CREATE_TIME.toString(), "text", }));
 			createSql.append(");");
 
 			// SQLの発行

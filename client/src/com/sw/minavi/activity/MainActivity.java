@@ -4,12 +4,15 @@ import java.util.Random;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.sw.minavi.R;
 import com.sw.minavi.item.BgmManager;
@@ -20,10 +23,42 @@ public class MainActivity extends Activity implements OnClickListener {
 	private MediaPlayer mPlayer;
 	private boolean bgmPlayingFlg = false;
 
+	private ImageView talkbtn;
+
+	// 設定マネージャー
+	private SharedPreferences sPref;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		sPref = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean emeFlg = sPref.getBoolean("pref_emergency_flag", false);
+
+		if (emeFlg == true) {
+			talkbtn = (ImageView) findViewById(R.id.talk_icon);
+			talkbtn.setVisibility(View.GONE);
+			charaImage = (ImageView) findViewById(R.id.chara_img);
+			charaImage.setImageResource(getResources().getIdentifier("mina2_emergency",
+					"drawable", getPackageName()));
+			
+			RelativeLayout layout = (RelativeLayout) findViewById(R.id.bg_layput);
+			layout.setBackgroundResource(R.drawable.resize);
+		}else{
+			BgmManager.newIntance(getApplicationContext()).playSound(
+					R.raw.kibou_no_hikari);
+
+			charaImage = (ImageView) findViewById(R.id.chara_img);
+
+			String[] charas = { "mina1_smile", "nami1_smile", "rise_sammar_smile_up", "rise_sammar_nomal", "mina2_smile" };
+
+			Random rdmRandom = new Random();
+			int k = rdmRandom.nextInt(charas.length);
+
+			charaImage.setImageResource(getResources().getIdentifier(charas[k],
+					"drawable", getPackageName()));
+
+		}
 
 		// BGM 再生
 		// mPlayer = MediaPlayer.create(getApplicationContext(),
@@ -34,20 +69,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		// if (!mPlayer.isPlaying()) {
 		// mPlayer.start();
 		// }
-
-		BgmManager.newIntance(getApplicationContext()).playSound(
-				R.raw.kibou_no_hikari);
-
-		charaImage = (ImageView) findViewById(R.id.chara_img);
-
-		String[] charas = { "chitoge", "nomal_s", "yan", "amuro", "attenboro" };
-
-		Random rdmRandom = new Random();
-		int k = rdmRandom.nextInt(charas.length);
-
-		charaImage.setImageResource(getResources().getIdentifier(charas[k],
-				"drawable", getPackageName()));
-
+		
 		/*
 		 * ImageView imageTalkIcon = (ImageView)findViewById(R.id.talk_icon);
 		 * imageTalkIcon.setOnClickListener(new OnClickListener() { public void
