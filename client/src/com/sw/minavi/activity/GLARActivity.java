@@ -13,7 +13,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -35,9 +34,9 @@ import com.sw.minavi.http.TransportLog;
 import com.sw.minavi.item.ARGLSurfaceView;
 import com.sw.minavi.item.BgmManager;
 import com.sw.minavi.item.CustomView;
-import com.sw.minavi.item.EmergencyItem;
 import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.SensorFilter;
+import com.sw.minavi.item.ToastRunnable;
 import com.sw.minavi.model.Model;
 import com.sw.minavi.util.LocationUtilities;
 
@@ -91,8 +90,9 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	// 設定マネージャー
 	private SharedPreferences sPref;
 	boolean emeFlg = false;
-	
+
 	private Handler mHandler;
+	private ToastRunnable toastRunnable;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -100,10 +100,13 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// レイアウトを設定
 		setContentView(R.layout.activity_gl);
-		
+
 		// モード判定
 		sPref = PreferenceManager.getDefaultSharedPreferences(this);
 		emeFlg = sPref.getBoolean("pref_emergency_flag", false);
+
+		toastRunnable = new ToastRunnable(this);
+		toastRunnable.run();
 
 		// センサーサービスの起動
 		initSensorService();
@@ -300,13 +303,13 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 			// 前回のロード座標から50m以内であれば位置情報を更新しない
 			if (lengthInMeter < 50) {
-				
+
 				// アイテム表示がない場合、念のためチェック
 				if(locationItems.size() == 0){
 					// 位置情報更新イベントの実行
 					updateLocationEvent();
 				}
-				
+
 				return;
 			}
 
@@ -345,7 +348,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		for (String provider : providers) {
 			locationManager.requestLocationUpdates(provider, 0, 1, this);
 		}
-		
+
 	}
 
 	private void initDataBaseManage() {
@@ -369,6 +372,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		if (isGetAzimuth == false || isGetLocation == false) {
 			return;
 		}
+		toastRunnable.stop();
 
 		// 周辺情報を取得
 		// GLSurfaceViewに登録されている位置情報、ロケーション情報を更新
