@@ -21,6 +21,8 @@ public class CustomView extends LinearLayout {
 		debug = (DebugView) layout.findViewById(R.id.debug);
 		produce = (ProduceView) layout.findViewById(R.id.produce);
 		miniMap = (MiniMap) layout.findViewById(R.id.miniMap);
+
+		debug.setVisibility(View.INVISIBLE);
 	}
 
 	public DebugView getDebug() {
