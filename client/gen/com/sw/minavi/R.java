@@ -618,6 +618,7 @@ containing a value of this type.
         public static final int currentUp=0x7f090060;
         public static final int customView=0x7f09003b;
         public static final int debug=0x7f09004b;
+        public static final int detail_btn=0x7f090062;
         public static final int donate_with_google=0x7f090015;
         public static final int eyeLabel=0x7f09005b;
         public static final int frame=0x7f09002a;
@@ -628,7 +629,6 @@ containing a value of this type.
         public static final int holo_dark=0x7f090008;
         public static final int holo_light=0x7f090009;
         public static final int hybrid=0x7f090004;
-        public static final int imageView1=0x7f090061;
         public static final int lblAzimuth=0x7f09001b;
         public static final int lblPitch=0x7f09001d;
         public static final int lblRoll=0x7f09001f;
@@ -643,7 +643,7 @@ containing a value of this type.
         public static final int log=0x7f090024;
         public static final int logoImage=0x7f090046;
         public static final int lookLabel=0x7f09005d;
-        public static final int map=0x7f090063;
+        public static final int map=0x7f090061;
         public static final int map_icon=0x7f090044;
         public static final int match_parent=0x7f090010;
         public static final int miniMap=0x7f09004c;
@@ -663,7 +663,7 @@ containing a value of this type.
         public static final int provider=0x7f090026;
         public static final int roll=0x7f090020;
         public static final int rollLabel=0x7f090057;
-        public static final int routeCheck=0x7f090062;
+        public static final int route_btn=0x7f090063;
         public static final int sandbox=0x7f09000b;
         public static final int satellite=0x7f090006;
         public static final int selectionDetails=0x7f09000f;
