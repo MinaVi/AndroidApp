@@ -6,3 +6,5 @@
 *.apk
 
 *.dex
+client/bin/dexedLibs/vecmath-ba7b97f8de1f9fe9924c76bfaf85f10a.jar
+client/bin/dexedLibs/jbullet-879251770ae942c0f7499d1c6387afa1.jar

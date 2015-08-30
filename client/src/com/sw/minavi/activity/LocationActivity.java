@@ -14,14 +14,18 @@ import java.util.List;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -29,7 +33,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -55,6 +62,8 @@ import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.EmergencyItemTableManager;
 import com.sw.minavi.activity.db.LocalItemTableManager;
+import com.sw.minavi.http.GetLocalItems;
+import com.sw.minavi.item.BgmManager;
 import com.sw.minavi.item.EmergencyItem;
 import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.parseJsonpOfDirectionAPI;
@@ -64,8 +73,9 @@ import com.sw.minavi.item.parseJsonpOfDirectionAPI;
 //import android.support.v4.app.Fragment;
 
 public class LocationActivity extends FragmentActivity implements
-		GoogleApiClient.OnConnectionFailedListener, LocationListener,
-		GoogleApiClient.ConnectionCallbacks, OnClickListener {
+		GoogleApiClient.OnConnectionFailedListener,
+		android.location.LocationListener, GoogleApiClient.ConnectionCallbacks,
+		OnClickListener, OnCheckedChangeListener {
 
 	GoogleMap gMap;
 	TileOverlay tileOverlay;
@@ -95,9 +105,23 @@ public class LocationActivity extends FragmentActivity implements
 	private SharedPreferences sPref;
 	boolean emeFlg = false;
 
+	PolylineOptions lineOptions = null;
+
+	private Handler mHandler;
+
 	/** 座標アイテム */
 	private ArrayList<LocalItem> LocalItems = new ArrayList<LocalItem>(); // 通常モード用
 	private ArrayList<EmergencyItem> EmergencyItems = new ArrayList<EmergencyItem>(); // 災害モード用
+
+	/** 位置情報管理 */
+	private LocationManager locationManager;
+	/** プロバイダ */
+	private List<String> providers;
+
+	private ToggleButton btn;
+	
+	private MediaPlayer mPlayer;
+	private boolean bgmPlayingFlg = false;
 
 	public int mode = 1;// デフォルトは詳細
 	private Location myLocation;
@@ -148,14 +172,69 @@ public class LocationActivity extends FragmentActivity implements
 		}
 	};
 
+	UrlTileProvider tileProviderBase = new UrlTileProvider(256, 256) {
+		@Override
+		public URL getTileUrl(int x, int y, int zoom) {
+
+			/* Define the URL pattern for the tile images */
+			// String s =
+			// String.format("http://my.image.server/images/%d/%d/%d.png",
+			// zoom, x, y);
+			String s = String.format(
+					"http://cyberjapandata.gsi.go.jp/xyz/std/%d/%d/%d.png",
+					zoom, x, y);
+
+			if (!checkTileExists(x, y, zoom)) {
+				return null;
+			}
+
+			try {
+				return new URL(s);
+			} catch (MalformedURLException e) {
+				throw new AssertionError(e);
+			}
+		}
+
+		/*
+		 * Check that the tile server supports the requested x, y and zoom.
+		 * Complete this stub according to the tile range you support. If you
+		 * support a limited range of tiles at different zoom levels, then you
+		 * need to define the supported x, y range at each zoom level.
+		 */
+		private boolean checkTileExists(int x, int y, int zoom) {
+//			int minZoom = 10;
+//			int maxZoom = 18;
+//
+//			if ((zoom < minZoom || zoom > maxZoom)) {
+//				return false;
+//			}
+
+			return true;
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map);
+		
+		// BGM設定
+		// mPlayer = MediaPlayer
+		// .create(getApplicationContext(), R.raw.spring_wind);
+		// mPlayer.setLooping(true);
+		// mPlayer.seekTo(0);
+		// if (!mPlayer.isPlaying()) {
+		// mPlayer.start();
+		// }
+		BgmManager.newIntance(getApplicationContext()).playSound(
+				R.raw.spring_wind);
 
 		// モード判定
 		sPref = PreferenceManager.getDefaultSharedPreferences(this);
 		emeFlg = sPref.getBoolean("pref_emergency_flag", false);
+
+		// routeモード
+		btn = (ToggleButton) findViewById(R.id.routeCheck);
 
 		// 現在地取得
 		// LocationManagerの取得
@@ -165,6 +244,8 @@ public class LocationActivity extends FragmentActivity implements
 		final Criteria criteria = new Criteria();
 		final String provider = locationManager.getBestProvider(criteria, true);
 		myLocation = locationManager.getLastKnownLocation(provider);
+
+		// initLocationService();
 
 		// プログレス
 		progressDialog = new ProgressDialog(this);
@@ -176,6 +257,8 @@ public class LocationActivity extends FragmentActivity implements
 		initDataBaseManage();
 		// 初期化
 		markerPoints = new ArrayList<LatLng>();
+
+		// initLocationService();
 
 		SupportMapFragment mapfragment = (SupportMapFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.map);
@@ -207,12 +290,16 @@ public class LocationActivity extends FragmentActivity implements
 
 			gMap.setMyLocationEnabled(true);
 
+			tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+					.tileProvider(tileProviderBase));
+
 			// クリックリスナー
 			gMap.setOnMapClickListener(new OnMapClickListener() {
 				@Override
 				public void onMapClick(LatLng point) {
-
-					if (mode == 2) {
+					// routeモードかどうかチェック
+					boolean checked = btn.isChecked();
+					if (checked == true) {
 						// ルート検索モード
 
 						// ３度目クリックでスタート地点を再設定
@@ -249,15 +336,27 @@ public class LocationActivity extends FragmentActivity implements
 
 						// ルート検索
 						gMap.clear();
+
 						routeSearch();
 						// オブジェクト取得
-						if (emeFlg == true) {
-							setEmeItemOnGmap();
-							tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
-							.tileProvider(tileProvider));
-						} else {
-							setItemOnGmap();
-						}
+						// if (emeFlg == true) {
+						// setEmeItemOnGmap();
+						// tileOverlay = gMap
+						// .addTileOverlay(new TileOverlayOptions()
+						// .tileProvider(tileProviderBase));
+						// tileOverlay = gMap
+						// .addTileOverlay(new TileOverlayOptions()
+						// .tileProvider(tileProvider));
+						// // 描画
+						// gMap.addPolyline(lineOptions);
+						// } else {
+						// setItemOnGmap();
+						// tileOverlay = gMap
+						// .addTileOverlay(new TileOverlayOptions()
+						// .tileProvider(tileProviderBase));
+						// // 描画
+						// gMap.addPolyline(lineOptions);
+						// }
 					} else {
 						// 詳細モード
 					}
@@ -267,8 +366,10 @@ public class LocationActivity extends FragmentActivity implements
 			// アイコン情報
 			if (emeFlg == true) {
 				setEmeItemOnGmap();
-				tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
-				.tileProvider(tileProvider));
+				// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+				// .tileProvider(tileProviderBase));
+				// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+				// .tileProvider(tileProvider));
 			} else {
 				setItemOnGmap();
 			}
@@ -278,7 +379,36 @@ public class LocationActivity extends FragmentActivity implements
 					.getLongitude()));
 
 		}
+
+		// handler準備
+		mHandler = new Handler() {
+			public void handleMassage(Message msg) {
+				// メッセージ表示
+
+			};
+		};
+
+		android.support.v4.app.FragmentManager manager = getSupportFragmentManager();
+		SupportMapFragment fragment = (SupportMapFragment) manager
+				.findFragmentById(R.id.map);
+		GoogleMap map = fragment.getMap();
+		if (map != null) {
+			map.getUiSettings().setZoomControlsEnabled(true);
+		}
+		
 	}
+
+	// private void initLocationService() {
+	// locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+	// providers = locationManager.getProviders(true);
+	//
+	// // 全プロバイダの登録
+	// for (String provider : providers) {
+	// locationManager.requestLocationUpdates(provider, 0, 1,
+	// (android.location.LocationListener) this);
+	// }
+	//
+	// }
 
 	private void routeSearch() {
 		progressDialog.show();
@@ -407,7 +537,7 @@ public class LocationActivity extends FragmentActivity implements
 		protected void onPostExecute(List<List<HashMap<String, String>>> result) {
 
 			ArrayList<LatLng> points = null;
-			PolylineOptions lineOptions = null;
+			// PolylineOptions lineOptions = null;
 			// MarkerOptions markerOptions = new MarkerOptions();
 
 			if (result.size() != 0) {
@@ -436,7 +566,26 @@ public class LocationActivity extends FragmentActivity implements
 				}
 
 				// 描画
+				lineOptions.zIndex(3);
 				gMap.addPolyline(lineOptions);
+				if (emeFlg == true) {
+					setEmeItemOnGmap();
+					TileOverlayOptions t1 = new TileOverlayOptions()
+							.tileProvider(tileProviderBase);
+					t1.zIndex(1);
+					tileOverlay = gMap.addTileOverlay(t1);
+					TileOverlayOptions t2 = new TileOverlayOptions()
+							.tileProvider(tileProviderBase);
+					t2.zIndex(2);
+					tileOverlay = gMap.addTileOverlay(t2);
+				} else {
+					setItemOnGmap();
+					TileOverlayOptions t1 = new TileOverlayOptions()
+							.tileProvider(tileProviderBase);
+					t1.zIndex(1);
+					tileOverlay = gMap.addTileOverlay(t1);
+				}
+
 			} else {
 				gMap.clear();
 				Toast.makeText(LocationActivity.this, "ルート情報を取得できませんでした",
@@ -488,26 +637,26 @@ public class LocationActivity extends FragmentActivity implements
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		if (v.getId() == R.id.detail_btn) {
-			mode = 1;
-			// 現在地に移動
-			CameraPosition cameraPos = new CameraPosition.Builder()
-					.target(new LatLng(myLocation.getLatitude(), myLocation
-							.getLongitude())).zoom(17.0f).bearing(0).build();
-			gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
-			// ルート検索
-			gMap.clear();
-			// オブジェクト取得
-			if (emeFlg == true) {
-				setEmeItemOnGmap();
-				tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
-				.tileProvider(tileProvider));
-			} else {
-				setItemOnGmap();
-			}
-		} else if (v.getId() == R.id.route_btn) {
-			mode = 2;
-		}
+		// if (v.getId() == R.id.detail_btn) {
+		// mode = 1;
+		// // 現在地に移動
+		// CameraPosition cameraPos = new CameraPosition.Builder()
+		// .target(new LatLng(myLocation.getLatitude(), myLocation
+		// .getLongitude())).zoom(17.0f).bearing(0).build();
+		// gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+		// // ルート検索
+		// gMap.clear();
+		// // オブジェクト取得
+		// if (emeFlg == true) {
+		// setEmeItemOnGmap();
+		// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+		// .tileProvider(tileProvider));
+		// } else {
+		// setItemOnGmap();
+		// }
+		// } else if (v.getId() == R.id.route_btn) {
+		// mode = 2;
+		// }
 
 	}
 
@@ -525,6 +674,17 @@ public class LocationActivity extends FragmentActivity implements
 
 	}
 
+	// private void initLocationService() {
+	// locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+	// providers = locationManager.getProviders(true);
+	//
+	// // 全プロバイダの登録
+	// // for (String provider : providers) {
+	// // locationManager.requestLocationUpdates(provider, 0, 1, this);
+	// // }
+	//
+	// }
+
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
@@ -541,7 +701,7 @@ public class LocationActivity extends FragmentActivity implements
 		if (emeFlg == true) {
 			setEmeItemOnGmap();
 			tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
-			.tileProvider(tileProvider));
+					.tileProvider(tileProvider));
 		} else {
 			setItemOnGmap();
 		}
@@ -553,8 +713,7 @@ public class LocationActivity extends FragmentActivity implements
 
 	private void setItemOnGmap() {
 		// オブジェクト取得
-		LocalItems = LocalItemTableManager.getInstance(helper)
-				.GetAroundRecords(myLocation);
+		LocalItems = LocalItemTableManager.getInstance(helper).GetRecords();
 		// オブジェクト配置
 		for (LocalItem LocalItem : LocalItems) {
 
@@ -571,14 +730,14 @@ public class LocationActivity extends FragmentActivity implements
 	private void setEmeItemOnGmap() {
 		// オブジェクト取得
 		EmergencyItems = EmergencyItemTableManager.getInstance(helper)
-				.GetAroundRecords(myLocation);
+				.GetRecords();
 		// オブジェクト配置
 		for (EmergencyItem EmergencyItem : EmergencyItems) {
 
 			emeitems = new MarkerOptions();
 			emeitems.icon(BitmapDescriptorFactory.fromResource(getResources()
-					.getIdentifier(EmergencyItem.getIconImageName(), "drawable",
-							getPackageName())));
+					.getIdentifier(EmergencyItem.getIconImageName(),
+							"drawable", getPackageName())));
 			emeitems.title(EmergencyItem.getMessage());
 			emeitems.position(new LatLng(EmergencyItem.getLat(), EmergencyItem
 					.getLon()));
@@ -594,6 +753,11 @@ public class LocationActivity extends FragmentActivity implements
 
 	private void initDataBaseManage() {
 		this.helper = new DatabaseOpenHelper(this);
+
+		// ネット経由でデータ取得
+		// GetLocalItems getLocalItems = new GetLocalItems(this, mHandler);
+		// getLocalItems.execute();
+
 		LocalItemTableManager.getInstance(helper).InsertSample();
 		EmergencyItemTableManager.getInstance(helper).InsertSample();
 		String lang = sPref.getString("lang", "Japanese");
@@ -606,4 +770,69 @@ public class LocationActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		// TODO Auto-generated method stub
+
+		// // routeモードかどうかチェック
+		// boolean checked = btn.isChecked();
+		//
+		// // TODO Auto-generated method stub
+		// if (checked == false) {
+		// mode = 1;
+		// // 現在地に移動
+		// CameraPosition cameraPos = new CameraPosition.Builder()
+		// .target(new LatLng(myLocation.getLatitude(), myLocation
+		// .getLongitude())).zoom(17.0f).bearing(0).build();
+		// gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+		// // ルート検索クリア
+		// gMap.clear();
+		// // オブジェクト取得
+		// if (emeFlg == true) {
+		// setEmeItemOnGmap();
+		// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+		// .tileProvider(tileProvider));
+		// } else {
+		// setItemOnGmap();
+		// }
+		// } else {
+		// mode = 2;
+		// }
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (!bgmPlayingFlg) {
+			BgmManager.newIntance(getApplicationContext()).playSound(-1);
+		}
+		bgmPlayingFlg = false;
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		BgmManager.newIntance(getApplicationContext()).playSound(
+				R.raw.spring_wind);
+	}
+
 }
