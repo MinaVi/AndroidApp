@@ -236,7 +236,6 @@ int id currentRoll 0x7f090058
 int id currentUp 0x7f090060
 int id customView 0x7f09003b
 int id debug 0x7f09004b
-int id detail_btn 0x7f090062
 int id donate_with_google 0x7f090015
 int id eyeLabel 0x7f09005b
 int id frame 0x7f09002a
@@ -247,6 +246,7 @@ int id grayscale 0x7f090017
 int id holo_dark 0x7f090008
 int id holo_light 0x7f090009
 int id hybrid 0x7f090004
+int id imageView1 0x7f090061
 int id lblAzimuth 0x7f09001b
 int id lblPitch 0x7f09001d
 int id lblRoll 0x7f09001f
@@ -261,7 +261,7 @@ int id location_button 0x7f090029
 int id log 0x7f090024
 int id logoImage 0x7f090046
 int id lookLabel 0x7f09005d
-int id map 0x7f090061
+int id map 0x7f090063
 int id map_icon 0x7f090044
 int id match_parent 0x7f090010
 int id miniMap 0x7f09004c
@@ -281,7 +281,7 @@ int id production 0x7f09000a
 int id provider 0x7f090026
 int id roll 0x7f090020
 int id rollLabel 0x7f090057
-int id route_btn 0x7f090063
+int id routeCheck 0x7f090062
 int id sandbox 0x7f09000b
 int id satellite 0x7f090006
 int id selectionDetails 0x7f09000f

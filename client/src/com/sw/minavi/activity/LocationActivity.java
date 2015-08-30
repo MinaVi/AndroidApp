@@ -29,7 +29,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -65,7 +68,7 @@ import com.sw.minavi.item.parseJsonpOfDirectionAPI;
 
 public class LocationActivity extends FragmentActivity implements
 		GoogleApiClient.OnConnectionFailedListener, LocationListener,
-		GoogleApiClient.ConnectionCallbacks, OnClickListener {
+		GoogleApiClient.ConnectionCallbacks, OnClickListener, OnCheckedChangeListener  {
 
 	GoogleMap gMap;
 	TileOverlay tileOverlay;
@@ -98,6 +101,8 @@ public class LocationActivity extends FragmentActivity implements
 	/** 座標アイテム */
 	private ArrayList<LocalItem> LocalItems = new ArrayList<LocalItem>(); // 通常モード用
 	private ArrayList<EmergencyItem> EmergencyItems = new ArrayList<EmergencyItem>(); // 災害モード用
+	
+	private ToggleButton btn;
 
 	public int mode = 1;// デフォルトは詳細
 	private Location myLocation;
@@ -156,6 +161,9 @@ public class LocationActivity extends FragmentActivity implements
 		// モード判定
 		sPref = PreferenceManager.getDefaultSharedPreferences(this);
 		emeFlg = sPref.getBoolean("pref_emergency_flag", false);
+		
+		// routeモード
+		btn = (ToggleButton) findViewById(R.id.routeCheck);
 
 		// 現在地取得
 		// LocationManagerの取得
@@ -211,8 +219,9 @@ public class LocationActivity extends FragmentActivity implements
 			gMap.setOnMapClickListener(new OnMapClickListener() {
 				@Override
 				public void onMapClick(LatLng point) {
-
-					if (mode == 2) {
+					// routeモードかどうかチェック
+					boolean checked = btn.isChecked();  
+					if (checked == true) {
 						// ルート検索モード
 
 						// ３度目クリックでスタート地点を再設定
@@ -488,26 +497,26 @@ public class LocationActivity extends FragmentActivity implements
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		if (v.getId() == R.id.detail_btn) {
-			mode = 1;
-			// 現在地に移動
-			CameraPosition cameraPos = new CameraPosition.Builder()
-					.target(new LatLng(myLocation.getLatitude(), myLocation
-							.getLongitude())).zoom(17.0f).bearing(0).build();
-			gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
-			// ルート検索
-			gMap.clear();
-			// オブジェクト取得
-			if (emeFlg == true) {
-				setEmeItemOnGmap();
-				tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
-				.tileProvider(tileProvider));
-			} else {
-				setItemOnGmap();
-			}
-		} else if (v.getId() == R.id.route_btn) {
-			mode = 2;
-		}
+//		if (v.getId() == R.id.detail_btn) {
+//			mode = 1;
+//			// 現在地に移動
+//			CameraPosition cameraPos = new CameraPosition.Builder()
+//					.target(new LatLng(myLocation.getLatitude(), myLocation
+//							.getLongitude())).zoom(17.0f).bearing(0).build();
+//			gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+//			// ルート検索
+//			gMap.clear();
+//			// オブジェクト取得
+//			if (emeFlg == true) {
+//				setEmeItemOnGmap();
+//				tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+//				.tileProvider(tileProvider));
+//			} else {
+//				setItemOnGmap();
+//			}
+//		} else if (v.getId() == R.id.route_btn) {
+//			mode = 2;
+//		}
 
 	}
 
@@ -605,5 +614,35 @@ public class LocationActivity extends FragmentActivity implements
 	public void onConnectionSuspended(int cause) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		// TODO Auto-generated method stub
+        
+//		// routeモードかどうかチェック
+//		boolean checked = btn.isChecked();   
+//		
+//		// TODO Auto-generated method stub
+//		if (checked == false) {
+//			mode = 1;
+//			// 現在地に移動
+//			CameraPosition cameraPos = new CameraPosition.Builder()
+//					.target(new LatLng(myLocation.getLatitude(), myLocation
+//							.getLongitude())).zoom(17.0f).bearing(0).build();
+//			gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+//			// ルート検索クリア
+//			gMap.clear();
+//			// オブジェクト取得
+//			if (emeFlg == true) {
+//				setEmeItemOnGmap();
+//				tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
+//				.tileProvider(tileProvider));
+//			} else {
+//				setItemOnGmap();
+//			}
+//		} else {
+//			mode = 2;
+//		}
 	}
 }
