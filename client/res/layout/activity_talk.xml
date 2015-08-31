@@ -13,8 +13,7 @@
             android:id="@+id/back_btn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            android:src="@drawable/summerwars" />
+            android:scaleType="fitXY" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -78,7 +77,6 @@
                 android:layout_marginTop="50dp"
                 android:clickable="true"
                 android:onClick="onClick"
-                android:text="text"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="25sp" />
 
@@ -88,7 +86,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
-                android:text="name"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="25sp"
                 android:textStyle="bold" />
@@ -107,10 +104,10 @@
 
         <ImageView
             android:id="@+id/talk_back_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="152dp"
+            android:layout_height="76dp"
             android:onClick="onClick"
-            android:src="@drawable/minavi_parts_21" />
+            android:src="@drawable/back_btn" />
 
         <LinearLayout
             android:id="@+id/answer_area"
@@ -184,7 +181,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="onClick"
-                android:src="@drawable/minavi_parts_41" />
+                android:src="@drawable/minavi_parts_41"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/ar_btn"

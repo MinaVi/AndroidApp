@@ -134,8 +134,9 @@ public class GLARActivity extends Activity implements SensorEventListener,
 		super.onResume();
 
 		// BGM復帰
-		BgmManager.newIntance(getApplicationContext()).playSound(R.raw.spring_wind);
-
+		if (emeFlg == false) {
+			BgmManager.newIntance(getApplicationContext()).playSound(R.raw.spring_wind);
+		}
 		// 加速度センサの登録
 		sensorManager.registerListener(this,
 				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
@@ -273,10 +274,10 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			Date date = new Date();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd kk':'mm':'ss':'");
 
-			//			tl.execute(String.valueOf(location.getLongitude()), String.valueOf(location.getLatitude()),
-			//					String.valueOf(location.getAltitude())
-			//					, String.valueOf(location.getAccuracy()), String.valueOf(location.getSpeed()),
-			//					sdf.format(date), String.valueOf(0), sPref.getString("name", "unknown"));
+			tl.execute(String.valueOf(location.getLongitude()), String.valueOf(location.getLatitude()),
+					String.valueOf(location.getAltitude())
+					, String.valueOf(location.getAccuracy()), String.valueOf(location.getSpeed()),
+					sdf.format(date), String.valueOf(0), sPref.getString("name", "unknown"));
 
 			// ロード中の座標を更新
 			loadLocation = location;
@@ -305,7 +306,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			if (lengthInMeter < 50) {
 
 				// アイテム表示がない場合、念のためチェック
-				if(locationItems.size() == 0){
+				if (locationItems.size() == 0) {
 					// 位置情報更新イベントの実行
 					updateLocationEvent();
 				}
@@ -376,12 +377,12 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 		// 周辺情報を取得
 		// GLSurfaceViewに登録されている位置情報、ロケーション情報を更新
-		if(emeFlg == true){
+		if (emeFlg == true) {
 			EmergencyItems.clear();
 			locationItems.clear();
 			EmergencyItems.addAll(EmergencyItemTableManager.getInstance(helper).GetAroundRecords(loadLocation));
 			glSurfaceView.updateLocation(loadLocation, EmergencyItems);
-		}else{
+		} else {
 			EmergencyItems.clear();
 			locationItems.clear();
 			locationItems.addAll(LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation));

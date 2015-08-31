@@ -221,8 +221,10 @@ public class TalkActivity extends Activity implements OnClickListener {
 		if (areaId > 0) {
 			groups = TalkGroupsTableManager.getInstance(helper)
 					.GetRecordsByAreaId(areaId);
-		} else {
+		} else if (arTalkGroupId != 0) {
 			groups = TalkGroupsTableManager.getInstance(helper).GetRecords();
+		} else {
+			groups = TalkGroupsTableManager.getInstance(helper).GetRecordsForGeneral();
 		}
 
 		return groups;
@@ -376,7 +378,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 
 			// メニュー表示
 			arBtn.setVisibility(View.VISIBLE);
-			checkAreaBtn.setVisibility(View.VISIBLE);
+//			checkAreaBtn.setVisibility(View.VISIBLE);
 
 		} else {
 
@@ -670,7 +672,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 								// .show();
 								stopLocationService();
 								cancel();
-								checkAreaBtn.setVisibility(View.VISIBLE);
+//								checkAreaBtn.setVisibility(View.VISIBLE);
 								progLog.cancel();
 							}
 						});
@@ -690,7 +692,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 							stopLocationService();
 							cancel();
 							progLog.cancel();
-							checkAreaBtn.setVisibility(View.VISIBLE);
+//							checkAreaBtn.setVisibility(View.VISIBLE);
 							return;
 						}
 						time = time + 1000L;
@@ -770,7 +772,7 @@ public class TalkActivity extends Activity implements OnClickListener {
 					city.append(addr.getAddressLine(i));
 				}
 			}
-			checkAreaBtn.setVisibility(View.VISIBLE);
+//			checkAreaBtn.setVisibility(View.VISIBLE);
 			progLog.cancel();
 
 			if (city != null) {

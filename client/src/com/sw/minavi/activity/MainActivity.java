@@ -22,8 +22,11 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ImageView charaImage;
 	private MediaPlayer mPlayer;
 	private boolean bgmPlayingFlg = false;
+	private ImageView backImageView;
 
 	private ImageView talkbtn;
+	
+	boolean emeFlg = false;
 
 	// 設定マネージャー
 	private SharedPreferences sPref;
@@ -33,29 +36,38 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		sPref = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean emeFlg = sPref.getBoolean("pref_emergency_flag", false);
-
+		emeFlg = sPref.getBoolean("pref_emergency_flag", false);
+		
 		if (emeFlg == true) {
+			
 			talkbtn = (ImageView) findViewById(R.id.talk_icon);
 			talkbtn.setVisibility(View.GONE);
 			charaImage = (ImageView) findViewById(R.id.chara_img);
 			charaImage.setImageResource(getResources().getIdentifier("mina2_emergency",
 					"drawable", getPackageName()));
-			
+
 			RelativeLayout layout = (RelativeLayout) findViewById(R.id.bg_layput);
 			layout.setBackgroundResource(R.drawable.resize);
-		}else{
+		} else {
 			BgmManager.newIntance(getApplicationContext()).playSound(
 					R.raw.kibou_no_hikari);
+			bgmPlayingFlg = true;
 
 			charaImage = (ImageView) findViewById(R.id.chara_img);
 
-			String[] charas = { "mina1_smile", "nami1_smile", "rise_sammar_smile_up", "rise_sammar_nomal", "mina2_smile" };
+			String[] charas = { "mina1_smile", "nami1_smile", "rise_sammar_smile_up", "rise_sammar_nomal",
+					"mina2_smile" };
 
 			Random rdmRandom = new Random();
 			int k = rdmRandom.nextInt(charas.length);
 
 			charaImage.setImageResource(getResources().getIdentifier(charas[k],
+					"drawable", getPackageName()));
+
+			String[] backs = { "aoiike", "garaku", "sabou", "stonesouko", "craftbeer" };
+
+			RelativeLayout layout = (RelativeLayout) findViewById(R.id.bg_layput);
+			layout.setBackgroundResource(getResources().getIdentifier(backs[k],
 					"drawable", getPackageName()));
 
 		}
@@ -69,7 +81,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		// if (!mPlayer.isPlaying()) {
 		// mPlayer.start();
 		// }
-		
+
 		/*
 		 * ImageView imageTalkIcon = (ImageView)findViewById(R.id.talk_icon);
 		 * imageTalkIcon.setOnClickListener(new OnClickListener() { public void
@@ -126,8 +138,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		BgmManager.newIntance(getApplicationContext()).playSound(
-				R.raw.kibou_no_hikari);
+		if (emeFlg == true) {
+			BgmManager.newIntance(getApplicationContext()).playSound(
+					R.raw.kibou_no_hikari);
+		}
 	}
 
 }

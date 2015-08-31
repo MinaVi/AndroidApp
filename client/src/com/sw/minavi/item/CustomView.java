@@ -22,6 +22,7 @@ public class CustomView extends LinearLayout {
 		produce = (ProduceView) layout.findViewById(R.id.produce);
 		miniMap = (MiniMap) layout.findViewById(R.id.miniMap);
 
+//		miniMap.setVisibility(View.INVISIBLE);
 		debug.setVisibility(View.INVISIBLE);
 	}
 

@@ -6,12 +6,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
-import android.os.Handler;
-import android.os.Message;
 
 import com.sw.minavi.activity.db.DatabaseOpenHelper.LocalItemTable;
 import com.sw.minavi.activity.db.DatabaseOpenHelper.Tables;
-import com.sw.minavi.http.GetLocalItems;
 import com.sw.minavi.item.LocalItem;
 
 /**
@@ -71,10 +68,19 @@ public class LocalItemTableManager {
 		
 		String[][] datas = new String[][] {
 
-{"1","2","北大１","hokudai１","141.34393","35.873561561281","mina1_nomal","pin","0","0","0","0","20150831"},
-{"2","0","北大２","hokudai2","141.344041","43.07268","question","pin","-1","-1","-1","-1","20150831"},
-{"2","0","北大３","hokudai3","141.343842","43.072588","mina2_nomal","pin","-1","-1","-1","-1","20150831"},
 
+{"1","12","210","hokudai210","141.3438259172218","43.07265368774401","mina1_nomal","mina_pin","0","0","0","0","20150831"},
+{"2","11","北海道大学","HokkaidoUniv","141.34742544171837","43.07116458468558","question","mina_pin","-1","-1","-1","-1","20150831"},
+
+// ニセコ
+{"2","13","茶房ヌプリ","SabouNupuri","140.6848768996914","42.8089283078543","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"3","14","雅楽","Garaku","140.64001951038688","42.84285156923757","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+
+//鎌倉
+{"4","15","江ノ島電鉄","EnoshimaTrain","139.550028","35.318579","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"5","16","鎌倉大仏","KamakuraDaibutu","139.535725","35.316852","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"6","17","鶴岡八幡宮　源平池","GenpeiIke","139.555278","35.324237","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"7","18","鶴岡八幡宮　本宮","TuruokaHachimangu","139.556222","35.325865","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
 
 		};
 

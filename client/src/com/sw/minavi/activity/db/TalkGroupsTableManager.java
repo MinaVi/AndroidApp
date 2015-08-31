@@ -55,27 +55,40 @@ public class TalkGroupsTableManager {
 
 		// サンプルデータの準備
 		String[][] datas = new String[][] {
-				{ "1", "0", "0", "sabou", "0", "0", "0", "1", "0"},
-				{ "2", "0", "0", "garaku", "0", "0", "0", "1", "0" },
-				{ "3", "0", "0", "stonesouko", "1", "0", "0", "1", "0" },
-				{ "4", "0", "0", "stonesouko", "1", "0", "0", "0", "0" },
-				{ "5", "0", "0", "stonesouko", "1", "0", "0", "0", "0" },
-				/*
-				{ "3", "0", "0", "0", "1", "0", "0", "1", "0" },
-				{ "4", "0", "0", "0", "1", "0", "0", "1", "0" },
-				{ "5", "0", "0", "0", "1", "0", "0", "1", "0" },
-				{ "6", "0", "0", "0", "1", "0", "0", "1", "0" },
-				{ "7", "0", "0", "0", "0", "0", "0", "1", "0"},
-				{ "8", "0", "0", "0", "0", "0", "0", "1", "0" },
-				{ "9", "0", "0", "0", "1", "0", "0", "1", "0" },
-				{ "10", "0", "0", "0", "1", "0", "0", "1", "0" },
+				{ "1", "0", "0", "craftbeer", "0", "0", "0", "1", "0"},
+				{ "2", "0", "0", "craftbeer", "0", "0", "0", "1", "0" },
+//				{ "3", "0", "0", "stonesouko", "1", "0", "0", "1", "0" },
+//				{ "4", "0", "0", "stonesouko", "1", "0", "0", "0", "0" },
+//				{ "5", "0", "0", "stonesouko", "1", "0", "0", "0", "0" },
+				
+				{ "3", "0", "0", "craftbeer", "1", "0", "0", "1", "0" },
+				{ "4", "0", "0", "craftbeer", "1", "0", "0", "0", "0" },
+				{ "5", "0", "0", "craftbeer", "1", "0", "0", "0", "0" },
+				{ "6", "0", "0", "craftbeer", "1", "0", "0", "1", "0" },
+				{ "7", "0", "0", "craftbeer", "1", "0", "0", "0", "0"},
+				{ "8", "0", "0", "craftbeer", "1", "0", "0", "0", "0" },
+				{ "9", "0", "0", "craftbeer", "1", "0", "0", "0", "0" },
+				{ "10", "0", "0", "craftbeer", "1", "0", "0", "0", "0" },
 
 				// 地域システム周辺
-				{ "11", "1", "0", "0", "0", "0", "0", "1", "0" },
-				{ "12", "1", "0", "0", "0", "0", "0", "1", "0" },
+				{ "11", "0", "1", "craftbeer", "0", "0", "0", "1", "0" },
+				{ "12", "0", "1", "craftbeer", "0", "0", "0", "1", "0" },
 				
-				{ "13", "0", "0", "0", "1", "0", "0", "1", "0" },
-				*/
+				{ "13", "0", "1", "sabou", "0", "0", "0", "1", "0" },
+				{ "14", "0", "1", "garaku", "0", "0", "0", "1", "0" },
+				
+				// 江ノ島電鉄
+				{ "15", "0", "1", "enosimadenntetu", "0", "0", "0", "1", "0" },
+
+				// 鎌倉大仏
+				{ "16", "0", "1", "kamakuradaibutu", "0", "0", "0", "1", "0" },
+				
+				// 鶴岡八幡宮　源平池
+				{ "17", "0", "1", "turuokahatimanngu_genpeiike", "0", "0", "0", "1", "0" },
+				
+				// 鶴岡八幡宮　本殿
+				{ "18", "0", "1", "turuokahatimanngu_honden", "0", "0", "0", "1", "0" },
+				
 
 		};
 
@@ -131,7 +144,49 @@ public class TalkGroupsTableManager {
 
 		try {
 			// select
-			cursor = sqliteDB.rawQuery("select * from talk_groups_tbl WHERE is_enabled = 1", null);
+			cursor = sqliteDB.rawQuery("select * from talk_groups_tbl", null);
+
+			// 取得したデータをレコード毎に処理する
+			while (cursor.moveToNext()) {
+
+				// TalkGroupsTableの生成・編集
+				TalkGroup val = new TalkGroup();
+				val.setTalkGroupId(cursor.getInt(TalkGroupsTable.talk_group_id.getColNo()));
+				val.setAreaId(cursor.getInt(TalkGroupsTable.area_id.getColNo()));
+				val.setLocalAreaId(cursor.getInt(TalkGroupsTable.local_area_id.getColNo()));
+				val.setBackGroundFileName(cursor.getString(TalkGroupsTable.background_file_name.getColNo()));
+				val.setSelectFlg(cursor.getInt(TalkGroupsTable.select_flg.getColNo()));
+				val.setNextGroupId(cursor.getInt(TalkGroupsTable.next_group_id.getColNo()));
+				val.setShowMemoryFlg(cursor.getInt(TalkGroupsTable.show_memory_flg.getColNo()));
+				val.setIsEnabled(cursor.getInt(TalkGroupsTable.is_enabled.getColNo()));
+				val.setIsRead(cursor.getInt(TalkGroupsTable.is_read.getColNo()));
+
+				// 戻り値のリストに追加
+				values.add(val);
+			}
+		} finally {
+			// DBクローズ
+			sqliteDB.close();
+		}
+		return values;
+	}
+	
+	/**
+	 * 以下の条件に該当するlocal_item_tblのレコードをList形式で取得する<br/>
+	 * ・抽出項目：指定なし<br/>
+	 * ・抽出条件：指定なし<br/>
+	 * @return
+	 */
+	public ArrayList<TalkGroup> GetRecordsForGeneral() {
+		ArrayList<TalkGroup> values = new ArrayList<TalkGroup>();
+		Cursor cursor = null;
+
+		// 読み込み用のDBオブジェクトを取得
+		SQLiteDatabase sqliteDB = helper.getReadableDatabase();
+
+		try {
+			// select
+			cursor = sqliteDB.rawQuery("select * from talk_groups_tbl WHERE local_area_id = 0 AND is_enabled = 1", null);
 
 			// 取得したデータをレコード毎に処理する
 			while (cursor.moveToNext()) {

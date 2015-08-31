@@ -38,7 +38,7 @@ public class TransportLog
 	protected Integer doInBackground(String... params) {
 
 		DefaultHttpClient client = new DefaultHttpClient();
-		HttpPost method = new HttpPost("http://133.242.167.74/locationlogviewer/api/set/locationlog");
+		HttpPost method = new HttpPost("http://www.snowwhite.hokkaido.jp/niseko/api/set/locationlog");
 
 		// リクエストパラメータの設定
 		List<NameValuePair> posts = new ArrayList<NameValuePair>();

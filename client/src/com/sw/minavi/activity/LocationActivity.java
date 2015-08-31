@@ -7,14 +7,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -41,7 +43,6 @@ import android.widget.ToggleButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -62,7 +63,7 @@ import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.EmergencyItemTableManager;
 import com.sw.minavi.activity.db.LocalItemTableManager;
-import com.sw.minavi.http.GetLocalItems;
+import com.sw.minavi.http.TransportLog;
 import com.sw.minavi.item.BgmManager;
 import com.sw.minavi.item.EmergencyItem;
 import com.sw.minavi.item.LocalItem;
@@ -119,7 +120,7 @@ public class LocationActivity extends FragmentActivity implements
 	private List<String> providers;
 
 	private ToggleButton btn;
-	
+
 	private MediaPlayer mPlayer;
 	private boolean bgmPlayingFlg = false;
 
@@ -202,12 +203,12 @@ public class LocationActivity extends FragmentActivity implements
 		 * need to define the supported x, y range at each zoom level.
 		 */
 		private boolean checkTileExists(int x, int y, int zoom) {
-//			int minZoom = 10;
-//			int maxZoom = 18;
-//
-//			if ((zoom < minZoom || zoom > maxZoom)) {
-//				return false;
-//			}
+			//			int minZoom = 10;
+			//			int maxZoom = 18;
+			//
+			//			if ((zoom < minZoom || zoom > maxZoom)) {
+			//				return false;
+			//			}
 
 			return true;
 		}
@@ -217,7 +218,7 @@ public class LocationActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map);
-		
+
 		// BGM設定
 		// mPlayer = MediaPlayer
 		// .create(getApplicationContext(), R.raw.spring_wind);
@@ -226,12 +227,14 @@ public class LocationActivity extends FragmentActivity implements
 		// if (!mPlayer.isPlaying()) {
 		// mPlayer.start();
 		// }
-		BgmManager.newIntance(getApplicationContext()).playSound(
-				R.raw.spring_wind);
-
 		// モード判定
 		sPref = PreferenceManager.getDefaultSharedPreferences(this);
 		emeFlg = sPref.getBoolean("pref_emergency_flag", false);
+
+		if (emeFlg == false) {
+			BgmManager.newIntance(getApplicationContext()).playSound(
+					R.raw.spring_wind);
+		}
 
 		// routeモード
 		btn = (ToggleButton) findViewById(R.id.routeCheck);
@@ -290,8 +293,10 @@ public class LocationActivity extends FragmentActivity implements
 
 			gMap.setMyLocationEnabled(true);
 
-			tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
-					.tileProvider(tileProviderBase));
+			TileOverlayOptions t1 = new TileOverlayOptions()
+					.tileProvider(tileProviderBase);
+			t1.zIndex(1);
+			tileOverlay = gMap.addTileOverlay(t1);
 
 			// クリックリスナー
 			gMap.setOnMapClickListener(new OnMapClickListener() {
@@ -366,6 +371,10 @@ public class LocationActivity extends FragmentActivity implements
 			// アイコン情報
 			if (emeFlg == true) {
 				setEmeItemOnGmap();
+				TileOverlayOptions t2 = new TileOverlayOptions()
+						.tileProvider(tileProvider);
+				t2.zIndex(2);
+				tileOverlay = gMap.addTileOverlay(t2);
 				// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
 				// .tileProvider(tileProviderBase));
 				// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
@@ -395,7 +404,7 @@ public class LocationActivity extends FragmentActivity implements
 		if (map != null) {
 			map.getUiSettings().setZoomControlsEnabled(true);
 		}
-		
+
 	}
 
 	// private void initLocationService() {
@@ -657,6 +666,9 @@ public class LocationActivity extends FragmentActivity implements
 		// } else if (v.getId() == R.id.route_btn) {
 		// mode = 2;
 		// }
+		if (v.getId() == R.id.map_back_btn) {
+			finish();
+		}
 
 	}
 
@@ -709,6 +721,8 @@ public class LocationActivity extends FragmentActivity implements
 		markerPoints.clear();
 		markerPoints.add(new LatLng(location.getLatitude(), location
 				.getLongitude()));
+
+		setLocation(location);
 	}
 
 	private void setItemOnGmap() {
@@ -818,7 +832,7 @@ public class LocationActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -830,9 +844,29 @@ public class LocationActivity extends FragmentActivity implements
 
 	@Override
 	protected void onStart() {
-		super.onStart();
-		BgmManager.newIntance(getApplicationContext()).playSound(
-				R.raw.spring_wind);
+		if (emeFlg == false) {
+			super.onStart();
+			BgmManager.newIntance(getApplicationContext()).playSound(
+					R.raw.spring_wind);
+		}
+	}
+
+	@SuppressLint("SimpleDateFormat")
+	private void setLocation(final Location location) {
+
+		// location情報をサーバーへ送信
+		TransportLog tl = new TransportLog(this, mHandler);
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat(
+				"yyyy'-'MM'-'dd kk':'mm':'ss':'");
+
+		tl.execute(String.valueOf(location.getLongitude()),
+				String.valueOf(location.getLatitude()),
+				String.valueOf(location.getAltitude()),
+				String.valueOf(location.getAccuracy()),
+				String.valueOf(location.getSpeed()), sdf.format(date),
+				String.valueOf(0), sPref.getString("name", "unknown"));
+
 	}
 
 }

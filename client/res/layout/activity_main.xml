@@ -67,7 +67,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:onClick="onClick"
-                        android:src="@drawable/minavi_parts_07" />
+                        android:src="@drawable/talk_icon" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -81,7 +81,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:onClick="onClick"
-                        android:src="@drawable/minavi_parts_13" />
+                        android:src="@drawable/ar_icon" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -95,7 +95,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:onClick="onClick"
-                        android:src="@drawable/minavi_parts_12" />
+                        android:src="@drawable/map_icon" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -109,7 +109,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:onClick="onClick"
-                        android:src="@drawable/minavi_parts_29" />
+                        android:src="@drawable/setting_icon" />
                 </LinearLayout>
             </LinearLayout>
 
