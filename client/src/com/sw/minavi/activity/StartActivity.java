@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,11 +20,14 @@ import com.growthpush.handler.DefaultReceiveHandler;
 import com.growthpush.model.Environment;
 import com.sw.minavi.BuildConfig;
 import com.sw.minavi.R;
+import com.sw.minavi.http.GetLocalItems;
 
 public class StartActivity extends Activity implements OnClickListener, AnimationListener {
 
 	// 設定マネージャー
 	private SharedPreferences sPref;
+
+	private Handler mHandler;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +45,14 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 		sPref = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean emeFlg = sPref.getBoolean("pref_emergency_flag", false);
 
+		// handler準備
+		mHandler = new Handler() {
+			public void handleMassage(Message msg) {
+				// メッセージ表示
+
+			};
+		};
+		
 		if (emeFlg == true) {
 			startActivity(intent);
 			finish();
@@ -49,6 +62,11 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 		
 		ImageView img = (ImageView) findViewById(R.id.logoImage);
 		Animation anim = AnimationUtils.loadAnimation(this, R.anim.start_logo_animation);
+		
+		// データ更新
+		GetLocalItems glt = new GetLocalItems(this, mHandler);
+		glt.execute();
+		
 		
 		anim.setAnimationListener(new AnimationListener() {
 			
@@ -67,8 +85,8 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				// TODO Auto-generated method stub
-				startActivity(intent);
-				finish();
+//				startActivity(intent);
+//				finish();
 			}
 		});
 		
