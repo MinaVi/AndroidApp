@@ -167,6 +167,10 @@ public class TalkEventsTableManager {
 				{ "80", "18", "ミナ", "MINA", "毎年、１２月１６日には「御鎮座記念祭」が執り行われます。", "Every year, in December 16th it will be celebrated is 御鎮座記念祭" , "mina2_smile", "0" , "0"},
 				{ "81", "18", "ミナ", "MINA", "ただ実はここも関東大震災の影響で倒壊しているのです。", "But in fact even here it has collapsed under the influence of the Great Kanto Earthquake." , "mina2_sad", "0" , "0"},
 				{ "82", "18", "ミナ", "MINA", "多くの人の努力が実り、現在の形になっているんですね。", "Fruitful efforts of many people, but I have been in the current form." , "mina2_smile", "0" , "0"},
+				
+				{ "83", "20", "ミナ", "MINA", "小樽水族館には様々な魚たちがいますよ。", "Fruitful efforts of many people, but I have been in the current form." , "mina2_smile", "0" , "0"},
+				{ "84", "20", "ミナ", "MINA", "このエントランスには小樽で保護されたウミガメが、みんなに笑顔にしています。", "Fruitful efforts of many people, but I have been in the current form." , "mina2_smile", "0" , "0"},
+				
 		};
 
 		// 書き込み用のDBオブジェクトを取得

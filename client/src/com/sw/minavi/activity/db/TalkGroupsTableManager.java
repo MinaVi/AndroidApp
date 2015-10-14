@@ -89,6 +89,8 @@ public class TalkGroupsTableManager {
 				// 鶴岡八幡宮　本殿
 				{ "18", "0", "1", "turuokahatimanngu_honden", "0", "0", "0", "1", "0" },
 				
+				// 小樽水族館
+				{ "20", "0", "1", "otarusuizokukan_2", "0", "0", "0", "1", "0" },
 
 		};
 

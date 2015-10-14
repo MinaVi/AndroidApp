@@ -354,7 +354,7 @@ public class GLARActivity extends Activity implements SensorEventListener,
 
 	private void initDataBaseManage() {
 		this.helper = new DatabaseOpenHelper(this);
-		LocalItemTableManager.getInstance(helper).InsertSample();
+//		LocalItemTableManager.getInstance(helper).InsertSample();
 		EmergencyItemTableManager.getInstance(helper).InsertSample();
 		String lang = sPref.getString("lang", "Japanese");
 		LocalItemTableManager.lang = lang;

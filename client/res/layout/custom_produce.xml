@@ -17,6 +17,7 @@
         android:layout_height="match_parent"
         android:layout_weight="70"
         android:background="@drawable/minavi_parts_03"
+        android:onClick="onTouch"
         android:orientation="vertical" >
 
         <LinearLayout

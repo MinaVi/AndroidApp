@@ -1,6 +1,7 @@
 package com.sw.minavi.item;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +46,12 @@ public class ProduceView extends LinearLayout {
 			}
 			Toast.makeText(getContext(), "talkGroupId:" + talkGroupId, Toast.LENGTH_SHORT).show();
 
-
+			Intent intent = new Intent();
+			intent.setClassName("com.sw.minavi",
+					"com.sw.minavi.activity.TalkActivity");
+			intent.putExtra("talkGroupId", talkGroupId);
+			getContext().startActivity(intent);
+			
 //			switch (v.getId()) {
 //			case R.id.produce_img:
 //			case R.id.produce_title:

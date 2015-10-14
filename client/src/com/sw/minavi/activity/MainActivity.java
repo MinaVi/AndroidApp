@@ -25,7 +25,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ImageView backImageView;
 
 	private ImageView talkbtn;
-	
+
 	boolean emeFlg = false;
 
 	// 設定マネージャー
@@ -37,9 +37,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_main);
 		sPref = PreferenceManager.getDefaultSharedPreferences(this);
 		emeFlg = sPref.getBoolean("pref_emergency_flag", false);
-		
+
 		if (emeFlg == true) {
-			
+
 			talkbtn = (ImageView) findViewById(R.id.talk_icon);
 			talkbtn.setVisibility(View.GONE);
 			charaImage = (ImageView) findViewById(R.id.chara_img);
@@ -49,9 +49,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			RelativeLayout layout = (RelativeLayout) findViewById(R.id.bg_layput);
 			layout.setBackgroundResource(R.drawable.resize);
 		} else {
-			BgmManager.newIntance(getApplicationContext()).playSound(
-					R.raw.kibou_no_hikari);
-			bgmPlayingFlg = true;
+			if (bgmPlayingFlg == false) {
+				BgmManager.newIntance(getApplicationContext()).playSound(
+						R.raw.kibou_no_hikari);
+				bgmPlayingFlg = true;
+			}
 
 			charaImage = (ImageView) findViewById(R.id.chara_img);
 
@@ -67,6 +69,15 @@ public class MainActivity extends Activity implements OnClickListener {
 			String[] backs = { "aoiike", "garaku", "sabou", "stonesouko", "craftbeer" };
 
 			RelativeLayout layout = (RelativeLayout) findViewById(R.id.bg_layput);
+			
+//			// httpリクエストを入れる変数
+//			String _url = "https://github.com/MinaVi/AndroidApp/blob/master/client/res/drawable-hdpi/aoiike.png?raw=true";
+//			Uri.Builder builder = new Uri.Builder();
+//			builder.appendEncodedPath(_url);
+//
+//			AsyncHttpRequest task = new AsyncHttpRequest(null, layout, null);
+//			task.execute(builder);
+			
 			layout.setBackgroundResource(getResources().getIdentifier(backs[k],
 					"drawable", getPackageName()));
 
@@ -138,9 +149,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		if (emeFlg == true) {
+		if (emeFlg == false) {
 			BgmManager.newIntance(getApplicationContext()).playSound(
 					R.raw.kibou_no_hikari);
+			bgmPlayingFlg = true;
 		}
 	}
 

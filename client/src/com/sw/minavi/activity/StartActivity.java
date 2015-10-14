@@ -1,7 +1,6 @@
 package com.sw.minavi.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,10 +14,6 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.growthpush.GrowthPush;
-import com.growthpush.handler.DefaultReceiveHandler;
-import com.growthpush.model.Environment;
-import com.sw.minavi.BuildConfig;
 import com.sw.minavi.R;
 import com.sw.minavi.http.GetLocalItems;
 
@@ -85,8 +80,8 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				// TODO Auto-generated method stub
-//				startActivity(intent);
-//				finish();
+				startActivity(intent);
+				finish();
 			}
 		});
 		

@@ -19,6 +19,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
@@ -234,6 +235,7 @@ public class LocationActivity extends FragmentActivity implements
 		if (emeFlg == false) {
 			BgmManager.newIntance(getApplicationContext()).playSound(
 					R.raw.spring_wind);
+			bgmPlayingFlg = true;
 		}
 
 		// routeモード
@@ -281,6 +283,16 @@ public class LocationActivity extends FragmentActivity implements
 
 		// 初期位置（テスト用）
 		// LatLng location = new LatLng(34.802556297454004, 135.53884506225586);
+
+		if (emeFlg == true) {
+			setEmeItemOnGmap();
+			TileOverlayOptions t2 = new TileOverlayOptions()
+					.tileProvider(tileProvider);
+			t2.zIndex(2);
+			tileOverlay = gMap.addTileOverlay(t2);
+		} else {
+			setItemOnGmap();
+		}
 
 		if (gMap != null && myLocation != null) {
 
@@ -370,19 +382,21 @@ public class LocationActivity extends FragmentActivity implements
 
 			// アイコン情報
 			if (emeFlg == true) {
-				setEmeItemOnGmap();
-				TileOverlayOptions t2 = new TileOverlayOptions()
-						.tileProvider(tileProvider);
-				t2.zIndex(2);
-				tileOverlay = gMap.addTileOverlay(t2);
+//				setEmeItemOnGmap();
+//				TileOverlayOptions t2 = new TileOverlayOptions()
+//						.tileProvider(tileProvider);
+//				t2.zIndex(2);
+//				tileOverlay = gMap.addTileOverlay(t2);
 				// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
 				// .tileProvider(tileProviderBase));
 				// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
 				// .tileProvider(tileProvider));
 			} else {
-				setItemOnGmap();
+//				setItemOnGmap();
 			}
 
+//			KmlLayer layer = new KmlLayer(getMap(), R.raw.kmlFile, getApplicationContext());
+			
 			markerPoints.clear();
 			markerPoints.add(new LatLng(myLocation.getLatitude(), myLocation
 					.getLongitude()));
@@ -667,6 +681,8 @@ public class LocationActivity extends FragmentActivity implements
 		// mode = 2;
 		// }
 		if (v.getId() == R.id.map_back_btn) {
+			Intent intent = new Intent(this, MainActivity.class);
+			startActivity(intent);
 			finish();
 		}
 
@@ -772,7 +788,7 @@ public class LocationActivity extends FragmentActivity implements
 		// GetLocalItems getLocalItems = new GetLocalItems(this, mHandler);
 		// getLocalItems.execute();
 
-		LocalItemTableManager.getInstance(helper).InsertSample();
+//		LocalItemTableManager.getInstance(helper).InsertSample();
 		EmergencyItemTableManager.getInstance(helper).InsertSample();
 		String lang = sPref.getString("lang", "Japanese");
 		LocalItemTableManager.lang = lang;
@@ -844,10 +860,12 @@ public class LocationActivity extends FragmentActivity implements
 
 	@Override
 	protected void onStart() {
+		super.onStart();
 		if (emeFlg == false) {
 			super.onStart();
 			BgmManager.newIntance(getApplicationContext()).playSound(
 					R.raw.spring_wind);
+			bgmPlayingFlg = true;
 		}
 	}
 
