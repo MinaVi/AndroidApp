@@ -64,6 +64,8 @@ import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.EmergencyItemTableManager;
 import com.sw.minavi.activity.db.LocalItemTableManager;
+import com.sw.minavi.http.GetGnaviItems;
+import com.sw.minavi.http.GetGnaviItems.AsyncTaskCallback;
 import com.sw.minavi.http.TransportLog;
 import com.sw.minavi.item.BgmManager;
 import com.sw.minavi.item.EmergencyItem;
@@ -77,7 +79,7 @@ import com.sw.minavi.item.parseJsonpOfDirectionAPI;
 public class LocationActivity extends FragmentActivity implements
 		GoogleApiClient.OnConnectionFailedListener,
 		android.location.LocationListener, GoogleApiClient.ConnectionCallbacks,
-		OnClickListener, OnCheckedChangeListener {
+		OnClickListener, OnCheckedChangeListener, AsyncTaskCallback {
 
 	GoogleMap gMap;
 	TileOverlay tileOverlay;
@@ -132,6 +134,7 @@ public class LocationActivity extends FragmentActivity implements
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+	
 
 	UrlTileProvider tileProvider = new UrlTileProvider(256, 256) {
 		@Override
@@ -400,7 +403,7 @@ public class LocationActivity extends FragmentActivity implements
 			markerPoints.clear();
 			markerPoints.add(new LatLng(myLocation.getLatitude(), myLocation
 					.getLongitude()));
-
+			
 		}
 
 		// handler準備
@@ -410,6 +413,11 @@ public class LocationActivity extends FragmentActivity implements
 
 			};
 		};
+		
+		// ぐるナビ情報
+		GetGnaviItems gnaviAsync = new GetGnaviItems(this);
+		gnaviAsync.execute(String.valueOf(myLocation.getLatitude()),String.valueOf(myLocation.getLongitude()));
+		
 
 		android.support.v4.app.FragmentManager manager = getSupportFragmentManager();
 		SupportMapFragment fragment = (SupportMapFragment) manager
@@ -885,6 +893,32 @@ public class LocationActivity extends FragmentActivity implements
 				String.valueOf(location.getSpeed()), sdf.format(date),
 				String.valueOf(0), sPref.getString("name", "unknown"));
 
+	}
+	
+    public void preExecute() {
+        //だいたいの場合ダイアログの表示などを行う
+    }
+    public void progressUpdate(int progress) {
+        //だいたいプログレスダイアログを進める
+    }
+    public void cancel() {
+        //キャンセルされた時になんかする
+    }
+
+	public void postExecute(ArrayList<HashMap<String, String>> result) {
+		// TODO Auto-generated method stub
+		// AsyncTaskの結果を受け取ってなんかする
+		for (HashMap<String, String> gItem : result) {
+
+			items = new MarkerOptions();
+			items.icon(BitmapDescriptorFactory.fromResource(getResources()
+					.getIdentifier("imgres", "drawable", getPackageName())));
+			items.title(gItem.get("name"));
+			double lat = Double.parseDouble(gItem.get("lat"));
+			double lon = Double.parseDouble(gItem.get("lon"));
+			items.position(new LatLng(lat, lon));
+			gMap.addMarker(items);
+		}
 	}
 
 }
