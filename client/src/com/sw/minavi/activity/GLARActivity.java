@@ -3,6 +3,7 @@ package com.sw.minavi.activity;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.vecmath.Vector3f;
@@ -30,7 +31,11 @@ import com.sw.minavi.R;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
 import com.sw.minavi.activity.db.EmergencyItemTableManager;
 import com.sw.minavi.activity.db.LocalItemTableManager;
+import com.sw.minavi.activity.db.DatabaseOpenHelper.EmergencyItemTable;
+import com.sw.minavi.activity.db.DatabaseOpenHelper.LocalItemTable;
+import com.sw.minavi.http.GetGnaviItems;
 import com.sw.minavi.http.TransportLog;
+import com.sw.minavi.http.GetGnaviItems.AsyncTaskCallback;
 import com.sw.minavi.item.ARGLSurfaceView;
 import com.sw.minavi.item.BgmManager;
 import com.sw.minavi.item.CustomView;
@@ -41,7 +46,7 @@ import com.sw.minavi.model.Model;
 import com.sw.minavi.util.LocationUtilities;
 
 public class GLARActivity extends Activity implements SensorEventListener,
-		LocationListener, OnClickListener {
+		LocationListener, OnClickListener, AsyncTaskCallback {
 
 	/** ジェスチャー検出器 */
 	private GestureDetector gesDetector = null;
@@ -94,6 +99,8 @@ public class GLARActivity extends Activity implements SensorEventListener,
 	private Handler mHandler;
 	private ToastRunnable toastRunnable;
 
+	private ArrayList<LocalItem> gNaviItems = new ArrayList<LocalItem>();
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -291,6 +298,10 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			//					Toast.LENGTH_SHORT).show();
 
 			// 位置情報更新イベントの実行
+			// ぐるナビ情報
+			GetGnaviItems gnaviAsync = new GetGnaviItems(this);
+			gnaviAsync.execute(String.valueOf(loadLocation.getLatitude()),String.valueOf(loadLocation.getLongitude()));
+			
 			updateLocationEvent();
 
 		} else {
@@ -381,11 +392,13 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			EmergencyItems.clear();
 			locationItems.clear();
 			EmergencyItems.addAll(EmergencyItemTableManager.getInstance(helper).GetAroundRecords(loadLocation));
+			EmergencyItems.addAll(gNaviItems);
 			glSurfaceView.updateLocation(loadLocation, EmergencyItems);
 		} else {
 			EmergencyItems.clear();
 			locationItems.clear();
 			locationItems.addAll(LocalItemTableManager.getInstance(helper).GetAroundRecords(loadLocation));
+			locationItems.addAll(gNaviItems);
 			glSurfaceView.updateLocation(loadLocation, locationItems);
 		}
 	}
@@ -414,6 +427,48 @@ public class GLARActivity extends Activity implements SensorEventListener,
 			//			startActivity(intent);
 			//			finish();
 		}
+	}
+
+	@Override
+	public void preExecute() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void postExecute(ArrayList<HashMap<String, String>> result) {
+		// TODO Auto-generated method stub
+		
+		gNaviItems = new ArrayList<LocalItem>();
+		
+		for (HashMap<String, String> gItem : result) {
+			LocalItem li = new LocalItem();
+			li.setMessage(gItem.get("name"));
+			li.setLon(Double.valueOf(gItem.get("lon")).doubleValue());
+			li.setLat(Double.valueOf(gItem.get("lat")).doubleValue());
+			li.setArImageName("imgres");
+			li.setIconImageName("imgres");
+			li.setSpecialLonMin(-1.0);
+			li.setSpecialLatMin(-1.0);
+			li.setSpecialLonMax(-1.0);
+			li.setSpecialLatMax(-1.0);
+			li.setCreateTime("");
+
+			gNaviItems.add(li);
+			
+		}
+	}
+
+	@Override
+	public void progressUpdate(int progress) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

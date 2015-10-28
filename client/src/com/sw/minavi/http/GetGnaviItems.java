@@ -67,19 +67,25 @@ public class GetGnaviItems extends
 		String gnaviRestUri = "http://api.gnavi.co.jp/ForeignRestSearchAPI/20150630/";
 		String prmFormat = "?format=" + format;
 		String prmKeyid = "&keyid=" + acckey;
+		String outcoordinates = "&input_coordinates_mode=" + 2;
+		String incoordinates = "&coordinates_mode=" + 2;
 		String prmLat = "&latitude=" + lat;
 		String prmLon = "&longitude=" + lon;
 		String prmRange = "&range=" + range;
 		String prmLang = "&lang=" + lang;
+		String count = "&hit_per_page=50";
 		// URI組み立て
 		StringBuffer uri = new StringBuffer();
 		uri.append(gnaviRestUri);
 		uri.append(prmFormat);
 		uri.append(prmKeyid);
+		uri.append(outcoordinates);
+		uri.append(incoordinates);
 		uri.append(prmLat);
 		uri.append(prmLon);
 		uri.append(prmRange);
 		uri.append(prmLang);
+		uri.append(count);
 
 		// APIを実行し結果を出力
 		String url = uri.toString();
@@ -132,9 +138,9 @@ public class GetGnaviItems extends
 					String prText = r.path("pr_short").asText();
 					gnaviItem.put("pr_short", prText);
 
-					String lon = r.path("location").path("longitude").asText();
+					String lon = r.path("location").path("longitude_wgs84").asText();
 					gnaviItem.put("lon", lon);
-					String lat = r.path("location").path("latitude").asText();
+					String lat = r.path("location").path("latitude_wgs84").asText();
 					gnaviItem.put("lat", lat);
 
 					if (name.length() > 0 && lon.length() > 0
