@@ -71,10 +71,12 @@ import com.sw.minavi.item.BgmManager;
 import com.sw.minavi.item.EmergencyItem;
 import com.sw.minavi.item.LocalItem;
 import com.sw.minavi.item.parseJsonpOfDirectionAPI;
+import com.sw.minavi.dummy.DummyContent;
 //import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 //import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 //import com.google.android.gms.location.LocationClient;
 //import android.support.v4.app.Fragment;
+import com.sw.minavi.dummy.DummyContent.DummyItem;
 
 public class LocationActivity extends FragmentActivity implements
 		GoogleApiClient.OnConnectionFailedListener,
@@ -134,7 +136,10 @@ public class LocationActivity extends FragmentActivity implements
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-	
+
+	// gnaviMarker対応表
+	private HashMap<String, HashMap<String, String>> gnaviMarker = new HashMap<String, HashMap<String, String>>();
+	private HashMap<String, LocalItem> markers = new HashMap<String, LocalItem>();
 
 	UrlTileProvider tileProvider = new UrlTileProvider(256, 256) {
 		@Override
@@ -207,12 +212,12 @@ public class LocationActivity extends FragmentActivity implements
 		 * need to define the supported x, y range at each zoom level.
 		 */
 		private boolean checkTileExists(int x, int y, int zoom) {
-			//			int minZoom = 10;
-			//			int maxZoom = 18;
+			// int minZoom = 10;
+			// int maxZoom = 18;
 			//
-			//			if ((zoom < minZoom || zoom > maxZoom)) {
-			//				return false;
-			//			}
+			// if ((zoom < minZoom || zoom > maxZoom)) {
+			// return false;
+			// }
 
 			return true;
 		}
@@ -337,23 +342,6 @@ public class LocationActivity extends FragmentActivity implements
 
 						gMap.addMarker(options);
 
-						gMap.setOnMarkerClickListener(new OnMarkerClickListener() {
-							@Override
-							public boolean onMarkerClick(Marker marker) {
-								// TODO Auto-generated method stub
-
-								String title = marker.getTitle();
-								if (title.equals("A")) {
-									marker.setSnippet(info_A);
-
-								} else if (title.equals("B")) {
-									marker.setSnippet(info_B);
-								}
-
-								return false;
-							}
-						});
-
 						// ルート検索
 						gMap.clear();
 
@@ -383,27 +371,117 @@ public class LocationActivity extends FragmentActivity implements
 				}
 			});
 
+			gMap.setOnMarkerClickListener(new OnMarkerClickListener() {
+				public boolean onMarkerClick(Marker marker) {
+					// routeモードかどうかチェック
+					boolean checked = btn.isChecked();
+					if (checked == true) {
+						// ルート検索モード
+
+						// ３度目クリックでスタート地点を再設定
+						// if (markerPoints.size() > 1) {
+						markerPoints.clear();
+						gMap.clear();
+						markerPoints.add(new LatLng(myLocation.getLatitude(),
+								myLocation.getLongitude()));
+						// }
+
+						markerPoints.add(marker.getPosition());
+
+						options = new MarkerOptions();
+						options.position(marker.getPosition());
+
+						gMap.addMarker(options);
+
+						// ルート検索
+						gMap.clear();
+
+						routeSearch();
+						// オブジェクト取得
+						// if (emeFlg == true) {
+						// setEmeItemOnGmap();
+						// tileOverlay = gMap
+						// .addTileOverlay(new TileOverlayOptions()
+						// .tileProvider(tileProviderBase));
+						// tileOverlay = gMap
+						// .addTileOverlay(new TileOverlayOptions()
+						// .tileProvider(tileProvider));
+						// // 描画
+						// gMap.addPolyline(lineOptions);
+						// } else {
+						// setItemOnGmap();
+						// tileOverlay = gMap
+						// .addTileOverlay(new TileOverlayOptions()
+						// .tileProvider(tileProviderBase));
+						// // 描画
+						// gMap.addPolyline(lineOptions);
+						// }
+					} else {
+						// 表示内容
+						if (markers.containsKey(marker.getId())) {
+
+							LocalItem detail = markers.get(marker.getId());
+
+							Intent intent = new Intent();
+							intent.setClassName("com.sw.minavi",
+									"com.sw.minavi.activity.ItemListActivity");
+							
+							DummyContent.ITEM_MAP = new HashMap<String, DummyItem>();
+							DummyContent.ITEMS = new ArrayList<DummyItem>();
+							DummyContent.name = detail.getMessage();
+							DummyContent.addItem(new DummyItem("1", detail.getMessage(),
+									detail.getDetail()));
+							startActivity(intent);
+
+						} else if (gnaviMarker.containsKey(marker.getId())) {
+
+							HashMap<String, String> detail = gnaviMarker
+									.get(marker.getId());
+
+							Intent intent = new Intent();
+							intent.setClassName("com.sw.minavi",
+									"com.sw.minavi.activity.ItemListActivity");
+
+							DummyContent.ITEM_MAP = new HashMap<String, DummyItem>();
+							DummyContent.ITEMS = new ArrayList<DummyItem>();
+
+							DummyContent.addItem(new DummyItem("1", "名称",
+									detail.get("name")));
+							DummyContent.addItem(new DummyItem("2", "詳細",
+									detail.get("detail")));
+							DummyContent.addItem(new DummyItem("3", "住所",
+									detail.get("address")));
+							DummyContent.name = detail.get("name");
+
+							startActivity(intent);
+						}
+					}
+					return true;
+				}
+			});
+
 			// アイコン情報
 			if (emeFlg == true) {
-//				setEmeItemOnGmap();
-//				TileOverlayOptions t2 = new TileOverlayOptions()
-//						.tileProvider(tileProvider);
-//				t2.zIndex(2);
-//				tileOverlay = gMap.addTileOverlay(t2);
+				// setEmeItemOnGmap();
+				// TileOverlayOptions t2 = new TileOverlayOptions()
+				// .tileProvider(tileProvider);
+				// t2.zIndex(2);
+				// tileOverlay = gMap.addTileOverlay(t2);
 				// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
 				// .tileProvider(tileProviderBase));
 				// tileOverlay = gMap.addTileOverlay(new TileOverlayOptions()
 				// .tileProvider(tileProvider));
 			} else {
-//				setItemOnGmap();
+				// setItemOnGmap();
 			}
 
-//			KmlLayer layer = new KmlLayer(getMap(), R.raw.kmlFile, getApplicationContext());
-			
+			// KmlLayer layer = new KmlLayer(getMap(), R.raw.kmlFile,
+			// getApplicationContext());
+
 			markerPoints.clear();
 			markerPoints.add(new LatLng(myLocation.getLatitude(), myLocation
 					.getLongitude()));
-			
+
 		}
 
 		// handler準備
@@ -413,11 +491,12 @@ public class LocationActivity extends FragmentActivity implements
 
 			};
 		};
-		
+
 		// ぐるナビ情報
 		GetGnaviItems gnaviAsync = new GetGnaviItems(this);
-		gnaviAsync.execute(String.valueOf(myLocation.getLatitude()),String.valueOf(myLocation.getLongitude()));
-		
+		gnaviAsync.setLang = sPref.getString("lang", "Japanese");
+		gnaviAsync.execute(String.valueOf(myLocation.getLatitude()),
+				String.valueOf(myLocation.getLongitude()));
 
 		android.support.v4.app.FragmentManager manager = getSupportFragmentManager();
 		SupportMapFragment fragment = (SupportMapFragment) manager
@@ -761,7 +840,9 @@ public class LocationActivity extends FragmentActivity implements
 							getPackageName())));
 			items.title(LocalItem.getMessage());
 			items.position(new LatLng(LocalItem.getLat(), LocalItem.getLon()));
-			gMap.addMarker(items);
+			Marker marker = gMap.addMarker(items);
+			markers.put(marker.getId(), LocalItem);
+
 		}
 	}
 
@@ -796,7 +877,7 @@ public class LocationActivity extends FragmentActivity implements
 		// GetLocalItems getLocalItems = new GetLocalItems(this, mHandler);
 		// getLocalItems.execute();
 
-//		LocalItemTableManager.getInstance(helper).InsertSample();
+		// LocalItemTableManager.getInstance(helper).InsertSample();
 		EmergencyItemTableManager.getInstance(helper).InsertSample();
 		String lang = sPref.getString("lang", "Japanese");
 		LocalItemTableManager.lang = lang;
@@ -894,16 +975,18 @@ public class LocationActivity extends FragmentActivity implements
 				String.valueOf(0), sPref.getString("name", "unknown"));
 
 	}
-	
-    public void preExecute() {
-        //だいたいの場合ダイアログの表示などを行う
-    }
-    public void progressUpdate(int progress) {
-        //だいたいプログレスダイアログを進める
-    }
-    public void cancel() {
-        //キャンセルされた時になんかする
-    }
+
+	public void preExecute() {
+		// だいたいの場合ダイアログの表示などを行う
+	}
+
+	public void progressUpdate(int progress) {
+		// だいたいプログレスダイアログを進める
+	}
+
+	public void cancel() {
+		// キャンセルされた時になんかする
+	}
 
 	public void postExecute(ArrayList<HashMap<String, String>> result) {
 		// TODO Auto-generated method stub
@@ -917,7 +1000,9 @@ public class LocationActivity extends FragmentActivity implements
 			double lat = Double.parseDouble(gItem.get("lat"));
 			double lon = Double.parseDouble(gItem.get("lon"));
 			items.position(new LatLng(lat, lon));
-			gMap.addMarker(items);
+			Marker marker = gMap.addMarker(items);
+
+			gnaviMarker.put(marker.getId(), gItem);
 		}
 	}
 

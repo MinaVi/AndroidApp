@@ -14,6 +14,7 @@ import android.util.Log;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sw.minavi.activity.db.DatabaseOpenHelper;
+import com.sw.minavi.activity.db.DatabaseOpenHelper.LocalItemTable;
 
 public class GetGnaviItems extends
 		AsyncTask<String, Integer, ArrayList<HashMap<String, String>>> {
@@ -21,6 +22,9 @@ public class GetGnaviItems extends
 	ProgressDialog dialog;
 	Context context;
 	Handler mHandler;
+	/** 言語設定マネージャー */
+	public static String setLang = "Japanese";
+	
 	public ArrayList<HashMap<String, String>> gnaviItems = new ArrayList<HashMap<String, String>>();
 
 	/** SQLiteOpenHelper継承クラス */
@@ -60,7 +64,14 @@ public class GetGnaviItems extends
 		// 範囲
 		String range = "1";
 		// 返却値言語
+		// メッセージは言語によって変える
 		String lang = "ja";
+		if (setLang.equals("English")) {		
+			lang = "en";
+		} else if(setLang.equals("Chainese")) {
+			lang = "zh_cn";
+		}
+		
 		// 返却形式
 		String format = "json";
 		// エンドポイント
@@ -142,7 +153,13 @@ public class GetGnaviItems extends
 					gnaviItem.put("lon", lon);
 					String lat = r.path("location").path("latitude_wgs84").asText();
 					gnaviItem.put("lat", lat);
-
+					
+					String detail = r.path("sales_points").path("pr_long").asText();
+					gnaviItem.put("detail", detail);
+					
+					String address = r.path("contacts").path("address").asText();
+					gnaviItem.put("address", address);
+					
 					if (name.length() > 0 && lon.length() > 0
 							&& lat.length() > 0) {
 						gnaviItems.add(gnaviItem);

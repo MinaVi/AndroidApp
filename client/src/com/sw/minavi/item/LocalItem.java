@@ -4,6 +4,7 @@ public class LocalItem {
 	private int id;
 	private int talkGroupId;
 	private String message;
+	private String detail;
 	private double lon;
 	private double lat;
 	private String arImageName;
@@ -38,6 +39,14 @@ public class LocalItem {
 		this.message = message;
 	}
 
+	public String getDetail() {
+		return this.detail;
+	}
+
+	public void setDetail(String detail) {
+		this.detail = detail;
+	}
+	
 	public double getLon() {
 		return this.lon;
 	}

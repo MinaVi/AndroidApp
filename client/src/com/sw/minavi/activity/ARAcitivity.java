@@ -109,10 +109,6 @@ public class ARAcitivity extends Activity implements SensorEventListener,
 		// 各センサーサービスの開始
 		initSensorService();
 
-		// Sampleの登録
-		helper = new DatabaseOpenHelper(this);
-		LocalItemTableManager.getInstance(helper).InsertSample();
-
 		// デバック時に表示
 		TableLayout textViewLayer = (TableLayout) findViewById(R.id.text_view_layer);
 		textViewLayer.setVisibility(View.GONE);

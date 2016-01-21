@@ -74,9 +74,9 @@ public class SettingsActivity extends PreferenceActivity {
 		// their values. When their values change, their summaries are updated
 		// to reflect the new value, per the Android Design guidelines.
 		bindPreferenceSummaryToValue(findPreference("name"));
-		bindPreferenceSummaryToValue(findPreference("country"));
-		bindPreferenceSummaryToValue(findPreference("sex"));
-		bindPreferenceSummaryToValue(findPreference("age"));
+//		bindPreferenceSummaryToValue(findPreference("country"));
+//		bindPreferenceSummaryToValue(findPreference("sex"));
+//		bindPreferenceSummaryToValue(findPreference("age"));
 	}
 
 	/** {@inheritDoc} */

@@ -79,6 +79,14 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		MESSAGE,
 		/** テーブル項目:message_en */
 		MESSAGE_EN,
+		/** テーブル項目:message_en */
+		MESSAGE_CN,
+		/** テーブル項目:detail */
+		DETAIL,
+		/** テーブル項目:detail_en */
+		DETAIL_EN,
+		/** テーブル項目:detail_cn */
+		DETAIL_CN,
 		/** テーブル項目:lon */
 		LON,
 		/** テーブル項目:lat */
@@ -395,6 +403,10 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 					",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.MESSAGE.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.MESSAGE_EN.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.MESSAGE_CN.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.DETAIL.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.DETAIL_EN.toString(), "text", })).append(",");
+			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.DETAIL_CN.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.LON.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_NOTNULL, new Object[] { LocalItemTable.LAT.toString(), "text", })).append(",");
 			createSql.append(String.format(SQL_CREATE_TBL_SET_PLANE, new Object[] { LocalItemTable.AR_IMAGE_NAME.toString(), "text", })).append(",");

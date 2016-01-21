@@ -69,19 +69,19 @@ public class LocalItemTableManager {
 		String[][] datas = new String[][] {
 
 
-{"1","12","210","hokudai210","141.3438259172218","43.07265368774401","mina1_nomal","mina_pin","0","0","0","0","20150831"},
-{"2","11","北海道大学","HokkaidoUniv","141.34742544171837","43.07116458468558","question","mina_pin","-1","-1","-1","-1","20150831"},
+{"1","12","210","hokudai210","hokudai210","210","hokudai210","hokudai210","141.3438259172218","43.07265368774401","mina1_nomal","mina_pin","0","0","0","0","20150831"},
+{"2","11","北海道大学","HokkaidoUniv","北海道大学","北海道大学","hokudai210","北海道大学","141.34742544171837","43.07116458468558","question","mina_pin","-1","-1","-1","-1","20150831"},
 
 // ニセコ
-{"2","13","茶房ヌプリ","SabouNupuri","140.6848768996914","42.8089283078543","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
-{"3","14","雅楽","Garaku","140.64001951038688","42.84285156923757","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"2","13","茶房ヌプリ","SabouNupuri","萨博Nupuri","茶房ヌプリ","hokudai210","萨博Nupuri","140.6848768996914","42.8089283078543","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"3","14","雅楽","Garaku","古代宫廷音乐","雅楽","Garaku","古代宫廷音乐","140.64001951038688","42.84285156923757","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
 
 //鎌倉
-{"4","15","江ノ島電鉄","EnoshimaTrain","139.550028","35.318579","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
-{"5","16","鎌倉大仏","KamakuraDaibutu","139.535725","35.316852","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
-{"6","17","鶴岡八幡宮　源平池","GenpeiIke","139.555278","35.324237","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
-{"7","18","鶴岡八幡宮　本宮","TuruokaHachimangu","139.556222","35.325865","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
-{"8","20","小樽水族館","EnoshimaTrain","141.011795","43.237091","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"4","15","江ノ島電鉄","EnoshimaTrain","江之岛电铁","島電鉄","EnoshimaTrain","江之岛电铁","139.550028","35.318579","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"5","16","鎌倉大仏","KamakuraDaibutu","镰仓大佛","鎌倉大仏","KamakuraDaibutu","镰仓大佛","139.535725","35.316852","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"6","17","鶴岡八幡宮　源平池","GenpeiIke","鹤冈八幡源平的池塘","岡八幡宮　源平池","GenpeiIke","鹤冈八幡源平的池塘","139.555278","35.324237","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"7","18","鶴岡八幡宮　本宮","TuruokaHachimangu","鹤冈八幡神社本宫","鶴岡八幡宮　本宮","TuruokaHachimangu","鹤冈八幡神社本宫","139.556222","35.325865","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
+{"8","20","小樽水族館","EnoshimaTrain","小樽水族馆","小樽水族館","EnoshimaTrain","小樽水族馆","141.011795","43.237091","mina2_nomal","mina_pin","-1","-1","-1","-1","20150831"},
 
 		};
 
@@ -146,8 +146,23 @@ public class LocalItemTableManager {
 				if (lang.equals("English")) {
 					val.setMessage(cursor.getString(LocalItemTable.MESSAGE_EN
 							.ordinal()));
+				} else if(lang.equals("Chainese")) {
+					val.setMessage(cursor.getString(LocalItemTable.MESSAGE_CN
+							.ordinal()));
 				} else {
 					val.setMessage(cursor.getString(LocalItemTable.MESSAGE
+							.ordinal()));
+				}
+				
+				// メッセージは言語によって変える
+				if (lang.equals("English")) {
+					val.setDetail(cursor.getString(LocalItemTable.DETAIL_EN
+							.ordinal()));
+				} else if(lang.equals("Chainese")) {
+					val.setDetail(cursor.getString(LocalItemTable.DETAIL_CN
+							.ordinal()));
+				} else {
+					val.setDetail(cursor.getString(LocalItemTable.DETAIL
 							.ordinal()));
 				}
 
@@ -218,11 +233,26 @@ public class LocalItemTableManager {
 				if (lang.equals("English")) {
 					val.setMessage(cursor.getString(LocalItemTable.MESSAGE_EN
 							.ordinal()));
+				} else if(lang.equals("Chainese")) {
+					val.setMessage(cursor.getString(LocalItemTable.MESSAGE_CN
+							.ordinal()));
 				} else {
 					val.setMessage(cursor.getString(LocalItemTable.MESSAGE
 							.ordinal()));
 				}
 
+				// メッセージは言語によって変える
+				if (lang.equals("English")) {
+					val.setDetail(cursor.getString(LocalItemTable.DETAIL_EN
+							.ordinal()));
+				} else if(lang.equals("Chainese")) {
+					val.setDetail(cursor.getString(LocalItemTable.DETAIL_CN
+							.ordinal()));
+				} else {
+					val.setDetail(cursor.getString(LocalItemTable.DETAIL
+							.ordinal()));
+				}
+				
 				val.setLon(Double.valueOf(
 						cursor.getString(LocalItemTable.LON.ordinal()))
 						.doubleValue());

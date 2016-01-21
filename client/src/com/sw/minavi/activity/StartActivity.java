@@ -15,6 +15,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.sw.minavi.R;
+import com.sw.minavi.activity.db.DatabaseOpenHelper;
+import com.sw.minavi.activity.db.LocalItemTableManager;
 import com.sw.minavi.http.GetLocalItems;
 
 public class StartActivity extends Activity implements OnClickListener, AnimationListener {
@@ -23,6 +25,8 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 	private SharedPreferences sPref;
 
 	private Handler mHandler;
+	/** DB操作オブジェクト */
+	protected DatabaseOpenHelper helper;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,10 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 //		startActivity(emeIntent);
 //		finish();
 
+		// Sampleの登録
+		helper = new DatabaseOpenHelper(this);
+		LocalItemTableManager.getInstance(helper).InsertSample();
+		
 		final Intent intent = new Intent(this, MainActivity.class);
 		
 		// 設定値の呼び出し
@@ -48,10 +56,10 @@ public class StartActivity extends Activity implements OnClickListener, Animatio
 			};
 		};
 		
-		if (emeFlg == true) {
-			startActivity(intent);
-			finish();
-		}
+//		if (emeFlg == true) {
+//			startActivity(intent);
+//			finish();
+//		}
 		
 		setContentView(R.layout.activity_start);
 		

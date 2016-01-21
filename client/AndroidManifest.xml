@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="14"
         android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -34,11 +34,11 @@
     <uses-permission android:name="com.sw.minavi.permission.C2D_MESSAGE" />
 
     <application
+        android:name=".application.MinaviApplication"
         android:allowBackup="true"
-        android:name="com.sw.minavi.application.MinaviApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/Theme.AppCompat" >
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/maps_api_key" />
@@ -50,13 +50,13 @@
 
         <activity
             android:name=".activity.MainActivity"
-            android:launchMode="singleTop"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:launchMode="singleTop" >
         </activity>
         <activity
             android:name=".activity.StartActivity"
-            android:launchMode="singleTop"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -65,26 +65,27 @@
         </activity>
         <activity
             android:name=".activity.TalkActivity"
-            android:launchMode="singleTop"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name=".activity.LocationActivity"
-            android:launchMode="singleTop"
-            android:label="@string/app_name" >
-        </activity>
-        <activity android:name=".activity.GLARActivity"
+            android:label="@string/app_name"
             android:launchMode="singleTop" >
         </activity>
         <activity
-            android:name="com.sw.minavi.activity.SettingsActivity"
+            android:name=".activity.LocationActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop" >
+        </activity>
+        <activity
+            android:name=".activity.GLARActivity"
+            android:launchMode="singleTop" >
+        </activity>
+        <activity
+            android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:launchMode="singleTop" >
         </activity>
         <activity
             android:name=".activity.EmergencyActivity"
-            android:launchMode="singleTop"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:launchMode="singleTop" >
         </activity>
         <activity
             android:name="com.growthpush.view.AlertActivity"
@@ -102,6 +103,19 @@
                 <category android:name="com.sw.minavi" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name="com.sw.minavi.activity.ItemListActivity"
+            android:label="@string/title_item_list" >
+        </activity>
+        <activity
+            android:name="com.sw.minavi.activity.ItemDetailActivity"
+            android:label="@string/title_item_detail"
+            android:parentActivityName="com.sw.minavi.activity.ItemListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sw.minavi.ItemListActivity" />
+        </activity>
     </application>
 
 </manifest>

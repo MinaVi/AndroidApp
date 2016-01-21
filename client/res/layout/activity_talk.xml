@@ -78,6 +78,7 @@
                 android:clickable="true"
                 android:onClick="onClick"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#000000"
                 android:textSize="25sp" />
 
             <TextView
@@ -87,6 +88,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#000000"
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
@@ -123,12 +125,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:background="#00000000"
                 android:alpha="255"
+                android:background="#00000000"
                 android:clickable="true"
                 android:onClick="onClick"
                 android:text="Large Text"
                 android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#000000"
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
@@ -142,6 +145,7 @@
                 android:onClick="onClick"
                 android:text="Large Text"
                 android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#000000"
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
@@ -155,6 +159,7 @@
                 android:onClick="onClick"
                 android:text="Large Text"
                 android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#000000"
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
@@ -167,8 +172,10 @@
                 android:onClick="onClick"
                 android:text="Large Text"
                 android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#000000"
                 android:textSize="25sp"
                 android:textStyle="bold" />
+
         </LinearLayout>
 
         <LinearLayout
